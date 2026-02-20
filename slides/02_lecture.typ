@@ -293,8 +293,6 @@
 #slide[
   = The seq2seq bottleneck
 
-  #source-slide("https://arxiv.org/abs/1409.3215", title: "Sutskever et al. 2014")
-
   Remember: the encoder compresses the *entire input* into a single vector $bold(h)_N$.
 
   #v(0.5em)
@@ -312,119 +310,74 @@
 #slide[
   = Attention -- the idea
 
-  #source-slide("https://arxiv.org/abs/1409.0473", title: "Bahdanau et al. 2015")
+
+  #ideabox()[Let the decoder *pick the information from the encoder hidden states*.]
+
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (2.5fr, 1fr),
     gutter: 1em,
-    [
-      #ideabox()[Instead of compressing everything into one vector, let the decoder *attend to all encoder hidden states* at each step.]
-
-      #v(0.5em)
-
-      At each decoding step $t$:
+    [*How exactly?* At each decoding step $t$:
       1. Compute a *score* for each encoder state $bold(h)_i$.
       2. Normalize scores with *softmax* → attention weights $alpha_(t,i)$.
-      3. Compute a *weighted sum* (context vector): $bold(c)_t = sum_i alpha_(t,i) bold(h)_i$
+      3. Compute a *weighted sum* of hidden states → context vector: $bold(c)_t = sum_i alpha_(t,i) bold(h)_i$.
       4. Use $bold(c)_t$ together with the decoder state to predict the next token.
     ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture02/encoder_decoder_attention.png", width: 100%)
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
+    [ #image("img/lecture02/screen-2026-02-20-15-54-38.png", width: 200pt)
+      #source-slide("https://arxiv.org/abs/1508.04025", title: "Luong et al. (2015)")
+
     ],
   )
+
+
 ]
 
 #slide[
-  = Bahdanau (additive) attention
+  = Attention with RNNs
 
-  #source-slide("https://arxiv.org/abs/1409.0473", title: "Bahdanau et al. 2015")
-
-  #grid(
-    columns: (1.2fr, 1fr),
-    gutter: 1em,
-    [
-      The score function uses a *learned feed-forward network*:
-
-      $ e_(t,i) = bold(v)^top tanh(bold(W)_1 bold(s)_(t-1) + bold(W)_2 bold(h)_i) $
-
-      $ alpha_(t,i) = "softmax"(e_(t,i)) = exp(e_(t,i)) / (sum_j exp(e_(t,j))) $
-
-      $ bold(c)_t = sum_(i) alpha_(t,i) bold(h)_i $
-
-      where $bold(s)_(t-1)$ is the decoder state and $bold(h)_i$ is the $i$-th encoder state.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture02/bahdanau_attention.png", width: 100%)
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
-    ],
-  )
-]
-
-#slide[
-  = Luong (dot-product) attention
-
-  #source-slide("https://arxiv.org/abs/1508.04025", title: "Luong et al. 2015")
-
-  Simpler: use the *dot product* to compute the score:
-
-  $ e_(t,i) = bold(s)_t^top bold(h)_i $
-
-  or a *general* (bilinear) variant:
-
-  $ e_(t,i) = bold(s)_t^top bold(W) bold(h)_i $
-
-  #v(0.5em)
-  #infobox(title: "Key difference")[
-    - *Bahdanau*: concat + learned layer → more expressive, slower.
-    - *Luong*: dot product → simpler, faster, and it turns out to work just as well.
-  ]
-]
-
-#slide[
-  = Attention -- visualized
-
-  The attention weights show *which input tokens the decoder focuses on* at each step.
+  The attention weights correspond to *which input tokens the decoder focuses on* at each step.
 
   #grid(
     columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      For machine translation, the attention matrix often resembles a *soft alignment* between the source and target sentences.
-
-      #v(0.5em)
-
-      This was a major breakthrough: finally, the model could *learn alignments on its own*, without any external alignment tool.
-    ],
+    gutter: 2em,
     [
       #set align(center + horizon)
-      #image("img/lecture02/sentence_attention_example.png", width: 100%)
+
+      #image("img/lecture02/sentence_attention_example.png", width: 400pt)
       #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
+
+
+
+    ],
+    [#image("img/lecture02/bahdanau_attention.png", width: 80%)
+
+      // #infobox()[
+      //   - #link("https://arxiv.org/abs/1409.0473")[Bahdanau et al. (2014)]: The score function uses a *learned feed-forward network*:
+      //   - #link("https://arxiv.org/abs/1508.04025")[Luong et al. (2015)]: Simpler: use the *dot product* to compute the score.
+
+      // ]
+      #source("https://arxiv.org/abs/1409.0473", title: "Bahdanau et al. (2014)")
     ],
   )
+
+
+
+
+
+
 ]
 
-#slide[
-  = From RNN attention to self-attention
 
+#slide[
+  = But it is slow...
   #set align(horizon)
 
-  So far, attention was used *between* the encoder and decoder (cross-attention).
+  RNN needs to process the input sequentially, token-by-token → there is no way to parallelize the process.
 
-  #v(0.5em)
+  #v(1em)
 
-  #questionbox()[What if we use attention *within* a single sequence? Each word attending to every other word in the same sequence?]
 
-  #show: later
-  #v(0.5em)
-
-  This is called *self-attention* -- and it is the key building block of the Transformer.
-
-  #v(0.5em)
-
-  #ideabox()[And what if we get rid of the RNN entirely and use *only* attention?]
+  #ideabox[Can we get rid of the RNN entirely and use *only attention*?]
 ]
 
 
@@ -438,28 +391,28 @@
 
   #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
 
+  Paper by Google in 2017, originally proposed for improving MT systems.
+
+  #v(1em)
+
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      The paper that changed everything.
 
-      #v(0.5em)
+      #set align(horizon)
 
       *Key ideas:*
-      - Replace RNNs entirely with *self-attention*.
-      - Process all tokens *in parallel* (no sequential bottleneck).
+      - Process each state *in parallel with FFNNs*.
+      - Use the *attention mechanism* to share information between the tokens.
+      - Apply it repeatedly in *layers* to make it more expressive.
       - Use *positional encoding* to inject position information.
-      - Stack multiple layers of attention + feed-forward networks.
 
-      #v(0.5em)
 
-      Originally proposed for *machine translation*, but the architecture turned out to be universal.
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture02/transformer_full.png", width: 200pt)
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
+      #image("img/lecture02/screen-2026-02-20-16-08-26.png", width: 200pt)
     ],
   )
 ]
@@ -469,16 +422,22 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  The Transformer follows the *encoder-decoder* pattern -- same as seq2seq, but without any recurrence.
+  The (original!) Transformer follows the *encoder-decoder* pattern (→seq2seq).
 
   #set align(center + horizon)
 
-  #image("img/lecture02/transformer_encoders_decoders.png", width: 400pt)
+  #image("img/lecture02/transformer_encoders_decoders.png", width: 300pt)
 
   #set align(left)
 
   - *Encoder*: reads the input sequence, produces a rich representation.
-  - *Decoder*: generates the output sequence, one token at a time.
+  - *Decoder*: generates the output sequence one token at a time.
+]
+
+#slide[
+  = Title
+  TODO - what transformer does, explained once again
+
 ]
 
 #slide[
@@ -486,19 +445,19 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  Both encoder and decoder are *stacks of identical layers* (blocks).
+  Both encoder and decoder are *stacks of identical layers* (called "blocks").
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      - The original Transformer uses *$N = 6$* layers for both.
+      - The original Transformer uses 6 layers for both.
       - Each layer refines the representation.
-      - The output of the last encoder layer is passed to *every* decoder layer.
+      - The output of the last encoder layer is passed to *every decoder layer*.
 
       #v(0.5em)
-      #infobox(title: "Scaling up")[
-        Modern LLMs use many more layers: GPT-3 has 96, LLaMA-70B has 80.
+      #infobox(title: "Current scales")[
+        Modern LLMs use many more layers: e.g. Llama 3.3 70B has *80 (decoder) layers*.
       ]
     ],
     [
@@ -513,26 +472,23 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  Each encoder block has two sub-layers:
+  #set align(horizon)
+
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1fr),
     gutter: 1em,
     [
-      1. *Self-attention layer*
-        - Each token looks at all other tokens.
-        - Captures dependencies regardless of distance.
+      Each encoder block has two sub-layers:
 
-      2. *Feed-forward network (FFN)*
-        - Applied to each token independently.
-        - Same weights for every position.
-
-      Both sub-layers have a *residual connection* and *layer normalization*.
+      1. *Self-attention layer* → sharing information between the tokens.
+      2. *Feed-forward layer* → updating the token information.
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture02/transformer_encoder_lillog.png", width: 100%)
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
+
+      #image("img/lecture02/encoder_with_tensors_2.png")
+      #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
     ],
   )
 ]
@@ -541,23 +497,36 @@
 // Self-attention deep dive
 // ============================================================
 #slide[
-  = Self-attention -- intuition
+  = Self-attention
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
+  The original attention mechanism was useful for decoding a new sequence.
+
+  #v(1em)
+
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (2fr, 1fr),
     gutter: 1em,
     [
-      The goal of self-attention: for each token, compute a *new representation* that incorporates information from *all tokens* in the sequence.
 
+
+
+      But what if we only want to *represent a sequence*?
+
+      → We can turn it into *self-attention*.
       #v(0.5em)
 
-      _"The animal didn't cross the street because *it* was too tired."_
+      #set text(size: 18pt)
 
-      #v(0.5em)
+      #infobox("Example")[
+        _"The animal didn't cross the street because *it* was too tired."_
 
-      When processing _"it"_, the model should attend strongly to _"animal"_ (not _"street"_).
+        #v(0.5em)
+
+        When processing _"it"_, the model should attend strongly to _"animal"_ (not _"street"_).
+      ]
+
     ],
     [
       #set align(center + horizon)
@@ -572,40 +541,47 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  For each token embedding $bold(x)_i$, we compute three vectors:
+  #set align(horizon)
 
-  $ bold(q)_i = bold(W)^Q bold(x)_i, quad bold(k)_i = bold(W)^K bold(x)_i, quad bold(v)_i = bold(W)^V bold(x)_i $
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
 
-  #set align(center + horizon)
+      For each token embedding $bold(x)_i$, we compute three vectors:
 
-  #image("img/lecture02/self_attention_vectors.png", width: 500pt)
+      $ bold(q)_i = bold(W)^Q bold(x)_i, quad bold(k)_i = bold(W)^K bold(x)_i, quad bold(v)_i = bold(W)^V bold(x)_i $
+
+      #v(1em)
+
+      - *Query* ($bold(q)$): "what am I looking for?"
+      - *Key* ($bold(k)$): "what do I contain?"
+      - *Value* ($bold(v)$): "what information do I provide?"
+    ],
+    [
+      #image("img/lecture02/self_attention_vectors.png", width: 300pt)
+    ],
+  )
 
   #set align(left)
 
-  - *Query* ($bold(q)$): "what am I looking for?"
-  - *Key* ($bold(k)$): "what do I contain?"
-  - *Value* ($bold(v)$): "what information do I provide?"
 ]
 
 #slide[
-  = Self-attention -- computing scores
+  = Self-attention -- computation
 
-  #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
+  We multiply queries $bold(q)_i$ by keys $bold(k)_i$ → *raw (non-normalized) attention scores*.
 
-  For a given query $bold(q)_i$:
-
-  1. Compute the *dot product* $bold(q)_i dot bold(k)_j$ for all keys → raw scores.
-  2. *Scale* by $1 / sqrt(d_k)$ (to keep gradients stable).
-  3. Apply *softmax* to get attention weights.
-  4. *Weighted sum* of value vectors.
-
-  #set align(center + horizon)
+  #set align(center)
 
   #image("img/lecture02/self_attention_score.png", width: 500pt)
+
 ]
 
 #slide[
-  = Self-attention -- softmax and output
+  = Self-attention -- computation
+
+  We normalize the scores: divide by $sqrt(d_k)$ and apply `softmax` → *attention weights*.
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
@@ -616,54 +592,89 @@
   #set align(left)
   #v(0.5em)
 
-  The output for token $i$ is a *weighted mixture* of all value vectors. Tokens with higher attention weights contribute more.
 ]
 
 
 #slide[
-  = Scaled dot-product attention -- matrix form
+  = Self-attention -- computation
 
-  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
-
-  In practice, we compute everything in *one matrix operation*:
-
-  $ "Attention"(bold(Q), bold(K), bold(V)) = "softmax"((bold(Q) bold(K)^top) / sqrt(d_k)) bold(V) $
-
-  where $bold(Q) in RR^(n times d_k)$, $bold(K) in RR^(n times d_k)$, $bold(V) in RR^(n times d_v)$.
+  The output for token $i$ is a vector $bold(z_i)$: *weighted mixture* of all value vectors.
 
   #set align(center + horizon)
-  #image("img/lecture02/self_attention_matrix_calculation_2.png", width: 500pt)
-]
-
-// ============================================================
-// Multi-head attention
-// ============================================================
-#slide[
-  = Multi-head attention -- why?
-
-  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
-
-  A single attention head captures *one type of relationship*. But words relate to each other in many ways:
-  - syntactic (subject–verb),
-  - semantic (co-reference),
-  - positional (adjacent words),
-  - ...
-
-  #v(0.5em)
-
-  #ideabox()[Run *multiple attention heads in parallel*, each with its own $bold(W)^Q$, $bold(W)^K$, $bold(W)^V$ -- and let each head learn a different pattern.]
-]
-
-#slide[
-  = Multi-head attention -- how it works
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
+
+  #image("img/lecture02/self-attention-output.png", width: 320pt)
+]
+
+#slide[
+  = Pause and ponder
+
+  #questionbox("Why do we need all three?")[
+
+  ]
+
+]
+
+#slide[
+  = Self-attention -- computing scores
+
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      With $h$ heads and model dimension $d$:
+
+      #set align(horizon)
+
+
+      In practice, we compute everything in *one matrix operation*:
+
+      $ "Attention"(bold(Q), bold(K), bold(V)) = "softmax"((bold(Q) bold(K)^top) / sqrt(d_k)) bold(V) $
+
+      where $bold(Q) in RR^(n times d_k)$, $bold(K) in RR^(n times d_k)$, $bold(V) in RR^(n times d_v)$.
+    ],
+    [#set align(center + horizon)
+      #image("img/lecture02/attention-is-all-you-need-formula-t-shirt-unisex-steel-blue-m-356.png", width: 250pt)
+
+      #source(
+        "https://www.artificial-intelligence.store/products/attention-is-all-you-need-formula-t-shirt-unisex?variant=48415389548872",
+        title: "Attention is All You Need Formula T-Shirt",
+      )
+    ],
+  )
+]
+
+
+#slide[
+  = Multi-head attention
+
+  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
+
+  A single attention head captures *one type of relationship*. But words relate to each other in many ways: syntactic, semantic, positional, ...
+
+
+  #questionbox()[How would you capture these relationships?]
+
+  #ideabox()[Run *multiple attention heads in parallel*, each with its own $bold(W)^Q$, $bold(W)^K$, $bold(W)^V$, let each head learn a different pattern.]
+
+
+
+  #v(0.5em)
+
+]
+
+#slide[
+  = Multi-head attention
+
+  #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
+
+  #grid(
+    columns: (2fr, 1fr),
+    gutter: 1em,
+    [
+
+      With $h$ heads and size of the hidden state $d$:
       - Each head uses $d_k = d_v = d / h$.
       - Each head computes its own Q, K, V and produces an output $bold(Z)_i$.
 
@@ -677,23 +688,20 @@
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture02/multi_head_attention.png", width: 100%)
+      #image("img/lecture02/transformer_attention_heads_z.png")
       #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
     ],
   )
 ]
 
 #slide[
-  = Multi-head attention -- visualization
+  = Self-attention: putting it all together
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
   #set align(center + horizon)
   #image("img/lecture02/multihead_recap.png", width: 550pt)
 
-  #set align(left)
-
-  Each head produces its own attention output → they are concatenated → multiplied by $bold(W)^O$ to get the final output.
 ]
 
 
@@ -754,7 +762,7 @@
     ],
     [
       #infobox(title: "What does the FFN do?")[
-        No interaction between positions -- that is the job of self-attention. The FFN processes each token *on its own*, acting as a *per-token memory* storing factual knowledge.
+        The FFN processes each token *on its own*, acting as a *per-token memory* storing factual knowledge.
       ]
     ],
   )
@@ -903,48 +911,35 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  The final decoder output is projected to vocabulary size and passed through *softmax*:
-
-  $ P(w_t | w_1, ..., w_(t-1), bold(x)) = "softmax"(bold(W)_"out" bold(h)_t + bold(b)) $
-
-  #set align(center + horizon)
-
-  #image("img/lecture02/decoder_output_softmax.png", width: 400pt)
-
-  #set align(left)
-  Same idea as neural language modeling from Lecture 1 -- but now the hidden state $bold(h)_t$ is much richer thanks to attention.
-]
-
-#slide[
-  = Training the Transformer
-
-  #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
-
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1fr),
     gutter: 1em,
-    [
-      *Objective:* maximize the probability of the correct target tokens.
+    [ The final decoder output is projected to vocabulary size and passed through *softmax*:
 
-      → *Cross-entropy loss* between predicted distribution and one-hot target:
+      $
+        P(w_t | w_1, ..., w_(t-1), bold(x)) \
+        = "softmax"(bold(W)_"out" bold(h)_t + bold(b))
+      $
 
-      $ cal(L) = - sum_(t=1)^T log P(w_t^* | w_1^*, ..., w_(t-1)^*, bold(x)) $
+      #v(1em)
 
-      #v(0.5em)
-
-      Thanks to masking, we can compute the loss for *all positions in parallel* during training (unlike RNNs!).
-
-      → *Teacher forcing*: use the ground-truth tokens as decoder input.
+      Same idea as neural language modeling we talked about the last time -- but now the hidden state $bold(h)_t$ is much richer thanks to attention.
     ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture02/transformer_training_loss.png", width: 100%)
-    ],
+    [#set align(center + horizon)
+
+      #image("img/lecture02/decoder_output_softmax.png", width: 400pt)
+
+      #set align(left)],
   )
+
+
+
+
 ]
 
+
 #slide[
-  = Why is the Transformer better than RNNs?
+  = Transformer vs. RNNs
 
   #grid(
     columns: (1fr, 1fr),
@@ -965,89 +960,11 @@
     ],
   )
 
-  #v(0.5em)
 
-  #infobox(title: "Computational cost")[
-    Self-attention is $O(n^2 dot d)$ per layer. For very long sequences, this can be expensive -- but there are efficient attention variants (→ later lectures).
-  ]
 ]
 
-// ============================================================
-// Transformer variants
-// ============================================================
-#slide[
-  = Transformer variants
 
-  The original Transformer is encoder-decoder. But there are *three main variants*:
 
-  #v(0.5em)
-
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    gutter: 1em,
-    [
-      #infobox(title: "Encoder-only")[
-        BERT, RoBERTa
-
-        - Bidirectional context.
-        - Good for *classification*, *NER*, *retrieval*.
-        - Cannot generate text.
-      ]
-    ],
-    [
-      #infobox(title: "Decoder-only")[
-        GPT, LLaMA, Gemma
-
-        - Autoregressive (left-to-right).
-        - Good for *text generation*, *language modeling*.
-        - The dominant LLM architecture today.
-      ]
-    ],
-    [
-      #infobox(title: "Encoder-decoder")[
-        T5, BART, mBART
-
-        - Full seq2seq.
-        - Good for *translation*, *summarization*.
-        - Less common now in large-scale LLMs.
-      ]
-    ],
-  )
-]
-
-#slide[
-  = The decoder-only Transformer
-
-  Most modern LLMs (GPT-4, Claude, LLaMA, ...) are *decoder-only*:
-  - No encoder, no cross-attention.
-  - The input and output are *one single sequence*.
-  - Uses *masked (causal) self-attention* throughout.
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      For each position $t$, the model predicts the next token:
-
-      $ P(w_(t+1) | w_1, ..., w_t) $
-
-      At inference, we generate tokens *autoregressively* -- feeding each generated token back as input.
-    ],
-    [
-      #infobox(title: "Why decoder-only?")[
-        - Simpler architecture.
-        - Scales well.
-        - Unifies many tasks under "generate the answer".
-      ]
-    ],
-  )
-]
-
-// ============================================================
-// Transformer at scale
-// ============================================================
 // ============================================================
 // Summary
 // ============================================================
@@ -1065,11 +982,7 @@
       - Multi-head attention → multiple parallel attention heads.
       - Positional encoding → injecting position information.
       - Residual connections + layer normalization.
-      - Encoder-decoder architecture + decoder-only variants.
   ]
-
-  #v(0.5em)
-  *Next time:* pre-training objectives, training data, finetuning, RLHF.
 ]
 
 #slide[
