@@ -13,7 +13,7 @@
   date: "24 Feb 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 #section-slide(section: "Recap")[Recap & math refresher]
 
@@ -377,7 +377,7 @@
   #v(1em)
 
 
-  #ideabox[Can we get rid of the RNN entirely and use *only attention*?]
+  #ideabox[Can we get rid of the recurrence entirely?]
 ]
 
 
@@ -402,7 +402,7 @@
 
       #set align(horizon)
 
-      *Key ideas:*
+      *How to get rid of recurrence:*
       - Process each state *in parallel with FFNNs*.
       - Use the *attention mechanism* to share information between the tokens.
       - Apply it repeatedly in *layers* to make it more expressive.
@@ -422,7 +422,8 @@
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  The (original!) Transformer follows the *encoder-decoder* pattern (→seq2seq).
+  The original Transformer follows the *encoder-decoder* pattern (→seq2seq generation).
+  #v(-2em)
 
   #set align(center + horizon)
 
@@ -432,12 +433,6 @@
 
   - *Encoder*: reads the input sequence, produces a rich representation.
   - *Decoder*: generates the output sequence one token at a time.
-]
-
-#slide[
-  = Title
-  TODO - what transformer does, explained once again
-
 ]
 
 #slide[
@@ -482,7 +477,7 @@
       Each encoder block has two sub-layers:
 
       1. *Self-attention layer* → sharing information between the tokens.
-      2. *Feed-forward layer* → updating the token information.
+      2. *Feed-forward (FF) layer* → updating the token information.
     ],
     [
       #set align(center + horizon)
@@ -514,7 +509,7 @@
 
       But what if we only want to *represent a sequence*?
 
-      → We can turn it into *self-attention*.
+      → We can turn it into *self-attention* #link("Same idea as neural language modeling we talked about the last time -- but now the hidden state $bold(h)_t$ is much richer thanks to attention.")[(Cheng et al., 2016)]
       #v(0.5em)
 
       #set text(size: 18pt)
@@ -608,12 +603,44 @@
 ]
 
 #slide[
-  = Pause and ponder
+  = Self-attention: Pause and ponder
 
-  #questionbox("Why do we need all three?")[
-
+  #questionbox()[
+    Is it the only and the best way to compute attention? And do we need all three: queries, keys, and values?
   ]
 
+  #set text(size: 14pt)
+
+  #table(
+    columns: (1fr, 1.5fr, 1.5fr),
+    align: (left, left, left),
+    table.header([*Name*], [*Alignment score function*], [*See*]),
+    [Content-base attention],
+    [$"score"(bold(italic(s))_t, bold(italic(h))_i) = "cosine"[bold(italic(s))_t, bold(italic(h))_i]$],
+    [#link("https://arxiv.org/abs/1410.5401")[Graves et al. (2014)]],
+
+    [Additive attention],
+    [$"score"(bold(italic(s))_t, bold(italic(h))_i) = bold(v)_a^top tanh(bold(W)_a [bold(italic(s))_(t-1); bold(italic(h))_i])$],
+    [#link("https://arxiv.org/pdf/1409.0473.pdf")[Bahdanau et al. (2015)], #link("https://arxiv.org/pdf/1601.06733")[Cheng et al. (2015)]],
+
+    [Location-Base],
+    [$alpha_(t,i) = "softmax"(bold(W)_a bold(italic(s))_t)$],
+    [#link("https://arxiv.org/pdf/1508.04025.pdf")[Luong et al. (2015)]],
+
+    [General],
+    [$"score"(bold(italic(s))_t, bold(italic(h))_i) = bold(italic(s))_t^top bold(W)_a bold(italic(h))_i$  ],
+    [#link("https://arxiv.org/pdf/1508.04025.pdf")[Luong et al. (2015)]],
+
+    [Dot-Product],
+    [$"score"(bold(italic(s))_t, bold(italic(h))_i) = bold(italic(s))_t^top bold(italic(h))_i$],
+    [#link("https://arxiv.org/pdf/1508.4025.pdf")[Luong et al. (2015)]],
+
+    [Scaled Dot-Product],
+    [$"score"(bold(italic(s))_t, bold(italic(h))_i) = (bold(italic(s))_t^top bold(italic(h))_i) / sqrt(n)$ ],
+    [#link("http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf")[Vaswani et al. (2017)]],
+  )
+
+  #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
 ]
 
 #slide[
@@ -628,7 +655,7 @@
       #set align(horizon)
 
 
-      In practice, we compute everything in *one matrix operation*:
+      In practice, we compute the attention sublayer in *one matrix operation*:
 
       $ "Attention"(bold(Q), bold(K), bold(V)) = "softmax"((bold(Q) bold(K)^top) / sqrt(d_k)) bold(V) $
 
@@ -649,50 +676,25 @@
 #slide[
   = Multi-head attention
 
-  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
-
   A single attention head captures *one type of relationship*. But words relate to each other in many ways: syntactic, semantic, positional, ...
 
+  #ideabox("Idea: multi-head attention")[
+    Run *multiple attentions ("heads") in parallel*, each with its own $bold(W)^Q$, $bold(W)^K$, $bold(W)^V$.       Then concatenate the outputs and project them to the original size.]
 
-  #questionbox()[How would you capture these relationships?]
+  #set align(center + horizon)
 
-  #ideabox()[Run *multiple attention heads in parallel*, each with its own $bold(W)^Q$, $bold(W)^K$, $bold(W)^V$, let each head learn a different pattern.]
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 0em,
+    [#image("img/lecture02/transformer_attention_heads_z.png", width: 290pt)],
+    [#image("img/lecture02/transformer_attention_heads_weight_matrix_o.png", width: 250pt)],
+  )
 
-
-
-  #v(0.5em)
-
-]
-
-#slide[
-  = Multi-head attention
 
   #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
-  #grid(
-    columns: (2fr, 1fr),
-    gutter: 1em,
-    [
-
-      With $h$ heads and size of the hidden state $d$:
-      - Each head uses $d_k = d_v = d / h$.
-      - Each head computes its own Q, K, V and produces an output $bold(Z)_i$.
-
-      $ "head"_i = "Attention"(bold(Q)_i, bold(K)_i, bold(V)_i) $
-
-      The heads are *concatenated* and projected:
-
-      $ "MultiHead" = [bold(Z)_1; ...; bold(Z)_h] bold(W)^O $
-
-      where $bold(W)^O in RR^(h d_v times d)$.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture02/transformer_attention_heads_z.png")
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
-    ],
-  )
 ]
+
 
 #slide[
   = Self-attention: putting it all together
@@ -705,9 +707,6 @@
 ]
 
 
-// ============================================================
-// Residual connections, layer norm, FFN
-// ============================================================
 #slide[
   = Residual connections & layer normalization
 
@@ -717,20 +716,20 @@
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      Each sub-layer (attention or FFN) is wrapped in:
+      Each sub-layer is wrapped in:
 
       $ "LayerNorm"(bold(x) + "SubLayer"(bold(x))) $
 
       #v(0.5em)
 
       *Residual connection* ($bold(x) +$ ...):
-      - Helps gradients flow through deep networks.
-      - The layer only needs to learn the *"delta"*.
+
+      The input to the sublayer is also passed as a identity (no modification) → the layer only needs to learn the *"delta"* (how to update the input).
 
       #v(0.5em)
       *Layer normalization*:
-      - Normalizes across features (not across batch).
-      - Stabilizes training.
+
+      Normalizes values across features → more stable training.
     ],
     [
       #set align(center + horizon)
@@ -740,7 +739,22 @@
 ]
 
 #slide[
-  = Position-wise feed-forward network
+  = Residual view of the Transformer
+
+  It may be even useful to think of attention and FF layers as mere *updates* to the "residual stream":
+
+  #v(-2em)
+
+  #set align(center + horizon)
+
+  #image("img/lecture02/residual_view_2.png", width: 300pt)
+
+  #source-slide("https://transformer-circuits.pub/2021/framework/index.html", title: "Transformer Circuits Thread")
+
+]
+
+#slide[
+  = Feed-forward layer
 
   Applied to *each token independently* (same weights, different inputs):
 
@@ -751,19 +765,18 @@
   #v(0.5em)
 
   #grid(
-    columns: (1fr, 1fr),
+    columns: (1.2fr, 1fr),
     gutter: 1em,
     [
-      #infobox(title: "Dimensions")[
-        In the original Transformer:
-        - $d = 512$ (model dimension)
-        - $d_"ff" = 2048$ (inner dimension, 4$times$ larger)
-      ]
+      #v(1em)
+
+      *What happens in the feedfoward layer?*
+      - Model's knowledge injected into each token's representation.
+      - Up-projection → non-linearity → down-projection (given usual $d$ and $d_"ff"$).
+
     ],
     [
-      #infobox(title: "What does the FFN do?")[
-        The FFN processes each token *on its own*, acting as a *per-token memory* storing factual knowledge.
-      ]
+      #image("img/lecture02/transformer_encoder.png")
     ],
   )
 ]
@@ -774,59 +787,68 @@
 #slide[
   = Positional encoding -- why do we need it?
 
-  Self-attention is *permutation-invariant*: if we shuffle the input tokens, the attention scores would be the same (up to the same permutation).
+  Self-attention is *permutation-invariant*: if we shuffle the input tokens, the attention scores would be the same (→ we did not have such an issue with RNNs!)
 
-  #v(0.5em)
+  #v(1em)
 
-  #questionbox()[
-    Why is that a problem? _"The cat sat on the mat"_ and _"mat the on sat cat the"_ should be different!
-  ]
+  *Why does it matter?*  The model now has no way to distinguish between sentences such as "dog bites man" and "man bites dog".
+
+
 
   #show: later
   #v(0.5em)
 
   #ideabox()[
-    We need to *inject position information* into the input embeddings so that the model can distinguish token order.
+    Let's generate "*positional embeddings*" ($"PE"$): vectors that are specific for each position, but content-independent. We then add it with the input embeddings $bold(x)_i = "Emb"(w_i) + "PE"(i)$, baking in the information about the position.
   ]
 ]
 
 #slide[
-  = Positional encoding -- sinusoidal
+  = Sinusoidal positional embeddings
 
   #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
 
-  The original Transformer uses *fixed sinusoidal functions*, added to the token embeddings:
+  The original Transformer uses *fixed sinusoidal functions* for the positional embeddings (PE):
 
-  $ bold(x)_i = "Embed"(w_i) + "PE"(i) $
+  #grid(
+    columns: (3fr, 1fr),
+    gutter: 2em,
+    [
+      $ "PE"(p, 2i) & = sin(p / 10000^(2i \/ d)), quad "PE"(p, 2i+1) = cos(p / 10000^(2i \/ d)) $
 
-  $ "PE"(p, 2i) & = sin(p / 10000^(2i \/ d)), quad "PE"(p, 2i+1) = cos(p / 10000^(2i \/ d)) $
+      where $p$ is the position and $i$ is the dimension index.
 
-  where $p$ is the position and $i$ is the dimension index.
+      PE's and tok. embeddings are added:
+    ],
+    [ #image("img/lecture02/positional_encoding_large.png", width: 150pt)],
+  )
 
-  #v(0.5em)
-  - Each position gets a *unique encoding*.
-  - Nearby positions have *similar encodings*.
-  - The model can learn to attend to *relative positions*.
 
-  #set text(size: 17pt)
-  Modern models often use *learned* positional embeddings or *rotary positional encoding* (RoPE) instead.
+  #infobox("Tip")[
+    Do not memorize these formulas (they are not used in the modern models, anyway). Try to understand the principles that behind them (next slide)
+  ]
+
 ]
 
 #slide[
-  = Positional encoding -- visualization
+  = Sinusoidal positional embeddings -- principles
 
-  #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
+  - Each dimension of the PE vector is a *sinusoid*:
+    - Different wavelenghts in different dimensions: from $2 pi$ to $10,000 dot 2pi$.
+  → each position gets a *unique encoding*; nearby positions have *similar encodings*.
 
   #set align(center + horizon)
 
-  #image("img/lecture02/positional_encoding_large.png", width: 550pt)
-
+  #image("img/lecture02/sinoidual-positional-encoding.png", width: 400pt)
   #set align(left)
-  #v(0.5em)
 
-  #set text(size: 17pt)
-  Each row is a positional encoding vector. The pattern changes across dimensions: low-frequency sinusoids on the left, high-frequency on the right.
+  #questionbox()[Can you think of another way to get to the same principles?]
+
+  #source-slide("https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/", title: "Lil'Log")
+
 ]
+
+
 
 // ============================================================
 // The decoder
@@ -841,71 +863,27 @@
     gutter: 1em,
     [
       The decoder has *three sub-layers* per block:
+      #v(0.5em)
 
       1. *Masked self-attention*
-        - Each token can only attend to previous tokens (no peeking into the future).
+
+      Each token can only attend to previous tokens, future positions masked by $-infinity$. (*why?*)
 
       2. *Encoder-decoder (cross) attention*
-        - Queries come from the decoder, keys and values come from the encoder output.
+      Queries come from the decoder, keys and values come from the encoder output.
 
-      3. *FFN*
-        - Same as in the encoder.
+      3. *FF layer*
+      Same as in the encoder.
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture02/transformer_decoder_lillog.png", width: 200pt)
-      #source("https://lilianweng.github.io/posts/2018-06-24-attention/", title: "Lil'Log")
+
+      #image("img/lecture02/transformer_decoder_detail.png", width: 90%)
     ],
   )
 ]
 
-#slide[
-  = Masked self-attention
 
-  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. 2017")
-
-  During training, we know the full target sequence. But we must prevent the decoder from *looking ahead*.
-
-  #v(0.5em)
-
-  We apply a *mask* to the attention scores before softmax:
-
-  $ "MaskedAttention"(bold(Q), bold(K), bold(V)) = "softmax"((bold(Q) bold(K)^top) / sqrt(d_k) + bold(M)) bold(V) $
-
-  where $bold(M)$ is a matrix with $0$ for allowed positions and $-infinity$ for future positions.
-
-  #v(0.5em)
-
-  #infobox(title: "Effect")[
-    $exp(-infinity) = 0$ → after softmax, future tokens get zero attention weight. Token $t$ can only attend to tokens $1, ..., t$.
-  ]
-]
-
-#slide[
-  = Encoder-decoder attention
-
-  In the cross-attention sub-layer:
-  - *Queries* come from the decoder (previous sub-layer).
-  - *Keys* and *values* come from the *encoder output*.
-
-  #v(0.5em)
-
-  $ "CrossAttention"(bold(Q)_"dec", bold(K)_"enc", bold(V)_"enc") $
-
-  #v(0.5em)
-
-  This allows every decoder position to attend over *all positions in the input* -- just like the attention mechanism in the RNN seq2seq, but more powerful.
-
-  #v(0.5em)
-
-  #infobox(title: "This is the bridge")[
-    Cross-attention is what connects the encoder and decoder. Without it, the decoder would have no access to the source sequence.
-  ]
-]
-
-// ============================================================
-// Output and training
-// ============================================================
 #slide[
   = Output layer
 
@@ -914,7 +892,8 @@
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
-    [ The final decoder output is projected to vocabulary size and passed through *softmax*:
+    [
+      The final decoder output is projected to vocabulary size $V$ and passed through *softmax*:
 
       $
         P(w_t | w_1, ..., w_(t-1), bold(x)) \
@@ -923,7 +902,8 @@
 
       #v(1em)
 
-      Same idea as neural language modeling we talked about the last time -- but now the hidden state $bold(h)_t$ is much richer thanks to attention.
+      - How to train all these weights? → *Lecture 3*
+      - How to use the distribution for decoding? → *Lecture 4*
     ],
     [#set align(center + horizon)
 
@@ -932,8 +912,12 @@
       #set align(left)],
   )
 
+]
 
-
+#slide[
+  = Stitching all pieces together
+  #set align(center + horizon)
+  *Slides 90-134*: https://cme295.stanford.edu/slides/fall25-cme295-lecture1.pdf
 
 ]
 
@@ -941,22 +925,25 @@
 #slide[
   = Transformer vs. RNNs
 
+  Both architectures can be used for sequence-to-sequence processing.
   #grid(
     columns: (1fr, 1fr),
     gutter: 2em,
     [
       === RNNs
-      - Sequential processing → *slow*.
-      - Information must pass through *all intermediate states*.
+      - Sequential processing
+        - (-) slow, non-parallelizable
+        - (+) implicit position information
+      - Hidden state is a bottleneck for sharing information.
       - Gradient vanishing over long distances.
-      - Hidden state is a *bottleneck*.
     ],
     [
       === Transformer
-      - Parallel processing → *fast*.
-      - Any token can directly attend to *any other token* (path length = 1).
+      - Parallel processing
+        - (+) scalable on GPUs
+        - (-) needs positional embeddings
+      - Token information can be easily cross-shared in the attention layer.
       - Stable gradients with residual connections.
-      - No bottleneck: information distributed across *all positions*.
     ],
   )
 
@@ -974,9 +961,9 @@
   = Summary
 
   #infobox(title: "What we covered today")[
-    - *Refresher*: matrix multiplication, FFNNs, softmax.
+    - *Math refresher*: matrix multiplication, FFNNs, softmax.
     - *Tokenization*: subword tokenization with BPE.
-    - *Attention*: solving the seq2seq bottleneck (Bahdanau, Luong).
+    - *Attention*: solving the hidden state bottleneck.
     - *The Transformer*:
       - Self-attention with Q, K, V → scaled dot-product attention.
       - Multi-head attention → multiple parallel attention heads.
@@ -991,8 +978,8 @@
   - #link("https://jalammar.github.io/illustrated-transformer/")[The Illustrated Transformer] -- Jay Alammar
   - #link("https://lilianweng.github.io/posts/2018-06-24-attention/")[Attention? Attention!] -- Lil'Log
   - #link("https://nlp.seas.harvard.edu/annotated-transformer/")[The Annotated Transformer] -- Harvard NLP
-  - #link("https://arxiv.org/abs/1706.03762")[Attention is all you need] -- Vaswani et al. 2017
-  - #link("https://arxiv.org/abs/1409.0473")[Neural machine translation by jointly learning to align and translate] -- Bahdanau et al. 2015
-  - #link("https://arxiv.org/abs/1508.07909")[Neural machine translation of rare words with subword units] -- Sennrich et al. 2016
+  - #link("https://arxiv.org/abs/1706.03762")[Attention is all you need] -- Vaswani et al. (2017)
+  - #link("https://arxiv.org/abs/1409.0473")[Neural machine translation by jointly learning to align and translate] -- Bahdanau et al. (2015)
+  - #link("https://arxiv.org/abs/1508.07909")[Neural machine translation of rare words with subword units] -- Sennrich et al. (2016)
   - #link("https://huggingface.co/spaces/Xenova/the-tokenizer-playground")[Tokenizer playground] -- Hugging Face
 ]
