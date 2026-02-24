@@ -112,7 +112,7 @@
 #slide[
   = Softmax
 
-  Given a vector $bold(x) in RR^d$, *softmax* ensures that $forall x_i >= 0$ and $sum(bold(x)) = 1$:
+  Given a vector $bold(x) in RR^d$, *softmax* ensures that $forall i "softmax"(x_i) >= 0$ and $sum(bold(x)) = 1$:
 
   $ "softmax"(x_i) = exp(x_i) / (sum_(j=1)^(K) exp(x_j)) $
 
@@ -181,10 +181,6 @@
   ]
 ]
 
-
-// ============================================================
-// SECTION 2: Tokenization
-// ============================================================
 #section-slide(section: "Tokenization")[Tokenization]
 
 #slide[
@@ -192,7 +188,7 @@
 
   *Tokenization* = splitting text into smaller units (*tokens*) that the model will process.
 
-  We assumed that our input is a *sequence of words*. That sounds good in theory, but worse in practice:
+  We assumed that our input is a *sequence of words*. That sounds good in theory, but does not work in practice:
 
   #v(0.5em)
 
@@ -253,6 +249,7 @@
 
   #v(0.5em)
 
+
   #table(
     columns: (auto, auto, auto),
     align: left,
@@ -262,14 +259,31 @@
     [3], [`(aa, c)` → 3 times], [`aac`],
     [4], [`(aab, ▁)` → 2 times], [`aab▁`],
   )
-
   #v(0.5em)
+
+
+  #set text(size: 20pt)
 
   Final vocabulary: `{▁, a, b, c, aa, aab, aac, aab▁}`
 
-  #v(0.5em)
+  #source-slide("https://www.bpe-visualizer.com", title: "BPE visualizer")
 
-  Typical vocabulary sizes in practice: *50k--200k* tokens.
+]
+
+#slide[
+  = Tokenization algorithms
+
+
+  *Notes*:
+
+  - In practice, the BPE algorithm *never crosses word boundaries*.
+    → By convention, you will find the space character ▁ always _before_ the other characters.
+  - Modern implementations use *Byte-Level BPE*, where the basic vocabulary has all the 256 possible byte values → no unknown characters.
+  - The *space "▁" in BPE* is a special character with the byte value `0x20`.
+    - This is often rendered as `Ġ`, which is artifact of #link("https://github.com/openai/gpt-2/blob/master/src/encoder.py")[GPT-2's byte-to-unicode mapping].
+  - There are other tokenization algorithms (SentencePiece, WordPiece, Unigram).
+  - Typical vocabulary size in practice: *50k--200k* tokens.
+
 ]
 
 #slide[
@@ -290,9 +304,6 @@
 ]
 
 
-// ============================================================
-// SECTION 3: Attention in RNNs
-// ============================================================
 #section-slide(section: "Attention")[Attention mechanism]
 
 #slide[
@@ -320,6 +331,8 @@
 
   #show: later
 
+  #source-slide("https://arxiv.org/abs/1508.04025", title: "Luong et al. (2015)")
+
   #grid(
     columns: (2.5fr, 1fr),
     gutter: 1em,
@@ -330,7 +343,7 @@
       4. Use $bold(c)_t$ together with the decoder state to predict the next token.
     ],
     [ #image("img/lecture02/screen-2026-02-20-15-54-38.png", width: 200pt)
-      #source-slide("https://arxiv.org/abs/1508.04025", title: "Luong et al. (2015)")
+
 
     ],
   )
@@ -401,8 +414,6 @@
         - Apply it repeatedly in *layers* to make it more expressive.
         - Use *positional encoding* to inject position information.
       ]
-
-
     ],
     [
       #set align(center + horizon)
@@ -482,9 +493,6 @@
   )
 ]
 
-// ============================================================
-// Self-attention deep dive
-// ============================================================
 #slide[
   = Self-attention
 
@@ -498,12 +506,9 @@
     columns: (2fr, 1fr),
     gutter: 1em,
     [
-
-
-
       But what if we only want to *represent a sequence*?
 
-      → We can turn it into *self-attention* #link("Same idea as neural language modeling we talked about the last time -- but now the hidden state $bold(h)_t$ is much richer thanks to attention.")[(Cheng et al., 2016)]
+      → We can turn it into *self-attention* #link("https://arxiv.org/abs/1601.06733")[(Cheng et al., 2016)]
       #v(0.5em)
 
       #set text(size: 18pt)
@@ -617,7 +622,7 @@
 
     [Additive attention],
     [$"score"(bold(italic(s))_t, bold(italic(h))_i) = bold(v)_a^top tanh(bold(W)_a [bold(italic(s))_(t-1); bold(italic(h))_i])$],
-    [#link("https://arxiv.org/pdf/1409.0473.pdf")[Bahdanau et al. (2015)], #link("https://arxiv.org/pdf/1601.06733")[Cheng et al. (2015)]],
+    [#link("https://arxiv.org/pdf/1409.0473.pdf")[Bahdanau et al. (2015)], #link("https://arxiv.org/pdf/1601.06733")[Cheng et al. (2016)]],
 
     [Location-Base],
     [$alpha_(t,i) = "softmax"(bold(W)_a bold(italic(s))_t)$],
@@ -651,7 +656,7 @@
       #set align(horizon)
 
 
-      In practice, we compute the attention sublayer in *one matrix operation*:
+      Compactly, the operation in the attention sublayer can be written out as:
 
       $ "Attention"(bold(Q), bold(K), bold(V)) = "softmax"((bold(Q) bold(K)^top) / sqrt(d_k)) bold(V) $
 
@@ -770,7 +775,7 @@
     [
       #v(1em)
 
-      *What happens in the feedfoward layer?*
+      *What happens in the feedforward layer?*
       - Model's knowledge injected into each token's representation.
       - Up-projection → non-linearity → down-projection (given usual $d$ and $d_"ff"$).
 
@@ -781,9 +786,6 @@
   )
 ]
 
-// ============================================================
-// Positional encoding
-// ============================================================
 #slide[
   = Positional encoding -- why do we need it?
 
@@ -834,7 +836,7 @@
   = Sinusoidal positional embeddings -- principles
 
   - Each dimension of the PE vector is a *sinusoid*:
-    - Different wavelenghts in different dimensions: from $2 pi$ to $10,000 dot 2pi$.
+    - Different wavelengths in different dimensions: from $2 pi$ to $10,000 dot 2pi$.
   → each position gets a *unique encoding*; nearby positions have *similar encodings*.
 
   #set align(center + horizon)
@@ -848,11 +850,6 @@
 
 ]
 
-
-
-// ============================================================
-// The decoder
-// ============================================================
 #slide[
   = The decoder
 
@@ -869,12 +866,13 @@
 
       Each token can only attend to previous tokens, future positions masked by $-infinity$. (*why?*)
 
-      #uncover("2-")[
+
+      #uncover("3-")[
         2. *Encoder-decoder (cross) attention*
         Queries come from the decoder, keys and values come from the encoder output.
       ]
 
-      #uncover("3-")[
+      #uncover("4-")[
         3. *FF layer*
         Same as in the encoder.
       ]
@@ -956,11 +954,6 @@
 
 ]
 
-
-
-// ============================================================
-// Summary
-// ============================================================
 #section-slide(section: "Summary")[Summary]
 
 #slide[
