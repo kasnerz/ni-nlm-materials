@@ -31,15 +31,17 @@
         - Also how to do language modeling with neural networks.
     ],
     [
-      === Today, we will cover:
+      #uncover("2-")[
+        === Today, we will cover:
 
-      How to process language in a more *efficient and scalable way*?
+        How to process language in a more *efficient and scalable way*?
 
-      (→ tokenization, attention, Transformer)
+        (→ tokenization, attention, Transformer)
 
 
-      #image("img/lecture01/attn.png", width: 100%)
-      #source("https://cme295.stanford.edu/slides/fall25-cme295-lecture1.pdf", title: "Stanford CME295")
+        #image("img/lecture01/attn.png", width: 100%)
+        #source("https://cme295.stanford.edu/slides/fall25-cme295-lecture1.pdf", title: "Stanford CME295")
+      ]
     ],
   )
 ]
@@ -51,6 +53,7 @@
 
   $ C_(i,j) = sum_(k=1)^(n) A_(i,k) B_(k,j) $
 
+  #show: later
 
   #grid(
     columns: (2fr, 1fr),
@@ -85,6 +88,7 @@
 
   #v(0.5em)
 
+  #show: later
 
   *Example:* FFNN with ReLU applied on a vector $bold(x)$:
 
@@ -112,11 +116,14 @@
 
   $ "softmax"(x_i) = exp(x_i) / (sum_(j=1)^(K) exp(x_j)) $
 
+  #show: later
   #infobox("How to think about softmax")[
     A convenient way how to transform any vector to a valid probability distribution.
   ]
 
   #v(0.5em)
+
+  #show: later
 
   #grid(
     columns: (1fr, 1fr),
@@ -205,9 +212,7 @@
     Keep the common words, split rare words into subwords.
   ]
 
-
   *Compare*:
-
 
   - Word-level:     `["unhappiness"]` → out of vocabulary
   - Character-level:     `["u","n","h","a","p","p","i","n","e","s","s"]`
@@ -313,6 +318,7 @@
 
   #ideabox()[Let the decoder *pick the information from the encoder hidden states*.]
 
+  #show: later
 
   #grid(
     columns: (2.5fr, 1fr),
@@ -349,22 +355,12 @@
 
 
     ],
-    [#image("img/lecture02/bahdanau_attention.png", width: 80%)
+    [
+      #image("img/lecture02/bahdanau_attention.png", width: 80%)
 
-      // #infobox()[
-      //   - #link("https://arxiv.org/abs/1409.0473")[Bahdanau et al. (2014)]: The score function uses a *learned feed-forward network*:
-      //   - #link("https://arxiv.org/abs/1508.04025")[Luong et al. (2015)]: Simpler: use the *dot product* to compute the score.
-
-      // ]
       #source("https://arxiv.org/abs/1409.0473", title: "Bahdanau et al. (2014)")
     ],
   )
-
-
-
-
-
-
 ]
 
 
@@ -376,14 +372,10 @@
 
   #v(1em)
 
-
   #ideabox[Can we get rid of the recurrence entirely?]
 ]
 
 
-// ============================================================
-// SECTION 4: The Transformer
-// ============================================================
 #section-slide(section: "Transformer")[The Transformer]
 
 #slide[
@@ -403,10 +395,12 @@
       #set align(horizon)
 
       *How to get rid of recurrence:*
-      - Process each state *in parallel with FFNNs*.
-      - Use the *attention mechanism* to share information between the tokens.
-      - Apply it repeatedly in *layers* to make it more expressive.
-      - Use *positional encoding* to inject position information.
+      #item-by-item()[
+        - Process each state *in parallel with FFNNs*.
+        - Use the *attention mechanism* to share information between the tokens.
+        - Apply it repeatedly in *layers* to make it more expressive.
+        - Use *positional encoding* to inject position information.
+      ]
 
 
     ],
@@ -477,7 +471,7 @@
       Each encoder block has two sub-layers:
 
       1. *Self-attention layer* → sharing information between the tokens.
-      2. *Feed-forward (FF) layer* → updating the token information.
+      #uncover("2-")[2. *Feed-forward (FF) layer* → updating the token information.]
     ],
     [
       #set align(center + horizon)
@@ -514,12 +508,14 @@
 
       #set text(size: 18pt)
 
-      #infobox("Example")[
-        _"The animal didn't cross the street because *it* was too tired."_
+      #uncover("2-")[
+        #infobox("Example")[
+          _"The animal didn't cross the street because *it* was too tired."_
 
-        #v(0.5em)
+          #v(0.5em)
 
-        When processing _"it"_, the model should attend strongly to _"animal"_ (not _"street"_).
+          When processing _"it"_, the model should attend strongly to _"animal"_ (not _"street"_).
+        ]
       ]
 
     ],
@@ -549,9 +545,9 @@
 
       #v(1em)
 
-      - *Query* ($bold(q)$): "what am I looking for?"
-      - *Key* ($bold(k)$): "what do I contain?"
-      - *Value* ($bold(v)$): "what information do I provide?"
+      #uncover("2-")[- *Query* ($bold(q)$): "what am I looking for?"]
+      #uncover("3-")[- *Key* ($bold(k)$): "what do I contain?"]
+      #uncover("4-")[- *Value* ($bold(v)$): "what information do I provide?"]
     ],
     [
       #image("img/lecture02/self_attention_vectors.png", width: 300pt)
@@ -608,7 +604,7 @@
   #questionbox()[
     Is it the only and the best way to compute attention? And do we need all three: queries, keys, and values?
   ]
-
+  #show: later
   #set text(size: 14pt)
 
   #table(
@@ -722,14 +718,18 @@
 
       #v(0.5em)
 
-      *Residual connection* ($bold(x) +$ ...):
+      #uncover("2-")[
+        *Residual connection* ($bold(x) +$ ...):
 
-      The input to the sublayer is also passed as a identity (no modification) → the layer only needs to learn the *"delta"* (how to update the input).
+        The input to the sublayer is also passed as a identity (no modification) → the layer only needs to learn the *"delta"* (how to update the input).
+      ]
 
       #v(0.5em)
-      *Layer normalization*:
+      #uncover("3-")[
+        *Layer normalization*:
 
-      Normalizes values across features → more stable training.
+        Normalizes values across features → more stable training.
+      ]
     ],
     [
       #set align(center + horizon)
@@ -869,11 +869,15 @@
 
       Each token can only attend to previous tokens, future positions masked by $-infinity$. (*why?*)
 
-      2. *Encoder-decoder (cross) attention*
-      Queries come from the decoder, keys and values come from the encoder output.
+      #uncover("2-")[
+        2. *Encoder-decoder (cross) attention*
+        Queries come from the decoder, keys and values come from the encoder output.
+      ]
 
-      3. *FF layer*
-      Same as in the encoder.
+      #uncover("3-")[
+        3. *FF layer*
+        Same as in the encoder.
+      ]
     ],
     [
       #set align(center + horizon)
@@ -938,12 +942,14 @@
       - Gradient vanishing over long distances.
     ],
     [
-      === Transformer
-      - Parallel processing
-        - (+) scalable on GPUs
-        - (-) needs positional embeddings
-      - Token information can be easily cross-shared in the attention layer.
-      - Stable gradients with residual connections.
+      #uncover("2-")[
+        === Transformer
+        - Parallel processing
+          - (+) scalable on GPUs
+          - (-) needs positional embeddings
+        - Token information can be easily cross-shared in the attention layer.
+        - Stable gradients with residual connections.
+      ]
     ],
   )
 
