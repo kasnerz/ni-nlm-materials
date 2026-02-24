@@ -13,7 +13,7 @@
   date: "24 Feb 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 #section-slide(section: "Recap")[Recap & math refresher]
 
@@ -298,7 +298,7 @@
   👉 #link("https://huggingface.co/spaces/Xenova/the-tokenizer-playground")
 
   #v(1em)
-  #bordered-box(image("img/lecture02/screen-2026-02-20-15-39-10.png", width: 400pt))
+  #bordered-box(image("img/lecture02/tokenizer_playground.png", width: 400pt))
 
   Notice the difference between languages.
 ]
@@ -342,7 +342,7 @@
       3. Compute a *weighted sum* of hidden states → context vector: $bold(c)_t = sum_i alpha_(t,i) bold(h)_i$.
       4. Use $bold(c)_t$ together with the decoder state to predict the next token.
     ],
-    [ #image("img/lecture02/screen-2026-02-20-15-54-38.png", width: 200pt)
+    [ #image("img/lecture02/luong_attention_viz.png", width: 200pt)
 
 
     ],
@@ -417,7 +417,7 @@
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture02/screen-2026-02-20-16-08-26.png", width: 200pt)
+      #image("img/lecture02/transformer_paper_fig.png", width: 200pt)
     ],
   )
 ]
@@ -663,7 +663,7 @@
       where $bold(Q) in RR^(n times d_k)$, $bold(K) in RR^(n times d_k)$, $bold(V) in RR^(n times d_v)$.
     ],
     [#set align(center + horizon)
-      #image("img/lecture02/attention-is-all-you-need-formula-t-shirt-unisex-steel-blue-m-356.png", width: 250pt)
+      #image("img/lecture02/attention_formula_tshirt.png", width: 250pt)
 
       #source(
         "https://www.artificial-intelligence.store/products/attention-is-all-you-need-formula-t-shirt-unisex?variant=48415389548872",
