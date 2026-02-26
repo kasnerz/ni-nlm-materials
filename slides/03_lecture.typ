@@ -76,10 +76,56 @@
 ]
 
 #slide[
-  = How does training a language model look like?
+  = Training a language model -- closer look
 
-  #image("img/lecture03/screen-2026-02-26-14-13-29.png")
+  #set text(size: 11pt)
 
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [```python
+        # Repeat in sequence
+    num_steps = 1000 # number of training steps
+    for step in range(num_steps):
+
+        # Take single document, tokenize it, surround it with BOS special token on both sides
+        doc = docs[step % len(docs)]
+        tokens = [BOS] + [uchars.index(ch) for ch in doc] + [BOS]
+        n = min(block_size, len(tokens) - 1)
+
+        # Forward the token sequence through the model, building up the computation graph all the way to the loss
+        keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
+        losses = []
+        for pos_id in range(n):
+            token_id, target_id = tokens[pos_id], tokens[pos_id + 1]
+            logits = gpt(token_id, pos_id, keys, values)
+            probs = softmax(logits)
+            loss_t = -probs[target_id].log()
+            losses.append(loss_t)
+        loss = (1 / n) * sum(losses) # final average loss over the document sequence. May yours be low.
+    ```],
+    [
+      ```python
+          # Backward the loss, calculating the gradients with respect to all model parameters
+          loss.backward()
+
+          # Adam optimizer update: update the model parameters based on the corresponding gradients
+          lr_t = learning_rate * (1 - step / num_steps) # linear learning rate decay
+          for i, p in enumerate(params):
+              m[i] = beta1 * m[i] + (1 - beta1) * p.grad
+              v[i] = beta2 * v[i] + (1 - beta2) * p.grad ** 2
+              m_hat = m[i] / (1 - beta1 ** (step + 1))
+              v_hat = v[i] / (1 - beta2 ** (step + 1))
+              p.data -= lr_t * m_hat / (v_hat ** 0.5 + eps_adam)
+              p.grad = 0
+
+          print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
+
+      ```
+
+
+    ],
+  )
   #source-slide("https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95", title: "Karpathy's microgpt")
 
 ]
@@ -330,22 +376,19 @@
   = Self-supervised pretraining
 
   #ideabox()[
-    Train the model on a *huge amount of text data*, without any human-provided labels. Let the model learn language patterns by predicting parts of the text from other parts.
+    If we train the model for predicting the words in a text that we know, we get training data essentially "for free": *any text is training data* for us.
+
   ]
 
-  #v(0.5em)
+  #set align(center)
+  #image("img/lecture03/screen-2026-02-26-17-32-54.png", width: 500pt)
 
-  - Also called *self-supervised learning*: the labels come from the text itself.
-  - Use specific *training objectives* (tasks) that don't need manual annotation.
+
+
+  #set align(left)
+
+  - *Self-supervised learning*: the labels come from the input itself.
   - Good for learning general language representations on massive data.
-
-  #v(0.5em)
-
-  #show: later
-
-  #questionbox()[
-    What "tasks" can we create from raw text without human annotations?
-  ]
 ]
 
 #slide[
