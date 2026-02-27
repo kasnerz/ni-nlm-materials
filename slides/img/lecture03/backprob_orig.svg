@@ -17,22 +17,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
-     id="defs27">
-    <marker
-       id="red-arrow"
-       viewBox="0 -5 10 10"
-       refX="10"
-       refY="0"
-       markerWidth="8"
-       markerHeight="8"
-       orient="auto">
-      <path
-         d="M0,-5 L10,0 L0,5 Z"
-         fill="red"
-         stroke="none"
-         id="path1" />
-    </marker>
-  </defs>
+     id="defs27" />
   <sodipodi:namedview
      id="namedview27"
      pagecolor="#ffffff"
@@ -43,21 +28,26 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
-     inkscape:zoom="0.85655514"
-     inkscape:cx="532.94876"
-     inkscape:cy="217.14889"
-     inkscape:window-width="1920"
-     inkscape:window-height="1020"
-     inkscape:window-x="340"
-     inkscape:window-y="1440"
+     inkscape:zoom="2.4227038"
+     inkscape:cx="515.33333"
+     inkscape:cy="177.90041"
+     inkscape:window-width="2560"
+     inkscape:window-height="1412"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="backward_pass" />
+     inkscape:current-layer="svg27" />
   <g
      id="graph0"
      class="graph"
      transform="scale(1 1) rotate(0) translate(4 263)">
     <title
        id="title1">G</title>
+    <polygon
+       fill="transparent"
+       stroke="transparent"
+       points="-4,4 -4,-263 769.19,-263 769.19,4 -4,4"
+       id="polygon1" />
     <!-- x -->
     <g
        id="node1"
@@ -604,168 +594,6 @@
          font-style="italic"
          font-size="14.00"
          id="text27">t</text>
-    </g>
-    <!-- Backward Pass -->
-    <g
-       id="backward_pass"
-       stroke="red"
-       fill="none"
-       stroke-width="1.5"
-       marker-end="url(#red-arrow)">
-      <!-- L to softmax -->
-      <path
-         d="m 750.83656,-55 q -35,-30 -85,-35"
-         id="path2" />
-      <text
-         x="720.7254"
-         y="-85.80394"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text8">∂L / ∂y</text>
-      <!-- softmax to y -->
-      <path
-         d="M 610,-90 Q 562,-115 515,-90"
-         id="path9" />
-      <text
-         x="571.19604"
-         y="-111.67975"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text12">∂L / ∂y<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan9">(in)</tspan></text>
-      <!-- y to yproj -->
-      <path
-         d="m 505.76468,-90.437907 q -30,-44.999993 -65,-47.999993"
-         id="path13" />
-      <text
-         x="495.06537"
-         y="-134.12744"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text18">∂L / ∂y<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan13">(in)</tspan></text>
-      <!-- y to by -->
-      <path
-         d="M 490,-54 Q 460,-35 438,-55"
-         id="path19" />
-      <text
-         x="470.69281"
-         y="-27.444433"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text28">∂L / ∂b<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan19">(y)</tspan></text>
-      <!-- yproj to Wy -->
-      <path
-         d="M 400,-102 Q 370,-75 340,-90"
-         id="path28" />
-      <text
-         x="361.94919"
-         y="-66.812248"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text29">∂L / ∂W<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan28">(y)</tspan></text>
-      <!-- yproj to relu -->
-      <path
-         d="m 415.17273,-138.30965 q -35,-37 -75,-40"
-         id="path29" />
-      <text
-         x="402.77701"
-         y="-169.82727"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text30">∂L / ∂h</text>
-      <!-- relu to hin -->
-      <path
-         d="M 295,-178 Q 262,-205 230,-178"
-         id="path30" />
-      <text
-         x="272.52802"
-         y="-197.30444"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text31">∂L / ∂h<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan30">(in)</tspan></text>
-      <!-- hin to hproj -->
-      <path
-         d="m 220.48238,-178.46447 q -30,-47 -65,-49"
-         id="path31" />
-      <text
-         x="205.34546"
-         y="-226.79433"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text32">∂L / ∂h<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan31">(in)</tspan></text>
-      <!-- hin to b -->
-      <path
-         d="M 205,-142 Q 180,-120 154,-142"
-         id="path32" />
-      <text
-         x="192.07625"
-         y="-113.05083"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text33">∂L / ∂b<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan32">(h)</tspan></text>
-      <!-- hproj to Wh -->
-      <path
-         d="M 115,-191 Q 85,-160 57,-170"
-         id="path33" />
-      <text
-         x="70.549042"
-         y="-141.05882"
-         font-family="Times, serif"
-         font-size="14px"
-         fill="#ff0000"
-         stroke="none"
-         text-anchor="middle"
-         id="text34">∂L / ∂W<tspan
-   baseline-shift="super"
-   font-size="10px"
-   id="tspan33">(h)</tspan></text>
     </g>
   </g>
 </svg>

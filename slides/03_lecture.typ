@@ -84,7 +84,7 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [```python
-        # Repeat in sequence
+    # Repeat in sequence
     num_steps = 1000 # number of training steps
     for step in range(num_steps):
 
@@ -140,7 +140,7 @@
   #questionbox()[Assume your model predicts a *real number*. How would you measure the error with respect to the ground truth value?]
 
   - `(true - predicted)`: bad idea, the errors may cancel out
-  - `abs(true - predicted)`: ok, but non-differentiable at 0
+  - `abs(true - predicted)`: ok, but non-differentiable at 0 → training issues
   - `(true - predicted)^2`: works well → smooth, penalizes large errors
 
 
@@ -181,8 +181,26 @@
       #image("img/lecture03/cross_entropy_overlay.svg")],
   )
 
-  #v(1em)
+]
 
+#slide[
+  = Loss function: language modeling
+
+
+  #set align(center + horizon)
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      *What we train for:*
+      #image("img/lecture03/output_target_probability_distributions.png")],
+    [
+      *What we hope to get:*
+      #image("img/lecture03/output_trained_model_probability_distributions.png")],
+  )
+
+  #source-slide("https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer")
 
 ]
 
@@ -202,8 +220,8 @@
   #infobox("Intuition about cross-entropy for language modeling")[
     - The model is supposed to predict the target token with *100% probability*.
     - Any difference between these probabilities is considered as an *error*.
-    - The value of the loss is a *negative logarithm of the difference* (why?).
-    - We ignore model predictions for any other tokens.
+    - The value of the loss is a *negative logarithm of the difference*. (why?)
+    - We ignore model predictions for any other tokens. (why?)
 
   ]
 ]
@@ -236,7 +254,7 @@
       #infobox("Gradient descent as a math formula")[$theta <- theta - eta nabla cal(L)(theta)$
 
         This simply says: we compute the steepest ascent direction ($nabla$) and go the opossite way.
-        - $nabla$ is  the *gradient* (derivative) of the loss w.r.t. each parameter.
+        - $nabla$ is  the *gradient*  of the loss w.r.t. each parameter.
 
         - $eta$ is the *learning rate*.
       ]
@@ -247,6 +265,106 @@
     ],
   )
 ]
+
+#slide[
+  = Computing gradient
+
+  #questionbox()[
+    We ended the forward pass by computing the loss. How do we get the gradient?
+  ]
+  #set align(center + horizon)
+
+  #v(-1em)
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [#image("img/lecture03/node_forward.svg")], [#image("img/lecture03/node_backward.svg")],
+  )
+
+  #source-slide(
+    "https://ufal.mff.cuni.cz/~straka/courses/npfl138/2526/slides.pdf/npfl138-2526-02.pdf",
+    title: "NPFL138",
+  )
+
+  #set align(left)
+  We start by computing $(partial cal(L))/(partial y)$  → *the derivative of the loss with respect to the model's output probabilities* (the softmax outputs).
+
+]
+
+#slide[
+  = Computing gradient
+
+  Since our loss is computed as:
+
+  $ cal(L) = -log y_"correct", $  then:
+  $ (partial cal(L))/(partial y_c) = cases(-1/y_c & "for the correct class", 0 & "for all other classes") $
+
+  #v(1em)
+
+  #infobox(
+    "Gradient vs. derivative",
+  )[Gradient ($nabla$) is how a (partial) *derivative* $partial$ is called for multivariate functions (= functions operating on multi-dimensional inputs).]
+]
+
+#slide[
+  = Backpropagation
+
+  *Backpropagation* = repeated application of the *chain rule* of derivatives for $f(g(x))$:
+
+  $ (partial f)/(partial x) = (partial f)/(partial g) dot (partial g)/(partial x) $
+  #v(0.5em)
+
+
+  How to apply it? First, build a *computation graph* (example for a simple FFNN):
+  #set align(center + horizon)
+  #image("img/lecture03/backprob_orig.svg", width: 500pt)
+
+  #source-slide("https://ufal.mff.cuni.cz/~courses/npfl129/2526/slides.pdf/npfl129-2526-05.pdf", title: "NPFL129")
+
+
+]
+
+#slide[
+  = Backpropagation
+  ...then apply the *chain rule* it in the backward direction:
+
+  #set align(center + horizon)
+  #image("img/lecture03/backprob.svg", width: 500pt)
+
+  #set align(left)
+
+  #infobox("Computing the gradient in practice")[
+    Modern deep learning frameworks (PyTorch, TensorFlow) have built-in *autograd* functionality that automatically computes gradients for us.
+
+  ]
+
+
+]
+
+
+#slide[
+  = Stochastic gradient descent
+
+  Computing the gradient over the *entire dataset* at once is #strike[expensive] impossible.
+
+
+  #ideabox()[
+    Instead of using all training examples, we iteratively compute the gradient on *small random subsets* of the training examples.
+  ]
+
+
+  - *Stochastic gradient descent (SGD)*: our subset is of size 1 (=a single example).
+  - *Mini-batch SGD*: we a take a batch of examples (e.g. 32 examples).
+
+
+  #show: later
+
+  #questionbox()[
+    Is it useful to introduce some stochasticity into the training process?
+  ]
+]
+
 
 #slide[
   = Learning rate
@@ -274,67 +392,6 @@
   )
 ]
 
-#slide[
-  = Computing gradient
-
-  #questionbox()[
-    We computed the loss: the end point of the forward pass. Now what?
-  ]
-
-
-  We start by computing $(partial cal(L))/(partial p)$  → *the derivative of the loss with respect to the model's output probabilities* (the softmax outputs).
-
-  Since $cal(L) = -log p("correct")$, then $(partial cal(L))/(partial p) = -1/p("correct")$ for the correct class and $0$ for others.
-
-  #infobox(
-    "Gradient vs. derivation",
-  )[The gradient $nabla$ is how a (partial) *derivation* $partial$ is called for multivariate functions (=functions operating on multi-dimensional inputs).]
-
-
-
-]
-
-#slide[
-  = Backpropagation
-
-
-  #v(0.5em)
-
-  *Backpropagation* = application of the *chain rule* for derivatives for $f(g(x))$:
-
-  $ (partial f)/(partial x) = (partial f)/(partial g) dot (partial g)/(partial x) $
-
-  How to apply it? Follow the *computation graph* in the backward direction:
-  #set align(center + horizon)
-
-  #image("img/lecture03/backprob.svg", width: 500pt)
-
-]
-
-
-#slide[
-  = Stochastic gradient descent
-
-  Computing the gradient over the *entire dataset* is (very, very) expensive.
-
-
-  #ideabox()[
-    Instead of using all training examples, we iteratively compute the gradient on *small random subsets* of the training examples.
-  ]
-
-
-  - *Stochastic gradient descent (SGD)*: our subset is of size 1 (=a single example).
-  - *Mini-batch SGD*: we a take a batch of examples (e.g. 32 examples).
-
-
-  #show: later
-
-  #questionbox()[
-    Is it useful to introduce some stochasticity into the training process?
-  ]
-]
-
-
 
 
 
@@ -354,7 +411,7 @@
       columns: (2.5fr, 1fr),
       gutter: 1em,
       [
-        See Milan Straka's *Deep Learning course* (lectures 1-3, lecture recordings available):
+        See the MFF UK *Deep Learning course* (lectures 1-3, lecture recordings available):
 
         https://ufal.mff.cuni.cz/courses/npfl138/2526-summer],
       [
@@ -372,162 +429,219 @@
 // ============================================================
 #section-slide(section: "Pretraining")[Pretraining the Transformer]
 
+
+#slide[
+  = Supervised training?
+
+  #source-slide("https://arxiv.org/abs/1706.03762", title: "Vaswani et al. (2017)")
+
+  The original Transformer was trained *fully supervised on machine translation*:
+
+  - English → German (WMT 2014, 4.5M sentence pairs)
+  - English → French (WMT 2014, 36M sentence pairs)
+
+  #questionbox()[
+    Where can we get that much data for other tasks?
+  ]
+
+  We *do not have* that much data for other tasks 🥲
+
+  → However, much of what the model was learning during the training was the *structure of the language* itself.
+]
+
+
 #slide[
   = Self-supervised pretraining
 
   #ideabox()[
-    If we train the model for predicting the words in a text that we know, we get training data essentially "for free": *any text is training data* for us.
+    If we train the model for predicting the words in a text, *any text is training data*!
 
   ]
 
   #set align(center)
   #image("img/lecture03/screen-2026-02-26-17-32-54.png", width: 500pt)
 
-
-
   #set align(left)
 
-  - *Self-supervised learning*: the labels come from the input itself.
-  - Good for learning general language representations on massive data.
+  - The training regime where the labels come from the input itself is called *self-supervised learning*.
+  - We can use it for learning general language representations
+
+    → ...maybe we will then need less data for the specific tasks?
+]
+
+
+#slide[
+  = Pretraining a Transformer encoder
+
+  #ideabox()[
+    We know the text representation is built in the Transformer *encoder*. Can we start pretraning the encoder alone?]
+
+  Good representations might help us with classification tasks:
+
+  #v(-1em)
+
+  #set align(center + horizon)
+
+  #image("img/lecture03/BERT-classification-spam.png", width: 600pt)
+
+  #source-slide("https://jalammar.github.io/illustrated-bert/", title: "Illustrated BERT")
+
 ]
 
 #slide[
-  = Pretraining objectives
-
-  #source-slide("https://arxiv.org/abs/1810.04805", title: "Devlin et al. 2019 (BERT)")
-
-  Depending on the architecture, we use different pretraining objectives:
-
-  #v(0.5em)
-
+  = Pretraining a Transformer encoder
   #grid(
-    columns: (1fr, 1fr, 1fr),
+    columns: (1fr, 1fr),
     gutter: 1em,
     [
-      === Encoder
-      *Masked language modeling* (MLM): mask out some tokens, predict them from the surrounding context.
-      - E.g. BERT, RoBERTa
-      - Bidirectional context
+
+      *Our goal:* Get a rich representation of the input text (one embedding per token).
+
+
+      - The resulting word embedding should incorporate the full sentence context (both *left and right*).
+      - Can we mask a word and let the model predict it?
+        - Yes, but too slow → let's mask \~15% of words at a time.
+
+
     ],
     [
-      === Decoder
-      *Causal language modeling* (CLM): predict the next token from the previous ones.
-      - E.g. GPT, GPT-2, LLaMA
-      - Left-to-right context only
-    ],
-    [
-      === Encoder-decoder
-      *Span corruption / denoising*: corrupt spans in the input, reconstruct them in the decoder.
-      - E.g. T5, BART
-      - Bidirectional encoder + autoregressive decoder
+      #set align(center + horizon)
+
+      #image("img/lecture03/BERT-language-modeling-masked-lm.png")
+
     ],
   )
+  → the *masked language modeling* objective.
+]
+
+#slide[
+  = Pretraining a Transformer encoder
+
+  Our setup:
+  #v(-1em)
+
+  #set align(center + horizon)
+
+  #v(-1em)
+
+  #image("img/lecture03/bert-transfer-learning.png", width: 550pt)
 ]
 
 
 #slide[
-  = Causal language modeling (CLM)
+  = BERT: Pre-trained Transformer encoder
+  *BERT: Pre-training of Deep Bidirectional Transformers for
+  Language Understanding* #link("https://arxiv.org/pdf/1810.04805")[(Devlin et al., 2019)] → breakthrough approach for many NLP tasks.
 
-  This is what we already know as *language modeling* from Lecture 1:
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [#infobox()[
+      The results BERT was getting were very cool -- anything using BERT was suddenly *state-of-the-art*. No one was sure why.
+
+
+      This started a whole new research field called "#link("https://arxiv.org/abs/2002.12327")[BERTology]".
+    ]],
+    [
+      #set align(center + horizon)
+
+      #image("img/lecture03/bert_pretraining_finetuning.png", width: 280pt)],
+  )
+
+
+
+]
+
+#slide[
+  = Pretraining a Transformer decoder
+
+  #ideabox(
+    "Meanwhile in OpenAI...",
+  )[The encoder seems kind of useless. The *decoder* can represent the text on its own -- and it can also *generate text*! Can we have more of that, please?]
+
+  #set align(center + horizon)
+  #v(-1em)
+
+  #image("img/lecture03/gpt2-sizes-hyperparameters-3.png", width: 400pt)
+
+  #source-slide("https://jalammar.github.io/illustrated-gpt2/", title: "Illustrated GPT-2")
+]
+
+#slide[
+  = Pretraining a Transformer decoder
+  *Decoder-only block*: only masked self-attention & FFNN, no encoder-decoder attention.
+
+  #v(-1em)
+
+  #set align(center + horizon)
+
+  #image("img/lecture03/transformer-decoder-intro.png", width: 600pt)
+
+  #source-slide("https://jalammar.github.io/illustrated-gpt2/", title: "Illustrated GPT-2")
+
+
+]
+
+#slide[
+  = Causal language modeling
+
+  How to pretrain a decoder? Using *causal language modeling*: what we already know as "language modeling" or "next-word prediction task":
 
   $ P(w_1, ..., w_T) = product_(t=1)^(T) P(w_t | w_1, ..., w_(t-1)) $
 
   #v(0.5em)
 
-  - The model predicts the *next token*, given all previous tokens.
-  - At training time: the model sees the full sequence, but each position can only attend to *previous* positions (causal masking).
-  - Loss: cross-entropy at *each position*.
+  #grid(
+    columns: (2.7fr, 1fr),
+    gutter: 2em,
+    [
+      #v(-0.5em)
+
+
+      #infobox("Attention mask")[
+        Masking the future tokens is what allows *parallel training*: we can compute the loss at all positions at once, even though each position "pretends" it cannot see the future.
+      ]
+    ],
+    [
+      #set align(center + horizon)
+
+      #image("img/lecture03/self-attention-and-masked-self-attention.png", width: 190pt)],
+  )
+]
+
+
+#slide[
+  = GPT-2: Pre-trained Transformer decoder
+
+  #source-slide(
+    "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf",
+    title: "Radford et al. 2018",
+  )
+
+  *Generative Pre-trained Transformer*
+
+  - Transformer *decoder only*.
+  - Pretrained with *causal language modeling* (next-word prediction).
+  - GPT-1 (2018): 12 layers, 117M params. Finetuned for downstream tasks.
 
   #v(0.5em)
 
   #show: later
 
-  #infobox(title: "Why causal?")[
-    "Causal" = each prediction depends only on the *past*, not the future. This is what makes it natural for *text generation*.
-  ]
-]
+  *GPT-2* (2019): scaled up to *1.5B params*, trained on WebText (8M web pages).
 
-
-#slide[
-  = Causal attention masking
-
-  #source-slide("https://jalammar.github.io/illustrated-gpt2/", title: "The Illustrated GPT-2")
-
-  In the Transformer decoder, *self-attention is masked*: each token can only attend to itself and earlier tokens.
+  #source(
+    "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf",
+    title: "Radford et al. 2019",
+  )
 
   #v(0.5em)
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      This is achieved with an *attention mask*:
+  Key finding: the model can perform tasks *without any finetuning* -- just from the pretraining data. This is what later became known as *zero-shot* capabilities.
 
-      $ "Attention"(Q, K, V) = "softmax"((Q K^top) / sqrt(d_k) + M) V $
-
-      where $M$ is a mask with $-infinity$ in the upper triangle (future positions).
-
-      #v(0.5em)
-
-      The masking is what allows *parallel training*: we can compute the loss at all positions at once, even though each position "pretends" it can't see the future.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/causal_attention.png", width: 100%)
-    ],
-  )
 ]
 
-
-#slide[
-  = Masked language modeling (MLM)
-
-  #source-slide("https://arxiv.org/abs/1810.04805", title: "Devlin et al. 2019 (BERT)")
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      Instead of predicting the next token, *randomly mask* some tokens and predict them from the full (bidirectional) context.
-
-      #v(0.5em)
-
-      *BERT's masking strategy* (15% of tokens):
-      - 80% replaced with `[MASK]`
-      - 10% replaced with a random token
-      - 10% kept unchanged
-
-      #v(0.5em)
-
-      Loss is computed *only on the masked positions*.
-
-      #v(0.5em)
-
-      Advantage: the model can use *both left and right context* for prediction.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/bert_mlm.png", width: 100%)
-    ],
-  )
-]
-
-#slide[
-  = Training transformers in parallel
-
-  #source-slide("https://ufal.cz/courses/npfl140", title: "NPFL140")
-
-  In the Transformer, we can train on *all positions at once*: feed the entire sequence and predict the next token at each position simultaneously.
-
-  #v(0.5em)
-
-  #set align(center + horizon)
-  #image("img/lecture03/training_transformers.png", width: 500pt)
-
-  #set align(left)
-
-  This is the key advantage over RNNs, which need sequential processing.
-]
 
 
 #slide[
@@ -561,130 +675,30 @@
 
 
 #slide[
-  = Scaling laws
+  = T5
 
-  #source-slide("https://arxiv.org/abs/2203.15556", title: "Hoffmann et al. 2022 (Chinchilla)")
+  #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. 2020")
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      How big should the model and the dataset be?
+  *Text-to-Text Transfer Transformer*
 
-      #v(0.5em)
+  - *Encoder-decoder* architecture.
+  - All tasks framed as *text-to-text*: input text → output text.
 
-      *Chinchilla scaling laws*: for a given compute budget, there is an *optimal ratio* of model size to data size.
+  #v(0.5em)
 
-      #v(0.5em)
+  *Example*:
+  - Translation: `"translate English to German: That is good"` → `"Das ist gut"`
+  - Summarization: `"summarize: ..."` → summary
+  - Classification: `"sentiment: great movie"` → `"positive"`
 
-      Rule of thumb: the number of training tokens should be roughly *20× the number of parameters*.
+  #v(0.5em)
 
-      #v(0.5em)
-
-      - 7B model → ~140B tokens
-      - 70B model → ~1.4T tokens
-
-      #v(0.5em)
-
-      Many early LLMs were *undertrained* relative to these estimates (e.g. original LLaMA trains on more data → better performance than larger models).
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/chinchilla_scaling.png", width: 100%)
-    ],
-  )
+  - Trained on C4 (Colossal Clean Crawled Corpus, ~750GB of text).
+  - Various sizes: 60M to 11B parameters.
+  - Systematically compared many design choices (architecture, objectives, data).
 ]
 
 
-// ============================================================
-// SECTION 3: Pretrained models
-// ============================================================
-#section-slide(section: "Pretrained models")[Pretrained models]
-
-#slide[
-  = Pretraining + finetuning paradigm
-
-  #source-slide("https://jalammar.github.io/illustrated-bert/", title: "The Illustrated BERT")
-
-  *Two-step training*:
-
-  + *Pretrain* a model on a huge dataset (self-supervised, language-based tasks).
-  + *Finetune* for your own task on your smaller, task-specific data (supervised).
-
-  #v(0.5em)
-
-  #set align(center + horizon)
-  #image("img/lecture03/bert_transfer_learning.png", width: 450pt)
-
-  #set align(left)
-  #v(0.5em)
-
-  Pretrained models provide *contextual embeddings* -- like a better version of word2vec that takes the whole sentence into account.
-]
-
-
-#slide[
-  = BERT
-
-  #source-slide("https://arxiv.org/abs/1810.04805", title: "Devlin et al. 2019")
-
-  *Bidirectional Encoder Representations from Transformers*
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      - Transformer *encoder only*.
-      - Pretrained with *two objectives*:
-        + Masked language modeling (MLM)
-        + Next sentence prediction (NSP)
-      - Finetuned by adding a task-specific output layer.
-      - BERT-base: 12 layers, 768 hidden, 110M params.
-      - BERT-large: 24 layers, 1024 hidden, 340M params.
-
-      #v(0.5em)
-
-      BERT set *new SOTA* on 11 NLP tasks when released.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/bert_pretraining_finetuning.png", width: 100%)
-    ],
-  )
-]
-
-
-#slide[
-  = GPT
-
-  #source-slide(
-    "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf",
-    title: "Radford et al. 2018",
-  )
-
-  *Generative Pre-trained Transformer*
-
-  - Transformer *decoder only*.
-  - Pretrained with *causal language modeling* (next-word prediction).
-  - GPT-1 (2018): 12 layers, 117M params. Finetuned for downstream tasks.
-
-  #v(0.5em)
-
-  #show: later
-
-  *GPT-2* (2019): scaled up to *1.5B params*, trained on WebText (8M web pages).
-
-  #source(
-    "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf",
-    title: "Radford et al. 2019",
-  )
-
-  #v(0.5em)
-
-  Key finding: the model can perform tasks *without any finetuning* -- just from the pretraining data. This is what later became known as *zero-shot* capabilities.
-]
 
 
 #slide[
@@ -725,75 +739,47 @@
 ]
 
 
-#slide[
-  = T5
 
-  #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. 2020")
-
-  *Text-to-Text Transfer Transformer*
-
-  - *Encoder-decoder* architecture.
-  - All tasks framed as *text-to-text*: input text → output text.
-
-  #v(0.5em)
-
-  *Example*:
-  - Translation: `"translate English to German: That is good"` → `"Das ist gut"`
-  - Summarization: `"summarize: ..."` → summary
-  - Classification: `"sentiment: great movie"` → `"positive"`
-
-  #v(0.5em)
-
-  - Trained on C4 (Colossal Clean Crawled Corpus, ~750GB of text).
-  - Various sizes: 60M to 11B parameters.
-  - Systematically compared many design choices (architecture, objectives, data).
-]
 
 
 #slide[
-  = The LLM evolutionary tree
+  = The LLM evolutionary tree (up to 2023)
 
   #source-slide("https://arxiv.org/abs/2304.13712", title: "Yang et al. 2023")
 
-  #set align(center + horizon)
 
-  #image("img/lecture03/llm_evolutionary_tree.png", width: 520pt)
-]
-
-
-// ============================================================
-// SECTION 4: Supervised finetuning
-// ============================================================
-#section-slide(section: "Finetuning")[Supervised finetuning]
-
-#slide[
-  = Why finetune?
-
-  Pretrained models learn *general language knowledge*. But we often want a model that is good at a *specific task*.
-
-  #v(0.5em)
-
-  *Supervised finetuning (SFT)* = continue training the pretrained model on a smaller, task-specific, labeled dataset.
-
-  #v(0.5em)
 
   #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
+    columns: (2.5fr, 1fr),
+    gutter: 0em,
     [
-      === Classic finetuning (BERT era)
-      - Add a task-specific head (e.g. linear classifier) on top.
-      - Train on labeled data for the specific task.
-      - Separate model per task.
+      #set align(center + horizon)
+      #image("img/lecture03/llm_evolutionary_tree.png", width: 480pt)
+
     ],
     [
-      === Modern finetuning (LLM era)
-      - Train the model to follow *instructions* in natural language.
-      - One model for many tasks.
-      - The task is specified in the prompt.
+
+      #set text(size: 16pt)
+
+      #set align(horizon)
+
+
+      *Legend:*
+
+      #box(circle(fill: rgb("#F2A3B4"), width: 0.7em, height: 0.7em)) #text(fill: rgb("#F2A3B4"))[*Encoder models*]
+
+      #box(circle(fill: rgb("#74B889"), width: 0.7em, height: 0.7em)) #text(
+        fill: rgb("#74B889"),
+      )[*Encoder-decoder models*]
+
+      #box(circle(fill: rgb("#8194B0"), width: 0.7em, height: 0.7em)) #text(fill: rgb("#8194B0"))[*Decoder models*]
+
     ],
   )
+
+
 ]
+
 
 
 #slide[
@@ -1076,7 +1062,7 @@
   = Summary
 
   #infobox(title: "What we covered today")[
-    - *Training NNs*: loss functions, gradient descent, SGD, backpropagation, learning rate, optimizers.
+    - *Training NNs*: loss functions, gradient descent, SGD, backpropagation, learning rate.
     - *Pretraining*: self-supervised objectives (CLM, MLM, span corruption).
     - *Pretrained models*: BERT, GPT, T5 and their variants; the LLM timeline.
     - *Supervised finetuning*: adapting pretrained models to specific tasks; instruction tuning.
