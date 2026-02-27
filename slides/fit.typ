@@ -217,7 +217,7 @@
   show quote: it => {
     block(
       width: 100%,
-      inset: (left: 1.0em, right: 0.8em, top: 0.5em, bottom: 0.5em),
+      inset: (left: 1.0em, right: 0.8em, top: 0.5em, bottom: 1.1em),
       radius: 0pt,
       stroke: (left: (paint: rgb("#686868"), thickness: 6pt)),
     )[

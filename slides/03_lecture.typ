@@ -8,7 +8,7 @@
 #title-slide(
   title: "NI-NLM",
   name: "NI-NLM – Lecture 3",
-  subtitle: "LLM Training",
+  subtitle: "Training language models",
   author: "Zdeněk Kasner",
   date: "3 Mar 2026",
 )[]
@@ -18,7 +18,7 @@
 // ============================================================
 // SECTION 1: Training neural networks
 // ============================================================
-#section-slide(section: "Training")[Training neural networks]
+#section-slide(section: "Training neural networks")[Training neural networks]
 
 #slide[
   = Training neural networks
@@ -427,7 +427,7 @@
 // ============================================================
 // SECTION 2: Pretraining
 // ============================================================
-#section-slide(section: "Pretraining")[Pretraining the Transformer]
+#section-slide(section: "Pretraining and pretrained models")[Pretraining the Transformer]
 
 
 #slide[
@@ -594,108 +594,173 @@
 
   #grid(
     columns: (2.7fr, 1fr),
-    gutter: 2em,
+    gutter: 1em,
     [
       #v(-0.5em)
 
 
       #infobox("Attention mask")[
-        Masking the future tokens is what allows *parallel training*: we can compute the loss at all positions at once, even though each position "pretends" it cannot see the future.
+        Masking the future tokens can be done using a triangular mask. That  allows *parallel training*: we can compute the loss at all positions at once, while each position "pretends" it cannot see its future.
       ]
     ],
     [
       #set align(center + horizon)
-
-      #image("img/lecture03/self-attention-and-masked-self-attention.png", width: 190pt)],
+      #image("img/lecture03/transformer-decoder-attention-mask-dataset.png", width: 250pt)
+    ],
   )
 ]
 
 
 #slide[
-  = GPT-2: Pre-trained Transformer decoder
+  = GPT: Pre-trained Transformer decoder
 
   #source-slide(
     "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf",
     title: "Radford et al. 2018",
   )
+  *The "GPT-1" paper* (#link("Improving Language Understanding
+by Generative Pre-Training")[Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)])
+  - 12 layers, 117M params, good results on downstream tasks.
+  - Published (pre-print + blogpost) in June 2018 → immediately overshadowed by BERT in October 2018.
 
-  *Generative Pre-trained Transformer*
+  #set align(center + horizon)
 
-  - Transformer *decoder only*.
-  - Pretrained with *causal language modeling* (next-word prediction).
-  - GPT-1 (2018): 12 layers, 117M params. Finetuned for downstream tasks.
+  #v(-1em)
 
-  #v(0.5em)
+  #image("img/lecture03/screen-2026-02-27-12-45-08.png", width: 400pt)
+]
 
-  #show: later
+#slide[
+  = GPT: Pre-trained Transformer decoder
 
-  *GPT-2* (2019): scaled up to *1.5B params*, trained on WebText (8M web pages).
+  *GPT-2:* #link("https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf")[Language Models are Unsupervised Multitask Learners (Radford et al., 2019)]
 
-  #source(
-    "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf",
-    title: "Radford et al. 2019",
-  )
+  Published as a pre-print and a blogpost on the OpenAI website in February 2019:
+  #set align(center + horizon)
 
-  #v(0.5em)
+  #image("img/lecture03/screen-2026-02-27-12-50-44.png", width: 500pt)
 
-  Key finding: the model can perform tasks *without any finetuning* -- just from the pretraining data. This is what later became known as *zero-shot* capabilities.
+
+  #source-slide("https://openai.com/index/better-language-models/", title: "OpenAI blog")
 
 ]
+
+#slide[
+  = GPT: Pre-trained Transformer decoder
+  Examples of astounding (back then!) *consistency of text over several paragraphs*:
+
+  #set text(size: 16pt)
+
+  #source-slide("https://openai.com/index/better-language-models/", title: "OpenAI blog")
+
+
+  #quote()[
+    #grid(
+      columns: (1fr, 5fr),
+      gutter: 1em,
+      [
+        #set text(size: 12pt)
+
+        System Prompt (human-written)
+      ],
+      [
+        In a shocking finding, scientist discovered a herd of unicorns living in a remote, previously unexplored valley, in the Andes Mountains. Even more surprising to the researchers was the fact that the unicorns spoke perfect English.
+      ],
+    )
+  ]
+
+  #quote()[
+    #grid(
+      columns: (1fr, 5fr),
+      gutter: 1em,
+      [
+        #set text(size: 12pt)
+
+        Model Completion (machine-written, 10 tries)
+      ],
+      [
+        The scientist named the population, after their distinctive horn, Ovid’s Unicorn. These four-horned, silver-white unicorns were previously unknown to science.
+
+
+        (...7 more paragraphs...)
+
+        However, Pérez also pointed out that it is likely that the only way of knowing for sure if unicorns are indeed the descendants of a lost alien race is through DNA. “But they seem to be able to communicate in English quite well, which I believe is a sign of evolution, or at least a change in social organization,” said the scientist.
+      ],
+    )
+  ]
+]
+
+
+#slide[
+  = GPT: Pre-trained Transformer decoder
+
+  #infobox("GPT-2 release strategy")[
+    At first, OpenAI decided to release only the *smallest model* version _"due to concerns about large language models being used to generate deceptive, biased, or abusive language at scale"_. They released all the models within \~6 months.
+  ]
+
+  #set align(center + horizon)
+
+  #image("img/lecture03/gpt2-sizes.png", width: 450pt)
+]
+
 
 
 
 #slide[
   = Encoder-decoder pretraining
 
-  #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. 2020 (T5)")
+  #questionbox()[
+    Can we also *pre-train* the full encoder decoder model?
+  ]
 
-  The encoder-decoder Transformer uses *span corruption* (denoising):
+  #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. (2020)")
 
-  #v(0.5em)
-
-  - Replace random *contiguous spans* with sentinel tokens (`<extra_id_0>`, `<extra_id_1>`, ...).
-  - The decoder generates only the *masked spans* (not the full text).
-
-  #v(0.5em)
-
-  *Example (T5):*
-
-  #set text(size: 16pt)
-
-  Input: `"The <X> brown <Y> over the lazy dog"`
-
-  Target: `"<X> quick <Y> fox jumps"`
-
-  #set text(size: 20pt)
-
-  #v(0.5em)
-
-  This combines the benefits of bidirectional encoding with autoregressive generation.
+  #grid(
+    columns: (1.2fr, 1fr),
+    gutter: 1em,
+    [
+      *Span corruption* (→ the "denoising" objective):
+      - The model needs to predict continuous spans in the sequence.
+      - Combines the benefits of bidirectional encoding with autoregressive generation.
+    ],
+    [
+      #image("img/lecture03/screen-2026-02-27-13-16-58.png")
+    ],
+  )
 ]
 
 
 #slide[
-  = T5
 
-  #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. 2020")
+  #set align(horizon)
 
-  *Text-to-Text Transfer Transformer*
+  = T5 & BART: Pre-trained Transformer encoder-decoders
 
-  - *Encoder-decoder* architecture.
-  - All tasks framed as *text-to-text*: input text → output text.
 
-  #v(0.5em)
+  #grid(
+    columns: (1.2fr, 1fr),
+    gutter: 1em,
+    [
+      *#link("https://arxiv.org/pdf/1910.10683")[T5 (Raffel et al., 2019)] - Google:*
 
-  *Example*:
-  - Translation: `"translate English to German: That is good"` → `"Das ist gut"`
-  - Summarization: `"summarize: ..."` → summary
-  - Classification: `"sentiment: great movie"` → `"positive"`
+      #image("/assets/screen-2026-02-27-13-19-16.png")
+    ],
+    [
 
-  #v(0.5em)
+      *#link("https://arxiv.org/pdf/1910.13461")[BART (Lewis et al., 2019)] - Microsoft*:
 
-  - Trained on C4 (Colossal Clean Crawled Corpus, ~750GB of text).
-  - Various sizes: 60M to 11B parameters.
-  - Systematically compared many design choices (architecture, objectives, data).
+      #set align(center + horizon)
+      #image("img/lecture03/screen-2026-02-27-13-19-48.png", width: 300pt)
+    ],
+  )
+
+  #v(1em)
+
+
+  - Very similar models (slightly different training objectives & training data).
+  - State-of-the-art on *seq2seq tasks* until the rise of large language models.
+
+
 ]
 
 
