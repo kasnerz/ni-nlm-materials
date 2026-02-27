@@ -759,7 +759,34 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
 
   - Very similar models (slightly different training objectives & training data).
   - State-of-the-art on *seq2seq tasks* until the rise of large language models.
+]
 
+#slide[
+  = What we covered
+  Three variants of pre-trained Transformer models:
+
+  #source-slide("https://drive.google.com/file/d/1kUvE_zaFC-9jZ_pyp8bXo7gWBwuH5Mo0/view", title: "CSE 517 / CSE 447")
+
+  #set align(center)
+  #v(2em)
+
+  #grid(
+    columns: (1fr, 1fr, 1.2fr),
+    gutter: 1em,
+    [
+      *Encoder-only (BERT)*
+      #image("img/lecture03/screen-2026-02-27-14-57-21.png", width: 180pt)
+    ],
+    [
+      *Decoder-only (GPT)*
+      #image("img/lecture03/screen-2026-02-27-14-57-29.png", width: 180pt)
+    ],
+    [
+
+      *Encoder-decoder (T5, BART)*
+      #image("img/lecture03/screen-2026-02-27-14-57-24.png", width: 180pt)
+    ],
+  )
 
 ]
 
@@ -769,50 +796,42 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
 #slide[
   = GPT-3
 
+  #ideabox("Meanwhile in OpenAI...")[
+    GPT-2 was kinda good. Let's see what happens if we make it *100x as big*!
+  ]
+  #set align(center + horizon)
+
+  #image("img/lecture03/screen-2026-02-27-13-35-05.png", width: 350pt)
+  #source("https://bbycroft.net/llm", title: "llm-vis")
+
+]
+
+#slide[
+  = GPT-3
+
+
   #source-slide("https://arxiv.org/abs/2005.14165", title: "Brown et al. 2020")
 
-  *175B parameters*, trained on a mix of Common Crawl, books, Wikipedia.
+  *GPT-3:* #link("https://arxiv.org/abs/2005.14165")[Language Models are Few-Shot Learners (Brown et al. 2020)]
+  - *175B parameters* (the largest GPT-2 model was 1.5B parameters)
+  - Trained on a mix of Common Crawl, books, Wikipedia.
 
-  #v(0.5em)
 
-  Key contribution: *in-context learning* -- the model can learn from a few examples provided in the input prompt, without any gradient updates.
+  #infobox("Biggest surprise: In-context learning")[
+    The model could suddenly learn a task from a few examples provided in the input prompt (without any gradient updates).
 
-  #v(0.5em)
-
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    gutter: 0.5em,
-    [
-      === Zero-shot
-      Task description only, no examples.
-    ],
-    [
-      === One-shot
-      Task description + one example.
-    ],
-    [
-      === Few-shot
-      Task description + a few examples.
-    ],
-  )
-
-  #v(0.5em)
-
-  #infobox()[
-    GPT-3 demonstrated that *scale alone* can unlock new capabilities. This was the starting point of the "scaling era" of LLMs.
+    - _Zero-shot_: Task description only, no examples.
+    - _Few-shot_: Task description + a few examples.
   ]
+
 ]
 
 
 
-
-
 #slide[
-  = The LLM evolutionary tree (up to 2023)
+  = The LLM evolutionary tree: how it continued
 
   #source-slide("https://arxiv.org/abs/2304.13712", title: "Yang et al. 2023")
-
-
 
   #grid(
     columns: (2.5fr, 1fr),
@@ -820,14 +839,10 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
     [
       #set align(center + horizon)
       #image("img/lecture03/llm_evolutionary_tree.png", width: 480pt)
-
     ],
     [
-
       #set text(size: 16pt)
-
       #set align(horizon)
-
 
       *Legend:*
 
@@ -841,30 +856,224 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
 
     ],
   )
+]
 
+#section-slide(section: "Finetuning and alignment")[Finetuning and alignment]
+
+
+#slide[
+  = Where are we?
+
+  #set text(size: 15pt)
+
+  // Helper: numbered circle badge
+  #let step-circle(n) = {
+    box(baseline: -0.15em, circle(
+      fill: primary-color,
+      radius: 0.6em,
+    )[#set align(center + horizon)
+      #text(fill: white, weight: "bold", size: 12pt)[#n]])
+  }
+
+  // Helper: gray rounded box for model stage labels
+  #let stage-box(content) = {
+    box(
+      fill: rgb("#f0f0f0"),
+      radius: 5pt,
+      inset: (x: 0.8em, y: 0.45em),
+    )[#set align(center)
+      #text(size: 13pt)[#content]]
+  }
+
+  // Helper: proper grey filled block arrow pointing down
+  #let down-arrow = {
+    box(width: 1.4em, height: 1.1em, inset: 0pt)[
+      #align(center + horizon)[
+        #polygon(
+          fill: rgb("#c0c0c0"),
+          (20%, 0%),
+          (80%, 0%),
+          (80%, 40%),
+          (100%, 40%),
+          (50%, 100%),
+          (0%, 40%),
+          (20%, 40%),
+        )
+      ]
+    ]
+  }
+
+  // Helper: colored underline matching the primary color
+  #let punderline(body) = underline(stroke: 1.5pt + primary-color, offset: 2pt, body)
+
+  #grid(
+    columns: (1fr, 10pt, 1.8fr),
+    gutter: 2em,
+    [
+      // ===== LEFT COLUMN: Model stages =====
+      #set align(center)
+      #text(size: 20pt, weight: "bold")[Model stages:]
+
+      #v(0.2em)
+      #stage-box[random neural network]
+      #v(-0.2em)
+      #step-circle("1") #h(0.2em) #down-arrow
+      #v(-0.2em)
+      #stage-box["autocomplete on steroids"]
+
+      #text(size: 11pt, style: "italic", fill: muted-color)[base / foundational model]
+      #v(-0.2em)
+      #step-circle("2") #h(0.2em) #down-arrow
+      #v(-0.2em)
+      #stage-box[assistant]
+
+      #text(size: 11pt, style: "italic", fill: muted-color)[instruction-tuned model]
+      #v(-0.2em)
+      #step-circle("3") #h(0.2em) #down-arrow
+      #v(-0.2em)
+      #stage-box[helpful assistant]
+    ],
+    [
+      // ===== DOTTED SEPARATOR =====
+      #align(center)[
+        #line(
+          angle: 90deg,
+          length: 100%,
+          stroke: (paint: rgb("#cccccc"), thickness: 1pt, dash: "dotted"),
+        )
+      ]
+    ],
+    [
+      // ===== RIGHT COLUMN: Training stages =====
+      #text(size: 20pt, weight: "bold")[Training stages:]
+
+      #v(0.2em)
+
+      // --- Stage 1: Pre-training ---
+      #grid(
+        columns: (auto, 1fr),
+        column-gutter: 0.4em,
+        align: horizon,
+        step-circle("1"), text(size: 18pt, weight: "bold")[Pre-training 🌍 ],
+      )
+      #v(0.1em)
+      #down-arrow
+      #h(0.2em) #punderline[*Prague is the capital of Czechia*] _(...)_
+
+      #v(0.6em)
+
+      // --- Stage 2: Instruction tuning ---
+      #grid(
+        columns: (auto, 1fr),
+        column-gutter: 0.4em,
+        align: horizon,
+        step-circle("2"), text(size: 18pt, weight: "bold")[Instruction tuning 💬 ],
+      )
+      #v(0.1em)
+      #down-arrow
+      #h(0.2em)
+      #box[
+        user: What is the capital of Czechia? \
+        assistant: #punderline[*Prague*]
+      ]
+
+      #v(0.6em)
+
+      // --- Stage 3: Human preference optimization ---
+      #grid(
+        columns: (auto, 1fr),
+        column-gutter: 0.4em,
+        align: horizon,
+        step-circle("3"), text(size: 18pt, weight: "bold")[Human preference optimization 🧑‍⚖️ ],
+      )
+      #v(0.1em)
+      #pad(left: 1.4em)[
+        #h(0.2em)
+        #box[
+          user: What is the capital of Czechia? \
+          answer \#1: Prague. \
+          #punderline[*answer \#2:*] The capital of Czechia is #punderline[Prague].
+        ]
+      ]
+    ],
+  )
+]
+
+#slide[
+  = Problems with base models
+
+  Base models are just an *"autocomplete on steroids"* → the following can happen:
+
+  #set text(size: 19pt)
+
+
+  #grid(
+    columns: (1fr, 3.5fr),
+    gutter: 1em,
+    [
+      #set align(horizon)
+
+      *Input*
+    ],
+    [
+      #quote[Explain the moon landing to a 6 year old.]
+    ],
+  )
+
+  #grid(
+    columns: (1fr, 3.5fr),
+    gutter: 1em,
+    [
+      #set align(horizon)
+
+      *Pre-trained model*
+    ],
+    [
+      #quote[Explain why the sky is blue to a 6 year old. Explain why planes can fly to a 6 year old. Explain how to build a car to a 6 year old (...)]
+    ],
+  )
+
+  #grid(
+    columns: (1fr, 3.5fr),
+    gutter: 1em,
+    [
+      #set align(horizon)
+
+      *What we want instead*
+    ],
+    [
+      #quote[Many years ago, people wanted to explore the Moon. So they built a huge rocket called Saturn V and sent astronauts in it. (...)]
+    ],
+  )
+  #set text(size: 20pt)
+
+  #v(0.5em)
+
+  #questionbox()[
+    Can this problem be fixed with few-shot prompting?
+  ]
 
 ]
 
 
-
 #slide[
-  = Finetuning -- how it works
+  = Finetuning
 
-  #v(0.5em)
+  === 🧑‍🍳 Recipe for finetuning a language model:
 
-  + Start from a *pretrained checkpoint* (e.g. LLaMA-3-8B).
+  + Start from a *pretrained "base" language model*.
   + Prepare a dataset of *(input, output) pairs* for the target task.
   + Continue training with the *same objective* (cross-entropy on the output tokens).
-  + Use a *lower learning rate* than pretraining (the model is already close to a good solution).
 
   #v(0.5em)
 
   #show: later
 
-  #ideabox(title: "Why does this work?")[
+  #infobox(title: "Why does this work?")[
     The pretrained model has already learned rich language representations. Finetuning only needs to *slightly adjust* the parameters to fit the new task. This is much more data-efficient than training from scratch.
   ]
 ]
+
 
 
 #slide[
@@ -872,213 +1081,96 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
 
   #source-slide("https://arxiv.org/abs/2109.01652", title: "Wei et al. 2022 (FLAN)")
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      A special form of finetuning: train the model to *follow instructions*.
+  *Instruction-tuning:* finetuning the model to *follow instructions*:
+  - *Input*: a natural language description of the task + the actual input.
+  - *Output*: the expected response.
 
-      #v(0.5em)
 
-      Training data format:
-      - *Instruction*: a natural language description of the task.
-      - *Input*: the actual input for the task (optional).
-      - *Output*: the expected response.
+  #set align(center + horizon)
+  #image("img/lecture03/instruction_tuning.png", width: 550pt)
 
-      #v(0.5em)
-
-      *Example*:
-      - Instruction: "Translate the following sentence to French."
-      - Input: "How are you?"
-      - Output: "Comment allez-vous?"
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/instruction_tuning.png", width: 100%)
-    ],
-  )
 ]
 
 #slide[
-  = Parameter-efficient finetuning (PEFT)
+  = InstructGPT
+  *InstructGPT*: #link("https://arxiv.org/pdf/2203.02155")[Training language models to follow instructions with human feedback (Ouyang et al., 2022)] → released \~6 months before ChatGPT.
+  #set align(center + horizon)
 
-  #source-slide("https://arxiv.org/abs/2106.09685", title: "Hu et al. 2021 (LoRA)")
-
-  Finetuning *all parameters* of a large model is expensive. Can we finetune only *a few*?
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      *LoRA* (Low-Rank Adaptation):
-      - Add two small matrices $A in RR^(d times r)$ and $B in RR^(r times d)$ parallel to each weight matrix.
-      - Only train $A$ and $B$ (where $r << d$).
-      - The update $Delta W = B A$ is added to the original weights.
-      - Much fewer trainable parameters: $2 times r times d$ instead of $d^2$.
-
-      #v(0.5em)
-
-      *QLoRA*: LoRA + 4-bit quantization → finetune a 65B model on a single GPU.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/lora_diagram.png", width: 100%)
-
-      #source("https://arxiv.org/abs/2305.14314", title: "Dettmers et al. 2023")
-    ],
-  )
+  #image("img/lecture03/screen-2026-02-27-14-51-51.png", width: 450pt)
 ]
 
-
-// ============================================================
-// SECTION 5: Alignment
-// ============================================================
-#section-slide(section: "Alignment")[Alignment]
-
 #slide[
-  = The alignment problem
+  = Problems with instruction-tuned models
 
-  A pretrained (or instruction-tuned) model can generate fluent text, but it may still:
-
-  - *Hallucinate* facts.
-  - Produce *harmful or toxic* content.
-  - Be *unhelpful* or refuse reasonable requests.
-  - Not follow the user's *intent*.
-
-  #v(0.5em)
-
-  #ideabox(title: "Alignment")[
-    Make the model *helpful, harmless, and honest* -- aligned with human preferences.
-  ]
-
-  #v(0.5em)
-
-  #show: later
-
-  The key idea: use *human feedback* to teach the model what "good" output looks like, beyond what can be captured by next-token prediction.
-]
-
-
-#slide[
-  = LLM training pipeline
-
-  The standard training pipeline for modern LLMs has *three stages*:
+  Even the instruction-tuned model may still produce *harmful or toxic* content, be *unhelpful*, or refuse reasonable requests.
 
   #v(1em)
 
-  #set text(size: 18pt)
+  #ideabox()[
+    Let people score which outputs are better, train the models to prefer these.
+  ]
 
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    gutter: 1em,
-    [
-      === 1. Pretraining
-      - Self-supervised on massive text data.
-      - Learn general language knowledge.
-      - Trillions of tokens.
-      - Hundreds of GPUs for weeks/months.
-    ],
-    [
-      === 2. Supervised finetuning
-      - Instruction-following data.
-      - Learn to be helpful and follow instructions.
-      - Thousands to millions of examples.
-      - Much cheaper than pretraining.
-    ],
-    [
-      === 3. Alignment
-      - Human preference data.
-      - Learn to produce outputs humans prefer.
-      - RLHF, DPO, or variants.
-      - The "secret sauce" of ChatGPT.
-    ],
-  )
+  #v(1em)
+
+  #questionbox()[Can we just apply supervised finetuning again?]
 ]
-
 
 #slide[
   = Reinforcement learning from human feedback (RLHF)
 
-  #source-slide("https://arxiv.org/abs/2203.02155", title: "Ouyang et al. 2022 (InstructGPT)")
+  🧑‍⚖️ *Step 0 -- Gather human annotators*.
 
-  *RLHF* was the key technique behind InstructGPT and ChatGPT.
 
-  #v(0.5em)
+  ⚖️ *Step 1 -- Collect pairwise rankings*:
+
+  #pad(left: 2em)[
+    - Generate two outputs $(y_1, y_2)$ for the same prompt $x$.
+    - Have annotators rank them: $r(x, y)$.
+  ]
+
+
+  ⚙️ *Step 2 -- Align the model using reinforcement learning*
+
+  #pad(left: 2em)[
+    - Optimize the LLM using the ranking $r(x, y)$ as a reward signal.
+      - Include a penalty to prevent  drifting too far from the original model:
+    $ cal(L)_"RLHF" = -EE[r(x, y)] + beta dot "KL"(pi_theta || pi_"ref") $
+
+  ]
+]
+
+
+#slide[
+  = RLHF - Reward model (→RLAIF)
+
+  #ideabox()[
+    Human annotators are costly and slow. Can we replace them with a *model*?
+  ]
+
+  Yes: we can train a *reward model* on the collected human feedback:
+  #set align(center + horizon)
+
+  #v(-1em)
+
+  #image("img/lecture03/reward-model.png", width: 280pt)
+
+  #source-slide("https://huggingface.co/blog/rlhf", title: "HF blog")
+
+]
+
+#slide[
+  = RLHF - Reward model (→RLAIF)
+
+  ...and then *replace human annotators* with the reward model:
 
   #set align(center + horizon)
-  #image("img/lecture03/rlhf_hf.png", width: 500pt)
 
-  #source("https://huggingface.co/blog/rlhf", title: "Hugging Face RLHF blog")
+  #image("img/lecture03/rlhf_hf.png", width: 350pt)
+
 ]
 
 
-#slide[
-  = RLHF -- step by step
 
-  #source-slide("https://arxiv.org/abs/2203.02155", title: "Ouyang et al. 2022")
-
-  #set text(size: 18pt)
-
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-    [
-      *Step 1: Collect comparison data*
-      - Generate multiple outputs for the same prompt.
-      - Have humans *rank* them (which output is better?).
-
-      #v(0.5em)
-
-      *Step 2: Train a reward model*
-      - A separate model that takes (prompt, response) → score.
-      - Trained on human preference data.
-      - Learns to predict which response humans would prefer.
-    ],
-    [
-      *Step 3: Optimize the policy with RL*
-      - Use the reward model as a signal.
-      - Optimize the LLM to produce outputs that get high reward.
-      - Usually with *PPO* (Proximal Policy Optimization).
-      - Include a *KL divergence penalty* to prevent the model from drifting too far from the SFT model.
-
-      $ cal(L)_"RLHF" = -EE[r(x, y)] + beta dot "KL"(pi_theta || pi_"ref") $
-    ],
-  )
-]
-
-
-#slide[
-  = InstructGPT / ChatGPT
-
-  #source-slide("https://arxiv.org/abs/2203.02155", title: "Ouyang et al. 2022")
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      *InstructGPT* = GPT-3 finetuned with RLHF:
-
-      + Start from GPT-3.
-      + SFT on human-written demonstrations.
-      + Train a reward model on human comparisons.
-      + Optimize with PPO using the reward model.
-
-      #v(0.5em)
-
-      Key result: InstructGPT (1.3B) was *preferred by humans* over the much larger GPT-3 (175B).
-
-      #v(0.5em)
-
-      *ChatGPT* (Nov 2022) used the same approach, applied to GPT-3.5.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/instructgpt_overview.jpg", width: 100%)
-    ],
-  )
-]
 
 
 #slide[
@@ -1086,35 +1178,19 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
 
   #source-slide("https://arxiv.org/abs/2305.18290", title: "Rafailov et al. 2023")
 
-  RLHF works but is *complex*: three models, unstable PPO, reward hacking. Can we do better?
+  *DPO* skips the reward model and RL entirely.
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      *DPO* skips the reward model and RL entirely.
+  #v(0.5em)
 
-      #v(0.5em)
+  Given pairs of (preferred, dispreferred) responses, DPO directly optimizes a *special loss function* (where $y_w$ = preferred response, $y_l$ = dispreferred response):
 
-      Given pairs of (preferred, dispreferred) responses, DPO directly optimizes a *special loss function*:
+  $
+    cal(L)_"DPO" = -log sigma (beta log (pi_theta (y_w | x)) / (pi_"ref" (y_w | x)) - beta log (pi_theta (y_l | x)) / (pi_"ref" (y_l | x)))
+  $
 
-      $
-        cal(L)_"DPO" = -log sigma (beta log (pi_theta (y_w | x)) / (pi_"ref" (y_w | x)) - beta log (pi_theta (y_l | x)) / (pi_"ref" (y_l | x)))
-      $
+  #set align(center + horizon)
 
-      where $y_w$ = preferred response, $y_l$ = dispreferred response.
-
-      #v(0.5em)
-
-      - *Increases* probability of preferred responses.
-      - *Decreases* probability of dispreferred responses.
-      - The reference model $pi_"ref"$ prevents too large updates.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture03/dpo_diagram.jpg", width: 100%)
-    ],
-  )
+  #image("img/lecture03/dpo_diagram.jpg", width: 600pt)
 ]
 
 
