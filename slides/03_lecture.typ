@@ -32,7 +32,7 @@
       #v(1em)
 
       *Repeat* for each training example $(x, y)$:
-      + Let the model *predict* $cal(M)(x,y) = hat(y)$.
+      + Let the model *predict* $cal(M)(x) = hat(y)$.
       + Compute a *loss function* $cal(L)(hat(y), y)$: how wrong the model prediction $hat(y)$ is.
       + Compute *gradients*: how each parameter of the model $cal(M)$ contributed to the loss $cal(L)$.
       + Apply *backpropagation*: update the model $cal(M)$ parameters in the direction that reduces the loss $cal(L)$.
@@ -40,14 +40,14 @@
     [
       #set align(center + horizon)
 
-      #image("img/lecture03/screen-2026-02-25-17-04-50.png", width: 130pt)
+      #image("img/lecture03/tf_playground_before.png", width: 130pt)
       #v(-1em)
 
       #set text(size: 24pt)
       ↓
       #v(-0.8em)
 
-      #image("img/lecture03/screen-2026-02-25-17-04-39.png", width: 130pt)],
+      #image("img/lecture03/tf_playground_after.png", width: 130pt)],
   )
   #source-slide("https://playground.tensorflow.org/", title: "https://playground.tensorflow.org")
 
@@ -62,21 +62,21 @@
     columns: (1fr, 1fr, 1.12fr),
     gutter: 1em,
     [
-      #image("/assets/screen-2026-02-26-13-59-08.png", width: 162pt)
+      #image("img/lecture03/tf_playground_training.png", width: 162pt)
       #source("https://playground.tensorflow.org/", title: "https://playground.tensorflow.org")
     ],
     [#image("img/lecture03/lin_reg_mse_gradientdescent.png")
       #source("https://ml4a.github.io/ml4a/how_neural_networks_are_trained/", title: "https://ml4a.github.io")
 
     ],
-    [#image("img/lecture03/20161110202746.png")
+    [#image("img/lecture03/loss_landscape_3d.png")
       #source("https://kaeken.hatenablog.com/entry/2016/11/10/203151", title: "https://kaeken.hatenablog.com/")
     ],
   )
 ]
 
 #slide[
-  = Training a language model -- closer look
+  = How does training a neural network look like  in Python?
 
   #set text(size: 11pt)
 
@@ -133,7 +133,7 @@
 #slide[
   = Loss function
 
-  A *loss function* (or cost function) measures *how far off* the model's prediction is from the correct answer.
+  A *loss function* measures *how far off* the model's prediction is from the correct answer.
 
   *How do we measure that?* Depends on our problem.
 
@@ -141,7 +141,7 @@
 
   - `(true - predicted)`: bad idea, the errors may cancel out
   - `abs(true - predicted)`: ok, but non-differentiable at 0 → training issues
-  - `(true - predicted)^2`: works well → smooth, penalizes large errors
+  - `(true - predicted)^2`: works well → smooth, penalizes outliers
 
 
 ]
@@ -216,16 +216,29 @@
 
   #show: later
 
+  #set text(size: 20pt)
 
   #infobox("Intuition about cross-entropy for language modeling")[
-    - The model is supposed to predict the target token with *100% probability*.
-    - Any difference between these probabilities is considered as an *error*.
-    - The value of the loss is a *negative logarithm of the difference*. (why?)
-    - We ignore model predictions for any other tokens. (why?)
-
+    - The model is supposed to predict the target token with *100% probability* and other tokens with 0% probability → any difference counts as an error.
+    - The loss is the *negative log of the predicted target token probability* (why?)
   ]
 ]
 
+#slide[
+  = Loss gradient -- softmax input
+
+  The gradient with respect the softmax input:
+
+  #source-slide(
+    "https://ufal.mff.cuni.cz/~straka/courses/npfl138/2425/slides.pdf/npfl138-2425-03.pdf",
+    title: "NPFL138",
+  )
+  #v(-3em)
+
+  #set align(center + horizon)
+
+  #image("img/lecture03/loss_gradient_softmax.png", width: 600pt)
+]
 
 
 #slide[
@@ -235,7 +248,7 @@
   *Let's see it animated:*
 
   https://animatedllm.github.io/pretraining-simple
-  #bordered-box(image("img/lecture03/screen-2026-02-26-16-40-13.png", width: 450pt))
+  #bordered-box(image("img/lecture03/cross_entropy_animated_llm.png", width: 450pt))
 ]
 
 
@@ -253,7 +266,7 @@
     [
       #infobox("Gradient descent as a math formula")[$theta <- theta - eta nabla cal(L)(theta)$
 
-        This simply says: we compute the steepest ascent direction ($nabla$) and go the opossite way.
+        This simply says: we compute the steepest ascent direction ($nabla$) and go the opposite way.
         - $nabla$ is  the *gradient*  of the loss w.r.t. each parameter.
 
         - $eta$ is the *learning rate*.
@@ -298,7 +311,7 @@
   Since our loss is computed as:
 
   $ cal(L) = -log y_"correct", $  then:
-  $ (partial cal(L))/(partial y_c) = cases(-1/y_c & "for the correct class", 0 & "for all other classes") $
+  $ (partial cal(L))/(partial hat(y)_c) = cases(-1/hat(y)_c & "for the correct class", 0 & "for all other classes") $
 
   #v(1em)
 
@@ -327,7 +340,7 @@
 
 #slide[
   = Backpropagation
-  ...then apply the *chain rule* it in the backward direction:
+  ...then apply the *chain rule* in the backward direction:
 
   #set align(center + horizon)
   #image("img/lecture03/backprob.svg", width: 500pt)
@@ -355,7 +368,7 @@
 
 
   - *Stochastic gradient descent (SGD)*: our subset is of size 1 (=a single example).
-  - *Mini-batch SGD*: we a take a batch of examples (e.g. 32 examples).
+  - *Mini-batch SGD*: we take a batch of examples (e.g. 32 examples).
 
 
   #show: later
@@ -402,7 +415,7 @@
   There are other concepts for NN training that we do not cover here, such as:
   - *Weight initialization*: how do we initialize the model weights before training?
   - *Regularization*: how do we prevent the model from overfitting to training data?
-  - *Optimizers*: is there are more efficient approach than SGD?
+  - *Optimizers, momentum*: is there a more efficient approach than SGD?
 
   #v(0.5em)
 
@@ -417,7 +430,7 @@
       [
         #set align(center + horizon)
         #v(-1.5em)
-        #image("img/lecture03/poster.png", width: 90pt)],
+        #image("img/lecture03/npfl138_poster.png", width: 90pt)],
     )
   ]
 
@@ -459,7 +472,7 @@
   ]
 
   #set align(center)
-  #image("img/lecture03/screen-2026-02-26-17-32-54.png", width: 500pt)
+  #image("img/lecture03/self_supervised_pretraining.png", width: 500pt)
 
   #set align(left)
 
@@ -476,9 +489,9 @@
   #ideabox()[
     We know the text representation is built in the Transformer *encoder*. Can we start pretraning the encoder alone?]
 
-  Good representations might help us with classification tasks:
+  We can put classifier on top of the encoded representations to perform classification tasks:
 
-  #v(-1em)
+  #v(-2em)
 
   #set align(center + horizon)
 
@@ -490,28 +503,51 @@
 
 #slide[
   = Pretraining a Transformer encoder
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-    [
 
-      *Our goal:* Get a rich representation of the input text (one embedding per token).
+  *Goal:* Get a rich representation of the input → one _contextual_ embedding per token.
 
+  Each embedding should incorporate the full sentence context (both *left and right*).
 
-      - The resulting word embedding should incorporate the full sentence context (both *left and right*).
-      - Can we mask a word and let the model predict it?
-        - Yes, but too slow → let's mask \~15% of words at a time.
+  #set align(center + horizon)
+
+  #image("img/lecture03/BERT-language-modeling-masked-lm.png", width: 400pt)
 
 
-    ],
-    [
-      #set align(center + horizon)
+]
 
-      #image("img/lecture03/BERT-language-modeling-masked-lm.png")
+#slide[
+  = Masked language modeling
 
-    ],
+  #ideabox()[
+    Let's mask some portion (15%? or 30%?) of words  and let the model predict it.]
+
+  The masked language modeling (MLM) objective:
+  $ cal(L)_"MLM" = - sum_(t in cal(M)) log P(x_t | bold(x)_(without cal(M))), $
+
+  where $cal(M)$ is the set of masked positions and $bold(x)_(without cal(M))$ is the input sequence with masked tokens replaced by a special [MASK] token.
+
+
+]
+
+#slide[
+  = Masked language modeling
+
+
+  #set align(center + horizon)
+
+  #v(-1em)
+
+  #image("img/lecture03/bert_mlm_transformations.png", width: 450pt)
+
+  #source-slide(
+    "https://www.amazon.com/Super-Study-Guide-Transformers-Language/dp/B0DC4NYLTN",
+    title: "Super Study Guide: Transformers & Large Language Models",
   )
-  → the *masked language modeling* objective.
+
+  #set align(left)
+
+  #infobox()[The original BERT model also used other transformations (replacing tokens, next sentence prediction), but these were dropped in follow-up models.]
+
 ]
 
 #slide[
@@ -548,6 +584,51 @@
 
       #image("img/lecture03/bert_pretraining_finetuning.png", width: 280pt)],
   )
+]
+
+#slide[
+  = The Sesame Street family
+
+  #set text(size: 16pt)
+
+  #grid(
+    columns: (1fr, 2.5fr),
+    gutter: 2em,
+    [#image("img/lecture03/sesame_street_muppets.png", width: 220pt)
+      #source("https://muppet.fandom.com/wiki/Sesame_Street")
+    ],
+    [
+
+
+      #grid(
+        columns: (1fr, 1fr),
+        gutter: 1em,
+        [
+          #bordered-box(image("img/lecture03/elmo_paper.png", width: 250pt))
+          #source("https://arxiv.org/pdf/1802.05365", title: "https://arxiv.org/pdf/1802.05365")
+
+          #bordered-box(image("img/lecture03/bert_paper.png", width: 250pt))
+
+          #source("https://arxiv.org/pdf/1810.04805", title: "https://arxiv.org/pdf/1810.04805")
+
+
+        ],
+        [
+          #set align(center + horizon)
+
+          #bordered-box(image("img/lecture03/deberta_paper.png", width: 260pt))
+          #source("https://arxiv.org/pdf/2007.14062", title: "https://arxiv.org/pdf/2007.14062")
+
+          #bordered-box(image("img/lecture03/xlnet_paper.png"))
+          #source("https://arxiv.org/pdf/1905.07129", title: "https://arxiv.org/pdf/1905.07129")
+
+
+        ],
+      )
+
+    ],
+  )
+
 
 
 
@@ -586,28 +667,50 @@
 #slide[
   = Causal language modeling
 
-  How to pretrain a decoder? Using *causal language modeling*: what we already know as "language modeling" or "next-word prediction task":
+  How to pretrain a decoder? Using the *causal language modeling* objective: what we already know as "language modeling" or "next-word prediction task":
+  $ cal(L) = - sum_(t=1)^(T) log P(x_t | x_1, ..., x_(t-1)) $
 
-  $ P(w_1, ..., w_T) = product_(t=1)^(T) P(w_t | w_1, ..., w_(t-1)) $
+  where $x_t$ is the token at position $t$.
 
-  #v(0.5em)
+  #set align(center + horizon)
+
+  #image("img/lecture03/causal_lm_objective.png", width: 500pt)
+  #source-slide("https://cme295.stanford.edu/slides/fall25-cme295-lecture4.pdf", title: "CME295")
+
+]
+
+#slide[
+  = Attention mask
+
+
+  *Recall*: The attention mechanism in the decoder uses an *attention mask*.
+
 
   #grid(
-    columns: (2.7fr, 1fr),
+    columns: (2fr, 1fr),
     gutter: 1em,
     [
-      #v(-0.5em)
+      - In practice, we apply a triangular mask during the matrix multiplications:
 
+        → we can train all positions in parallel.
 
-      #infobox("Attention mask")[
-        Masking the future tokens can be done using a triangular mask. That  allows *parallel training*: we can compute the loss at all positions at once, while each position "pretends" it cannot see its future.
-      ]
+      - The model learns to attend only to the left context.
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture03/transformer-decoder-attention-mask-dataset.png", width: 250pt)
+
+      #image("img/lecture03/attention_mask_triangular.png")
     ],
   )
+
+  #source-slide(
+    "https://www.amazon.com/Super-Study-Guide-Transformers-Language/dp/B0DC4NYLTN",
+    title: "Super Study Guide: Transformers & Large Language Models",
+  )
+
+  #questionbox()[
+    Why we do *not* need the attention mask in the encoder? And does it mean the encoder "understands" the text better?
+  ]
 ]
 
 
@@ -618,16 +721,15 @@
     "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf",
     title: "Radford et al. 2018",
   )
-  *The "GPT-1" paper* (#link("Improving Language Understanding
-by Generative Pre-Training")[Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)])
+  *The "GPT-1" paper* (#link("https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf")[Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)])
   - 12 layers, 117M params, good results on downstream tasks.
-  - Published (pre-print + blogpost) in June 2018 → immediately overshadowed by BERT in October 2018.
+  - Published (pre-print + blogpost) in June 2018 (immediately overshadowed by BERT in October 2018).
 
   #set align(center + horizon)
 
   #v(-1em)
 
-  #image("img/lecture03/screen-2026-02-27-12-45-08.png", width: 400pt)
+  #image("img/lecture03/gpt1_paper.png", width: 400pt)
 ]
 
 #slide[
@@ -638,7 +740,7 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
   Published as a pre-print and a blogpost on the OpenAI website in February 2019:
   #set align(center + horizon)
 
-  #image("img/lecture03/screen-2026-02-27-12-50-44.png", width: 500pt)
+  #image("img/lecture03/gpt2_blog.png", width: 500pt)
 
 
   #source-slide("https://openai.com/index/better-language-models/", title: "OpenAI blog")
@@ -724,7 +826,7 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
       - Combines the benefits of bidirectional encoding with autoregressive generation.
     ],
     [
-      #image("img/lecture03/screen-2026-02-27-13-16-58.png")
+      #image("img/lecture03/span_corruption_t5.png")
     ],
   )
 ]
@@ -743,14 +845,14 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
     [
       *#link("https://arxiv.org/pdf/1910.10683")[T5 (Raffel et al., 2019)] - Google:*
 
-      #image("/assets/screen-2026-02-27-13-19-16.png")
+      #image("img/lecture03/t5_paper.png")
     ],
     [
 
-      *#link("https://arxiv.org/pdf/1910.13461")[BART (Lewis et al., 2019)] - Microsoft*:
+      *#link("https://arxiv.org/pdf/1910.13461")[BART (Lewis et al., 2019)] - Facebook*:
 
       #set align(center + horizon)
-      #image("img/lecture03/screen-2026-02-27-13-19-48.png", width: 300pt)
+      #image("img/lecture03/bart_paper.png", width: 300pt)
     ],
   )
 
@@ -775,16 +877,16 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
     gutter: 1em,
     [
       *Encoder-only (BERT)*
-      #image("img/lecture03/screen-2026-02-27-14-57-21.png", width: 180pt)
+      #image("img/lecture03/encoder_only_architecture.png", width: 180pt)
     ],
     [
       *Decoder-only (GPT)*
-      #image("img/lecture03/screen-2026-02-27-14-57-29.png", width: 180pt)
+      #image("img/lecture03/decoder_only_architecture.png", width: 180pt)
     ],
     [
 
       *Encoder-decoder (T5, BART)*
-      #image("img/lecture03/screen-2026-02-27-14-57-24.png", width: 180pt)
+      #image("img/lecture03/encoder_decoder_architecture.png", width: 180pt)
     ],
   )
 
@@ -801,7 +903,7 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
   ]
   #set align(center + horizon)
 
-  #image("img/lecture03/screen-2026-02-27-13-35-05.png", width: 350pt)
+  #image("img/lecture03/gpt3_visualization.png", width: 350pt)
   #source("https://bbycroft.net/llm", title: "llm-vis")
 
 ]
@@ -992,7 +1094,7 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
         #box[
           user: What is the capital of Czechia? \
           answer \#1: Prague. \
-          #punderline[*answer \#2:*] The capital of Czechia is #punderline[Prague].
+          #punderline[*answer \#2:*] The capital of Czechia is Prague. It is the largest (...)
         ]
       ]
     ],
@@ -1096,21 +1198,22 @@ by Generative Pre-Training")[Improving Language Understanding by Generative Pre-
   *InstructGPT*: #link("https://arxiv.org/pdf/2203.02155")[Training language models to follow instructions with human feedback (Ouyang et al., 2022)] → released \~6 months before ChatGPT.
   #set align(center + horizon)
 
-  #image("img/lecture03/screen-2026-02-27-14-51-51.png", width: 450pt)
+  #image("img/lecture03/instructgpt_training_overview.png", width: 450pt)
 ]
 
 #slide[
   = Problems with instruction-tuned models
 
   Even the instruction-tuned model may still produce *harmful or toxic* content, be *unhelpful*, or refuse reasonable requests.
+  #image("img/lecture03/llama_refuses_kill_process.png")
+  #v(-0.5em)
 
-  #v(1em)
+  #source(
+    "https://www.reddit.com/r/LocalLLaMA/comments/15442iy/totally_useless_llama_70b_refuses_to_kill_a/",
+    title: "Reddit.com",
+  )
 
-  #ideabox()[
-    Let people score which outputs are better, train the models to prefer these.
-  ]
-
-  #v(1em)
+  → We want to find steer the model from unhelpful answers in a fine-grained way.
 
   #questionbox()[Can we just apply supervised finetuning again?]
 ]
