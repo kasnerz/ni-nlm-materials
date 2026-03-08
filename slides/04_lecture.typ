@@ -698,82 +698,76 @@
 #section-slide(section: "Navigating the LLM zoo")[Navigating the LLM zoo]
 
 
-#slide[
-  = LLM evolutionary tree
+// #slide[
+//   = LLM evolutionary tree
 
-  #source-slide("https://arxiv.org/abs/2304.13712", title: "Yang et al. (2023)")
+//   #source-slide("https://arxiv.org/abs/2304.13712", title: "Yang et al. (2023)")
+
+//   #set align(center + horizon)
+
+//   #image("img/lecture04/llm_evolutionary_tree.jpg", width: 500pt)
+// ]
+
+
+// #slide[
+//   = LLM size and capabilities
+
+//   #source-slide(
+//     "https://informationisbeautiful.net/visualizations/the-rise-of-generative-ai-large-language-models-llms-like-chatgpt/",
+//     title: "informationisbeautiful.net",
+//   )
+
+//   #set align(center + horizon)
+
+//   #image("img/lecture04/llm_size_capabilities.png", width: 500pt)
+// ]
+
+
+#slide[
+  = HuggingFace: source of open LLMs
+
+  *HuggingFace*: the largest repository of open LLMs. As of March 2026, it contains ~2.7M models (many of these are derivatives).
 
   #set align(center + horizon)
 
-  #image("img/lecture04/llm_evolutionary_tree.jpg", width: 500pt)
-]
-
-
-#slide[
-  = LLM size and capabilities
-
-  #source-slide(
-    "https://informationisbeautiful.net/visualizations/the-rise-of-generative-ai-large-language-models-llms-like-chatgpt/",
-    title: "informationisbeautiful.net",
-  )
-
-  #set align(center + horizon)
-
-  #image("img/lecture04/llm_size_capabilities.png", width: 500pt)
-]
-
-
-#slide[
-  = Model sources and leaderboards: HuggingFace
-
-  *HuggingFace*: the largest repository of open LLMs. As of March 2026, it contains ~1.5M models (many of these are derivatives).
-
-  #set align(center + horizon)
-
-  #bordered-box(image("img/lecture04/huggingface_models.png", width: 500pt))
-
+  #bordered-box(image("img/lecture04/screen-2026-03-08-14-51-25.png", width: 500pt))
   #source-slide("https://huggingface.co/models", title: "HuggingFace Models")
 ]
 
 
 #slide[
-  = Model sources and leaderboards: Arena.ai
+  = Model sources and leaderboards
 
-  *Arena.ai*: Elo rating of LLMs. For a pair of answers from different models, users decide which is better.
+  *Arena.ai*: Elo rating of LLMs: for a pair of answers from different models, users decide which is better.
   #v(-0.5em)
 
   #set align(center + horizon)
-  #bordered-box(image("img/lecture04/screen-2026-03-03-10-13-59.png", width: 500pt))
+  #bordered-box(image("img/lecture04/screen-2026-03-03-10-13-59.png", width: 450pt))
 
   #source-slide("https://arena.ai/leaderboard", title: "Arena.ai")
 ]
 
-
 #slide[
-  = Model sources and leaderboards: Open LLM Leaderboard
+  = Model sources and leaderboards
 
-  *Open LLM Leaderboard*: ratings of open LLMs on benchmarks.
+  *OpenRouter*: routing traffic to various LLM providers, tracks real model usage through their proxy.
+  #v(-0.5em)
 
   #set align(center + horizon)
-
-  #bordered-box(image("img/lecture04/open_llm_leaderboard.png", width: 500pt))
-
-  #source-slide(
-    "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
-    title: "Open LLM Leaderboard",
-  )
+  #bordered-box(image("img/lecture04/screen-2026-03-08-14-52-53.png", width: 650pt))
+  #source-slide("https://openrouter.ai/rankings", title: "OpenRouter")
 ]
 
-
 #slide[
-  = Rules of thumb for selecting a model
+  = Model sources and leaderboards
 
-  - Try a *general-purpose model* first.
-  - You can specify your task using *in-context learning*.
-  - *RAG* can help you with a custom knowledge base.
-  - You may want to use a *fine-tuned model*, but think carefully about which data it was finetuned on.
-  - You probably do *not* want an off-the-shelf *base model* unless you want to fine-tune it (or you are interested in LM on its own).
-  - Out of the newest models, select the *largest model you can support*.
+  *Artificial Analysis LLM Leaderboard*: rating LLMs across many dimensions (context, window size, price, speed, performance...).
+
+  Model performance is grouped under a single #link("https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index")["Intelligence index"] (=combined score from 10 benchmarks).
+  #v(-0.5em)
+  #set align(center + horizon)
+  #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 550pt))
+  #source-slide("https://artificialanalysis.ai/leaderboards/models", title: "Artificial Analysis")
 ]
 
 
@@ -782,6 +776,12 @@
 // ============================================================
 #section-slide(section: "Running LLMs locally")[Running LLMs locally]
 
+#slide[
+  = How to use LLMs
+  #set align(center + horizon)
+
+  #image("img/lecture04/screen-2026-03-08-14-59-33.png")
+]
 
 #slide[
   = How to use LLMs
@@ -794,6 +794,7 @@
       - OpenAI (ChatGPT, GPT-4o)
       - Anthropic (Claude)
       - Google (Gemini)
+      - ...
 
       ✅ Easy to use, no hardware needed \
       ❌ Paid, no control over the model
@@ -802,7 +803,8 @@
       === Open models (local)
       - Meta (Llama)
       - Mistral
-      - Qwen, DeepSeek, ...
+      - Qwen
+      - ...
 
       ✅ Free, full control \
       ❌ Requires hardware (GPU)
@@ -812,20 +814,20 @@
 
 
 #slide[
-  = Frameworks for running open LLMs: HuggingFace transformers
+  = Frameworks for running open LLMs
 
   *HuggingFace transformers*: Python library for loading models from the HuggingFace model repository.
 
   #set align(center + horizon)
 
-  #bordered-box(image("img/lecture04/hf_transformers_code.png", width: 500pt))
+  #bordered-box(image("img/lecture04/hf_transformers_code.png", width: 650pt))
 
   #source-slide("https://huggingface.co/docs/transformers/llm_tutorial", title: "HF Transformers")
 ]
 
 
 #slide[
-  = Frameworks for running open LLMs: Ollama
+  = Frameworks for running open LLMs
 
   *Ollama*: running a local server, easy to use, focus on quantized models.
 
@@ -838,31 +840,31 @@
 
 
 #slide[
-  = Frameworks for running open LLMs: vLLM
+  = Frameworks for running open LLMs
 
   *vLLM*: efficient library for serving of LLMs on an enterprise level.
 
   #set align(center + horizon)
 
-  #bordered-box(image("img/lecture04/vllm_screenshot.png", width: 500pt))
+  #bordered-box(image("img/lecture04/vllm_screenshot.png", width: 600pt))
 
   #source-slide("https://vllm.ai", title: "vLLM")
 ]
 
 
-#slide[
-  = Text generation
+// #slide[
+//   = Text generation
 
-  #set align(center + horizon)
+//   #set align(center + horizon)
 
-  == Demo time 🧑‍💻
+//   == Demo time 🧑‍💻
 
-  #v(1em)
+//   #v(1em)
 
-  👉 #link("https://huggingface.co/docs/transformers/llm_tutorial")[HuggingFace LLM tutorial]
+//   👉 #link("https://huggingface.co/docs/transformers/llm_tutorial")[HuggingFace LLM tutorial]
 
-  👉 #link("https://mlabonne.github.io/blog/posts/2023-06-07-Decoding_strategies.html")[Decoding strategies tutorial]
-]
+//   👉 #link("https://mlabonne.github.io/blog/posts/2023-06-07-Decoding_strategies.html")[Decoding strategies tutorial]
+// ]
 
 
 #section-slide(section: "Summary")[Summary]
