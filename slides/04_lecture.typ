@@ -196,14 +196,23 @@
 #slide[
   = LLM inference
 
-  This lecture: *LLM inference* = we have a trained model and we want to *use it*.
+  #grid(
+    columns: (1fr, 1.15fr),
+    gutter: 1em,
+    [
+      #set align(horizon)
 
-  #v(0.5em)
+      This lecture: *LLM inference* = we have a trained model and we want to *use it*.
+    ],
+    [
+      #image("img/lecture04/shoggothhh_header.jpg", width: 400pt)
+    ],
+  )
+
+
+  #set align(left)
 
   #questionbox()[What is the difference between inference, generation, and decoding?]
-
-  #v(0.5em)
-
 
 ]
 
@@ -373,33 +382,18 @@
 ]
 
 
-#slide[
-  = Generating text
 
-  For each time step $t$, the decoder outputs *probability distribution* over the  tokens given the previous context:
-  $ P(y_t | y_(1:t-1), X) $
-
-  #questionbox()[
-
-    How to use the distribution to generate text?
-  ]
-
-
-]
 
 #slide[
   = Generating text: autoregressive decoding
-  #v(0.5em)
-  #infobox("🧑‍🍳 Recipe: How to generate text")[
-    + Start with a sequence of tokens (*prompt*).
-    + Feed the sequence into the LLM.
-    + Select the next token from the model-generated probability distribution.
-    + Append the selected token to the sequence.
-    + Repeat from (2).
-  ]
 
-  Note: we are interested only in the *last position's output* -- the probability distribution for the next token to generate.
+  === 🧑‍🍳 Recipe: How to generate text autoregressively
 
+  + *Start with the context*: a sequence of tokens (a "prompt" if instruction-tuned).
+  + *Feed the context* into the LLM.
+  + *Select the next token* from the model-generated probability distribution.
+  + *Append the selected token* to the sequence.
+  + *Repeat* from (3) until the `EOS` (end-of-sequence) token is selected.
 ]
 
 
@@ -444,23 +438,74 @@
 
 
 
-// ============================================================
-// SECTION 2: Decoding algorithms
-// ============================================================
 #section-slide(section: "Decoding algorithms")[Decoding algorithms]
+
+#slide[
+  = Decoding the next token
+
+  For each time step $t$, the decoder outputs *probability distribution* over the  tokens given the previous context $P(y_t | y_(1:t-1), X)$.
+  #v(-0.5em)
+
+  #set align(center + horizon)
+  #image("img/lecture04/cross_entropy_model.svg")
+
+  #set align(left)
+
+  #v(1em)
+
+  That is where the "job" of the Transformer decoder ends → it is up to us (or our decoding algorithm) to *use the distribution for decoding the next token*.
+
+]
+
+#slide[
+  = Exact inference
+
+  🏆 *Holy grail*: Find the the most probable continuation to our prompt:
+  #v(-1em)
+
+  $ y^* = arg max_(y in cal(Y)) P(y) = arg max_(y in cal(Y)) product_(i=1)^(t) P(y_i | y_1, dots, y_(t-1)) $
+
+  #questionbox()[
+    Why this is not possible in practice?
+  ]
+
+  *Intractable* (exponential search space) → we need to approximate it.
+
+  #questionbox()[
+    And is it even our goal?
+  ]
+
+]
+
+
+
 #slide[
   = Decoding algorithms
 
-  For each time step $t$, the decoder outputs a probability distribution:
-  $ P(y_t | y_(1:t-1), X) $
+  #set align(center + horizon)
 
-  === How to use it?
-  1. *Exact inference*: Find sequence maximizing $P(y_(1:T) | X)$.
-    - Not possible in practice (why? and is it our goal?).
-  2. *Approximating the most probable sequence*:
-    - Greedy search, beam search.
-  3. *Adding stochasticity*:
-    - Random / top-k / nucleus (Top-p) sampling.
+  Two approaches we typically combine in practice:
+  #v(1em)
+
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 2em,
+    [
+      === Approximating the most probable sequence 🤔
+      #v(1em)
+
+      Greedy search / beam search
+    ],
+    [
+      === Adding stochasticity 🎲
+      #v(1em)
+
+
+      Temperature / top-k sampling / nucleus (top-p) sampling
+    ],
+  )
+
 ]
 
 #slide[
@@ -468,21 +513,22 @@
 
   #source-slide("https://huggingface.co/blog/how-to-generate", title: "HF Blog")
 
-  Selecting the *most probable token in each step* $t$:
-
-  $ y_t = arg max_(y_t in cal(V)) P(y_t | y_1, dots, y_(t-1)) $
+  #infobox("Algorithm")[
+    In each step $t$, select the most probable token: $y_t = arg max_(y_t in cal(V)) P(y_t | y_1, dots, y_(t-1))$
+  ]
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1fr),
     gutter: 1em,
     [
+
       - Very fast, often works satisfactorily (especially with LLMs).
       - Non-parametric (no hyperparameters to tune).
-      - But: may miss high-probability words hidden behind a low-probability word.
+      - But: may produce sequences that are too generic.
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture04/greedy_search_hf_blog.png", width: 100%)
+      #image("img/lecture04/greedy_search_hf_blog.png", width: 280pt)
     ],
   )
 ]
@@ -493,43 +539,33 @@
 
   #source-slide("https://huggingface.co/blog/how-to-generate", title: "HF Blog")
 
+
+
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      Parameter $k$: number of sequences (beams).
 
-      Each step $t$:
-      + Extend the sequences from step $t-1$ with all possible tokens.
-      + Select the $k$ most probable sequences for step $t+1$.
+      #infobox("Algorithm")[
+        *Parameter $k$*: number of sequences (beams).
 
-      Tuning $k$:
-      - $k=1$ → greedy decoding.
-      - Larger $k$ → slower, but better approximation.
-      - $k > 1$ allows re-ranking results.
+        Each step $t$:
+        + Extend the sequences from step $t-1$ with all possible tokens.
+        + Select the $k$ most probable sequences for step $t+1$.
+      ]
+
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture04/beam_search_hf_blog.png", width: 100%)
+      #image("img/lecture04/beam_search_hf_blog.png", width: 300pt)
     ],
   )
+
+  - $k=1$ → greedy decoding; larger $k$ → slower, but better approximation.
+  - $k > 1$ allows re-ranking results.
 ]
 
 
-#slide[
-  = Exact inference (MAP decoding)
-
-  Finding the most probable sequence (= mode of the LM distribution):
-
-  $ y^* = arg max_(y in cal(Y)) P(y) = arg max_(y in cal(Y)) product_(i=1)^(t) P(y_i | y_1, dots, y_(t-1)) $
-
-  #v(0.5em)
-
-  - *Intractable* (exponential search space).
-  - Can be approximated by greedy decoding or beam search.
-  - The mode may *not be a good solution*! (e.g. an empty sequence)
-
-]
 
 
 #slide[
@@ -537,52 +573,24 @@
 
   #source-slide("https://huggingface.co/blog/how-to-generate", title: "HF Blog")
 
-  In its most basic form, *sampling* means randomly picking the next word $w_t$ according to its conditional probability distribution:
+  Instead of picking the most probable token, we can randomly sample the next token $y_t$ according to its conditional probability distribution:
 
-  $ w_t tilde P(w | w_(1:t-1)) $
+  $ y_t tilde P(y_t | y_1, dots, y_(t-1)) $
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      - Language generation using sampling is *not deterministic* anymore.
-      - Human language does not always follow the highest-probability path -- we want some surprise!
-      - But: pure sampling from the full distribution can produce incoherent text.
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture04/sampling_search_hf_blog.png", width: 100%)
-    ],
-  )
+
+  #set align(center + horizon)
+
+  #image("img/lecture04/sampling_search_hf_blog.png", width: 400pt)
+
+  #set align(left)
+
+  #questionbox()[
+    Why is this sampling from the entire vocabulary not a good idea?
+  ]
 ]
 
 
-#slide[
-  = Temperature
 
-  The shape of the distribution can be adjusted using the *temperature* $T$:
-
-  $ "softmax"(y_i) = exp(y_i \/ T) / (sum_(j) exp(y_j \/ T)) $
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-    [
-      - $T = 1$: unchanged distribution.
-      - $T < 1$: *sharper* distribution (more confident).
-      - $T > 1$: *flatter* distribution (more random).
-      - $T -> 0$: greedy decoding.
-
-      #v(0.5em)
-
-      #image("img/lecture04/sampling_with_temp_hf_blog.png", width: 100%)
-    ],
-    [
-      #set align(center + horizon)
-      #image("img/lecture04/temperature_distribution.png", width: 100%)
-    ],
-  )
-]
 
 
 #slide[
@@ -600,7 +608,6 @@
 
   #set align(left)
 
-  #infobox()[Top-k does not dynamically adapt the number of filtered words -- this can be problematic for both sharp and flat distributions.]
 ]
 
 
@@ -620,10 +627,54 @@
   #image("img/lecture04/top_p_sampling_hf_blog.png", width: 500pt)
 
   #set align(left)
-
-  #infobox()[Top-p keeps a wide range of words when the next word is less predictable, and only a few words when it is more predictable.]
 ]
 
+#slide[
+  = Temperature
+
+  The shape of the output distribution can be adjusted using the *temperature* $T$:
+
+  $ "softmax"(y_t) = exp(y_t \/ T) / (sum_(j) exp(y_j \/ T)) $
+
+  #set text(size: 18pt)
+
+  #set align(center + horizon)
+
+  #grid(
+    columns: (1fr, 1fr, 1fr),
+    gutter: 2em,
+    [
+      $T = 1$: *original distribution*
+    ],
+    [
+      $T < 1$: *more peaked*
+
+      ($T=0$ → greedy decoding)
+    ],
+    [
+      $T > 1$: *more uniformly random*
+    ],
+  )
+  #v(1em)
+
+  #set align(center + horizon)
+
+  #grid(
+    columns: (1fr, 1fr, 1fr),
+    gutter: 1em,
+    [
+      #image("img/lecture04/screen-2026-03-08-14-10-46.png")
+    ],
+    [
+      #image("img/lecture04/screen-2026-03-08-14-10-22.png")
+    ],
+    [
+      #image("img/lecture04/screen-2026-03-08-14-10-31.png")
+    ],
+  )
+
+  #source-slide("https://cme295.stanford.edu/slides/fall25-cme295-lecture3.pdf", title: "CME295")
+]
 
 #slide[
   = Is greediness all you need?
@@ -804,9 +855,7 @@
 
   #set align(center + horizon)
 
-  #v(2em)
-
-  *Demo time* 🧑‍💻
+  == Demo time 🧑‍💻
 
   #v(1em)
 
@@ -816,9 +865,21 @@
 ]
 
 
-// ============================================================
-// SECTION 5: Links
-// ============================================================
+#section-slide(section: "Summary")[Summary]
+
+
+#slide[
+  = Summary
+
+  - *Terms*:
+    - *inference* = using a trained model for predictions
+    - *generation* = producing a sequence of tokens
+    - *decoding* = selecting the next token.
+  - *Greedy decoding* is the simplest approach
+  - *beam search* improves it by keeping $k$ hypotheses.
+  - *Stochastic methods* (top-k, top-p, temperature) add randomness to avoid repetitive and dull outputs.
+  - Open LLMs can be run locally using *HuggingFace transformers*, *Ollama*, or *vLLM*.
+]
 
 #slide[
   = Links and resources
@@ -835,10 +896,18 @@
   - #link("https://arxiv.org/abs/2504.02115")[Minimum Bayes Risk decoding]
 ]
 
+#slide[
+  = Further reading
 
-// ============================================================
-// SECTION 6: Bonus -- extra decoding algorithms
-// ============================================================
+  - #link("https://aclanthology.org/D19-1331/")[*On NMT Search Errors and Model Errors: Cat Got Your Tongue?* (Stahlberg and Byrne, 2019)] -- what happens if one manages to approximate exact inference
+  - #link("https://aclanthology.org/2022.tacl-1.58/")[*On decoding strategies for neural text generators* (Wiher et al., 2022)] -- language generation tasks vs. decoding strategies.
+  - #link("https://aclanthology.org/2020.emnlp-main.170")[*If beam search is the answer, what was the question?* (Meister et al., 2020)] -- why does beam search work so well?
+  - #link("https://aclanthology.org/2021.acl-long.22/")[*Understanding the properties of Minimum Bayes Risk decoding in neural machine translation* (Müller and Sennrich, 2021)] -- when can MBR be useful?
+]
+
+
+
+
 #section-slide(section: "Bonus: extra decoding algorithms")[Bonus: extra decoding algorithms]
 
 
@@ -851,12 +920,24 @@
 
   $ y^* = arg max_(y_k in cal(Y)) sum_(y_ell in cal(Y) without {y_k}) "sim"(y_k, y_ell) $
 
-  - Useful for minimizing pathological behavior.
-  - Intractable → we need a sampling algorithm.
-  - Application in ASR and machine translation.
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
+      #set align(horizon)
 
-  #set align(center + horizon)
-  #image("img/lecture04/mbr_decoding.jpg", width: 350pt)
+      - Useful for minimizing pathological behavior.
+      - Intractable → we need a sampling algorithm.
+      - Application in ASR and machine translation.
+    ],
+    [
+      #set align(center + horizon)
+      #image("img/lecture04/mbr_decoding.jpg", width: 350pt)
+    ],
+  )
+
+
+
 ]
 
 
@@ -867,14 +948,30 @@
 
   Aims to eliminate *repetition and incoherent text* in stochastic algorithms.
 
-  Adapting the $k$ parameter based on the desired text perplexity ("mirum" = surprise, "stat" = control).
 
-  *Parameters*:
-  - $tau$ -- the target perplexity
-  - $eta$ -- learning rate
+  #grid(
+    columns: (0.7fr, 1fr),
+    gutter: 1em,
+    [
 
-  #set align(center + horizon)
-  #image("img/lecture04/mirostat.png", width: 450pt)
+
+      Adapting the $k$ parameter based on the desired text perplexity.
+
+      *Parameters*:
+      - $tau$ -- the target perplexity
+      - $eta$ -- learning rate
+    ],
+    [
+      #set align(center + horizon)
+      #image("img/lecture04/mirostat.png", width: 400pt)
+    ],
+  )
+
+  #infobox("Mirostat")[
+
+    "mirum" = surprise, "stat" = control
+  ]
+
 ]
 
 
@@ -883,53 +980,35 @@
 
   #source-slide("https://aclanthology.org/2023.tacl-1.7/", title: "Meister et al. (2023)")
 
-  Decodes text so that in each step, its perplexity is *close to the perplexity of the model*.
+
+
 
   Similar to Mirostat, but *dynamic*: the perplexity is not pre-specified.
 
+  Ensures that in each  decoding step, text perplexity is *close to the model perplexity*.
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      Information theory: *typical messages* are the messages that we would expect from the process.
+
 
       #v(0.5em)
 
-      $p(H) = 0.75$, $p(T) = 0.25$:
-      - $H H H H$ → most probable sequence
-      - $H T H H$ → typical sequence
+      #infobox("Example: coin toss")[
+        $p(H) = 0.75$, $p(T) = 0.25$:
+        - $H H H H$ → most probable sequence
+        - $H T H H$ → typical sequence
+      ]
     ],
     [
       #set align(center + horizon)
       #image("img/lecture04/typical_sampling_plot.png", width: 100%)
     ],
   )
+  Originates from the information theory: *typical messages* are the messages that we would expect from the process.
 ]
 
 
-#slide[
-  = Further reading
-
-  #set text(size: 18pt)
-
-  - *On decoding strategies for neural text generators* (Wiher et al., 2022) -- language generation tasks vs. decoding strategies.
-  - *If beam search is the answer, what was the question?* (Meister et al., 2020) -- why does beam search work so well?
-  - *Understanding the properties of Minimum Bayes Risk decoding in neural machine translation* (Müller and Sennrich, 2021) -- when can MBR be useful?
-]
 
 
-// ============================================================
-// Summary
-// ============================================================
-#section-slide(section: "Summary")[Summary]
 
-
-#slide[
-  = Summary
-
-  - LLM *inference* = using a trained model for predictions; *generation* = producing a sequence of tokens; *decoding* = selecting the next token.
-  - *Greedy decoding* is the simplest approach, *beam search* improves it by keeping $k$ hypotheses.
-  - *Stochastic methods* (top-k, top-p, temperature) add randomness to avoid repetitive and dull outputs.
-  - There are many LLMs to choose from -- use *leaderboards* and *benchmarks* to navigate.
-  - Open LLMs can be run locally using *HuggingFace transformers*, *Ollama*, or *vLLM*.
-]
