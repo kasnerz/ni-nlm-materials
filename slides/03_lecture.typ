@@ -15,9 +15,6 @@
 
 #enable-handout-mode(true)
 
-// ============================================================
-// SECTION 1: Training neural networks
-// ============================================================
 #section-slide(section: "Training neural networks")[Training neural networks]
 
 #slide[
@@ -32,10 +29,15 @@
       #v(1em)
 
       *Repeat* for each training example $(x, y)$:
-      + Let the model *predict* $cal(M)(x) = hat(y)$.
-      + Compute a *loss function* $cal(L)(hat(y), y)$: how wrong the model prediction $hat(y)$ is.
-      + Compute *gradients*: how each parameter of the model $cal(M)$ contributed to the loss $cal(L)$.
-      + Apply *backpropagation*: update the model $cal(M)$ parameters in the direction that reduces the loss $cal(L)$.
+
+      #show: later
+
+      #item-by-item(start: 2)[
+        + Let the model *predict* $cal(M)(x) = hat(y)$.
+        + Compute a *loss function* $cal(L)(hat(y), y)$: how wrong the model prediction $hat(y)$ is.
+        + Compute *gradients*: how each parameter of the model $cal(M)$ contributed to the loss $cal(L)$.
+        + Apply *backpropagation*: update the model $cal(M)$ parameters in the direction that reduces the loss $cal(L)$.
+      ]
     ],
     [
       #set align(center + horizon)
@@ -76,7 +78,7 @@
 ]
 
 #slide[
-  = How does training a neural network look like  in Python?
+  = How does training a Transformer look like?
 
   #set text(size: 11pt)
 
@@ -139,6 +141,8 @@
 
   #questionbox()[Assume your model predicts a *real number*. How would you measure the error with respect to the ground truth value?]
 
+  #show: later
+
   - `(true - predicted)`: bad idea, the errors may cancel out
   - `abs(true - predicted)`: ok, but non-differentiable at 0 → training issues
   - `(true - predicted)^2`: works well → smooth, penalizes outliers
@@ -150,6 +154,8 @@
   = Loss function: language modeling
 
   #questionbox()[Assume your model predicts a *probability distribution for the next word*. How would you measure the error with respect to the ground truth value?]
+
+  #show: later
 
   #grid(
     columns: (1fr, 1fr, 1fr),
@@ -227,17 +233,22 @@
 #slide[
   = Loss gradient -- softmax input
 
-  The gradient with respect the softmax input:
+  The gradient with respect to the *softmax input*:
 
   #source-slide(
     "https://ufal.mff.cuni.cz/~straka/courses/npfl138/2425/slides.pdf/npfl138-2425-03.pdf",
     title: "NPFL138",
   )
-  #v(-3em)
 
   #set align(center + horizon)
 
-  #image("img/lecture03/loss_gradient_softmax.png", width: 600pt)
+  #v(-2em)
+
+  #image("img/lecture03/loss_gradient_softmax.png", width: 500pt)
+
+  #set align(left)
+
+  → contributions towards the ground truth token probability are *promoted*, contributions towards other tokens probabilities are *discouraged*.
 ]
 
 
@@ -285,6 +296,9 @@
   #questionbox()[
     We ended the forward pass by computing the loss. How do we get the gradient?
   ]
+
+  #show: later
+
   #set align(center + horizon)
 
   #v(-1em)
@@ -328,6 +342,7 @@
   $ (partial f)/(partial x) = (partial f)/(partial g) dot (partial g)/(partial x) $
   #v(0.5em)
 
+  #show: later
 
   How to apply it? First, build a *computation graph* (example for a simple FFNN):
   #set align(center + horizon)
@@ -346,6 +361,7 @@
   #image("img/lecture03/backprob.svg", width: 500pt)
 
   #set align(left)
+
 
   #infobox("Computing the gradient in practice")[
     Modern deep learning frameworks (PyTorch, TensorFlow) have built-in *autograd* functionality that automatically computes gradients for us.
@@ -419,6 +435,8 @@
 
   #v(0.5em)
 
+  #show: later
+
   #infobox("If you want to learn more...")[
     #grid(
       columns: (2.5fr, 1fr),
@@ -457,9 +475,11 @@
     Where can we get that much data for other tasks?
   ]
 
-  We *do not have* that much data for other tasks 🥲
+  #show: later
 
-  → However, much of what the model was learning during the training was the *structure of the language* itself.
+  We do *not* have that much data for other tasks 😥
+
+  But much of what the model was learning during the training was the *structure of the language* itself...
 ]
 
 
@@ -471,6 +491,8 @@
 
   ]
 
+  #show: later
+
   #set align(center)
   #image("img/lecture03/self_supervised_pretraining.png", width: 500pt)
 
@@ -479,7 +501,8 @@
   - The training regime where the labels come from the input itself is called *self-supervised learning*.
   - We can use it for learning general language representations
 
-    → ...maybe we will then need less data for the specific tasks?
+
+  → ...maybe we will then need less data for the specific tasks?
 ]
 
 
@@ -489,9 +512,11 @@
   #ideabox()[
     We know the text representation is built in the Transformer *encoder*. Can we start pretraning the encoder alone?]
 
-  We can put classifier on top of the encoded representations to perform classification tasks:
+  #show: later
 
-  #v(-2em)
+  *Why encoder alone?* We can put classifier on top of the encoded representations to perform classification tasks:
+
+  #v(-1em)
 
   #set align(center + horizon)
 
@@ -520,6 +545,8 @@
 
   #ideabox()[
     Let's mask some portion (15%? or 30%?) of words  and let the model predict it.]
+
+  #show: later
 
   The masked language modeling (MLM) objective:
   $ cal(L)_"MLM" = - sum_(t in cal(M)) log P(x_t | bold(x)_(without cal(M))), $
@@ -569,6 +596,7 @@
   *BERT: Pre-training of Deep Bidirectional Transformers for
   Language Understanding* #link("https://arxiv.org/pdf/1810.04805")[(Devlin et al., 2019)] → breakthrough approach for many NLP tasks.
 
+  #show: later
 
   #grid(
     columns: (1fr, 1fr),
@@ -589,7 +617,7 @@
 #slide[
   = The Sesame Street family
 
-  #set text(size: 16pt)
+  #set text(size: 8pt)
 
   #grid(
     columns: (1fr, 2.5fr),
@@ -604,10 +632,15 @@
         columns: (1fr, 1fr),
         gutter: 1em,
         [
-          #bordered-box(image("img/lecture03/elmo_paper.png", width: 250pt))
-          #source("https://arxiv.org/pdf/1802.05365", title: "https://arxiv.org/pdf/1802.05365")
+          #set align(center + horizon)
 
-          #bordered-box(image("img/lecture03/bert_paper.png", width: 250pt))
+          #v(1em)
+
+          #image("img/lecture03/elmo_paper.png", width: 250pt)
+          #source("https://arxiv.org/pdf/1802.05365", title: "https://arxiv.org/pdf/1802.05365")
+          #v(1em)
+
+          #image("img/lecture03/bert_paper.png", width: 250pt)
 
           #source("https://arxiv.org/pdf/1810.04805", title: "https://arxiv.org/pdf/1810.04805")
 
@@ -615,11 +648,13 @@
         ],
         [
           #set align(center + horizon)
+          #v(1em)
 
-          #bordered-box(image("img/lecture03/deberta_paper.png", width: 260pt))
+          #image("img/lecture03/deberta_paper.png", width: 260pt)
           #source("https://arxiv.org/pdf/2007.14062", title: "https://arxiv.org/pdf/2007.14062")
+          #v(1em)
 
-          #bordered-box(image("img/lecture03/xlnet_paper.png"))
+          #image("img/lecture03/xlnet_paper.png")
           #source("https://arxiv.org/pdf/1905.07129", title: "https://arxiv.org/pdf/1905.07129")
 
 
@@ -722,6 +757,9 @@
     title: "Radford et al. 2018",
   )
   *The "GPT-1" paper* (#link("https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf")[Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)])
+
+  #show: later
+
   - 12 layers, 117M params, good results on downstream tasks.
   - Published (pre-print + blogpost) in June 2018 (immediately overshadowed by BERT in October 2018).
 
@@ -815,6 +853,8 @@
     Can we also *pre-train* the full encoder decoder model?
   ]
 
+  #show: later
+
   #source-slide("https://arxiv.org/abs/1910.10683", title: "Raffel et al. (2020)")
 
   #grid(
@@ -860,11 +900,12 @@
 
 
   - Very similar models (slightly different training objectives & training data).
+
   - State-of-the-art on *seq2seq tasks* until the rise of large language models.
 ]
 
 #slide[
-  = What we covered
+  = Recap: What we covered
   Three variants of pre-trained Transformer models:
 
   #source-slide("https://drive.google.com/file/d/1kUvE_zaFC-9jZ_pyp8bXo7gWBwuH5Mo0/view", title: "CSE 517 / CSE 447")
@@ -918,9 +959,10 @@
   - *175B parameters* (the largest GPT-2 model was 1.5B parameters)
   - Trained on a mix of Common Crawl, books, Wikipedia.
 
+  #show: later
 
   #infobox("Biggest surprise: In-context learning")[
-    The model could suddenly learn a task from a few examples provided in the input prompt (without any gradient updates).
+    The model could suddenly learn new tasks from  *an example* (or a few) provided in the input prompt (→without any gradient updates).
 
     - _Zero-shot_: Task description only, no examples.
     - _Few-shot_: Task description + a few examples.
@@ -1016,24 +1058,37 @@
       #set align(center)
       #text(size: 20pt, weight: "bold")[Model stages:]
 
+      // Subslide 1: random neural network only
       #v(0.2em)
       #stage-box[random neural network]
       #v(-0.2em)
-      #step-circle("1") #h(0.2em) #down-arrow
-      #v(-0.2em)
-      #stage-box["autocomplete on steroids"]
 
-      #text(size: 11pt, style: "italic", fill: muted-color)[base / foundational model]
-      #v(-0.2em)
-      #step-circle("2") #h(0.2em) #down-arrow
-      #v(-0.2em)
-      #stage-box[assistant]
+      // Subslide 3: circle 1 + arrow + autocomplete + hint (together)
+      #uncover((beginning: 3))[
+        #step-circle("1") #h(0.2em) #down-arrow
+        #v(-0.2em)
+        #stage-box["autocomplete on steroids"]
 
-      #text(size: 11pt, style: "italic", fill: muted-color)[instruction-tuned model]
-      #v(-0.2em)
-      #step-circle("3") #h(0.2em) #down-arrow
-      #v(-0.2em)
-      #stage-box[helpful assistant]
+        #text(size: 11pt, style: "italic", fill: muted-color)[base / foundational model]
+        #v(-0.2em)
+      ]
+
+      // Subslide 5: circle 2 + arrow + assistant + hint (together)
+      #uncover((beginning: 5))[
+        #step-circle("2") #h(0.2em) #down-arrow
+        #v(-0.2em)
+        #stage-box[assistant]
+
+        #text(size: 11pt, style: "italic", fill: muted-color)[instruction-tuned model]
+        #v(-0.2em)
+      ]
+
+      // Subslide 7: circle 3 + arrow + helpful assistant (together, last)
+      #uncover((beginning: 7))[
+        #step-circle("3") #h(0.2em) #down-arrow
+        #v(-0.2em)
+        #stage-box[helpful assistant]
+      ]
     ],
     [
       // ===== DOTTED SEPARATOR =====
@@ -1047,54 +1102,64 @@
     ],
     [
       // ===== RIGHT COLUMN: Training stages =====
-      #text(size: 20pt, weight: "bold")[Training stages:]
 
-      #v(0.2em)
+      // Subslide 2: header + stage 1 (pre-training + example)
+      #uncover((beginning: 2))[
+        #text(size: 20pt, weight: "bold")[Training stages:]
 
-      // --- Stage 1: Pre-training ---
-      #grid(
-        columns: (auto, 1fr),
-        column-gutter: 0.4em,
-        align: horizon,
-        step-circle("1"), text(size: 18pt, weight: "bold")[Pre-training 🌍 ],
-      )
-      #v(0.1em)
-      #down-arrow
-      #h(0.2em) #punderline[*Prague is the capital of Czechia*] _(...)_
+        #v(0.2em)
 
-      #v(0.6em)
-
-      // --- Stage 2: Instruction tuning ---
-      #grid(
-        columns: (auto, 1fr),
-        column-gutter: 0.4em,
-        align: horizon,
-        step-circle("2"), text(size: 18pt, weight: "bold")[Instruction tuning 💬 ],
-      )
-      #v(0.1em)
-      #down-arrow
-      #h(0.2em)
-      #box[
-        user: What is the capital of Czechia? \
-        assistant: #punderline[*Prague*]
+        // --- Stage 1: Pre-training ---
+        #grid(
+          columns: (auto, 1fr),
+          column-gutter: 0.4em,
+          align: horizon,
+          step-circle("1"), text(size: 18pt, weight: "bold")[Pre-training 🌍 ],
+        )
+        #v(0.1em)
+        #down-arrow
+        #h(0.2em) #punderline[*Prague is the capital of Czechia*] _(...)_
       ]
 
-      #v(0.6em)
+      // Subslide 4: stage 2 (instruction tuning + example)
+      #uncover((beginning: 4))[
+        #v(0.6em)
 
-      // --- Stage 3: Human preference optimization ---
-      #grid(
-        columns: (auto, 1fr),
-        column-gutter: 0.4em,
-        align: horizon,
-        step-circle("3"), text(size: 18pt, weight: "bold")[Human preference optimization 🧑‍⚖️ ],
-      )
-      #v(0.1em)
-      #pad(left: 1.4em)[
+        // --- Stage 2: Instruction tuning ---
+        #grid(
+          columns: (auto, 1fr),
+          column-gutter: 0.4em,
+          align: horizon,
+          step-circle("2"), text(size: 18pt, weight: "bold")[Instruction tuning 💬 ],
+        )
+        #v(0.1em)
+        #down-arrow
         #h(0.2em)
         #box[
           user: What is the capital of Czechia? \
-          answer \#1: Prague. \
-          #punderline[*answer \#2:*] The capital of Czechia is Prague. It is the largest (...)
+          assistant: #punderline[*Prague*]
+        ]
+      ]
+
+      // Subslide 6: stage 3 (human preference optimization + example)
+      #uncover((beginning: 6))[
+        #v(0.6em)
+
+        // --- Stage 3: Human preference optimization ---
+        #grid(
+          columns: (auto, 1fr),
+          column-gutter: 0.4em,
+          align: horizon,
+          step-circle("3"), text(size: 18pt, weight: "bold")[Human preference optimization 🧑‍⚖️ ],
+        )
+        #v(0.1em)
+        #pad(left: 1.4em)[
+          #h(0.2em)
+          #box[
+            user: What is the capital of Czechia? \
+            answer \#1: Prague. \
+            #punderline[*answer \#2:*] The capital of Czechia is Prague. It is the largest (...)
+          ]
         ]
       ]
     ],
@@ -1107,7 +1172,6 @@
   Base models are just an *"autocomplete on steroids"* → the following can happen:
 
   #set text(size: 19pt)
-
 
   #grid(
     columns: (1fr, 3.5fr),
@@ -1171,7 +1235,7 @@
 
   #show: later
 
-  #infobox(title: "Why does this work?")[
+  #infobox(title: "How is this different?")[
     The pretrained model has already learned rich language representations. Finetuning only needs to *slightly adjust* the parameters to fit the new task. This is much more data-efficient than training from scratch.
   ]
 ]
@@ -1215,6 +1279,8 @@
 
   → We want to find steer the model from unhelpful answers in a fine-grained way.
 
+  #show: later
+
   #questionbox()[Can we just apply supervised finetuning again?]
 ]
 
@@ -1223,6 +1289,7 @@
 
   🧑‍⚖️ *Step 0 -- Gather human annotators*.
 
+  #show: later
 
   ⚖️ *Step 1 -- Collect pairwise rankings*:
 
@@ -1231,6 +1298,7 @@
     - Have annotators rank them: $r(x, y)$.
   ]
 
+  #show: later
 
   ⚙️ *Step 2 -- Align the model using reinforcement learning*
 
@@ -1249,6 +1317,8 @@
   #ideabox()[
     Human annotators are costly and slow. Can we replace them with a *model*?
   ]
+
+  #show: later
 
   Yes: we can train a *reward model* on the collected human feedback:
   #set align(center + horizon)
@@ -1273,9 +1343,6 @@
 ]
 
 
-
-
-
 #slide[
   = Direct preference optimization (DPO)
 
@@ -1284,6 +1351,8 @@
   *DPO* skips the reward model and RL entirely.
 
   #v(0.5em)
+
+  #show: later
 
   Given pairs of (preferred, dispreferred) responses, DPO directly optimizes a *special loss function* (where $y_w$ = preferred response, $y_l$ = dispreferred response):
 
@@ -1297,9 +1366,6 @@
 ]
 
 
-// ============================================================
-// SUMMARY
-// ============================================================
 #section-slide(section: "Summary")[Summary]
 
 #slide[

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 280 260"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="nested_circles.svg"
+   inkscape:version="1.4.3 (1:1.4.3+202512261035+0d15f75042)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.3334524"
+     inkscape:cx="130.06479"
+     inkscape:cy="128.99342"
+     inkscape:window-width="1920"
+     inkscape:window-height="1020"
+     inkscape:window-x="283"
+     inkscape:window-y="1440"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5" />
+  <!-- Outer circle: inference (purple) -->
+  <circle
+     cx="140"
+     cy="131.57176"
+     r="122"
+     fill="#7b3fa0"
+     id="circle1" />
+  <!-- Middle circle: generation (blue) -->
+  <circle
+     cx="140"
+     cy="167.57176"
+     r="86"
+     fill="#5b8dd9"
+     id="circle2" />
+  <!-- Inner circle: decoding (red) -->
+  <circle
+     cx="140"
+     cy="200.57176"
+     r="53"
+     fill="#e05060"
+     id="circle3" />
+  <!-- Label: inference (in the purple ring, top area) -->
+  <text
+     x="139.83"
+     y="52.427326"
+     text-anchor="middle"
+     dominant-baseline="central"
+     fill="#ffffff"
+     font-size="17px"
+     font-family="'Fira Sans', sans-serif"
+     font-weight="bold"
+     id="text3">inference</text>
+  <!-- Label: generation (in the blue ring, top area) -->
+  <text
+     x="140.4335"
+     y="126.85388"
+     text-anchor="middle"
+     dominant-baseline="central"
+     fill="#ffffff"
+     font-size="17px"
+     font-family="'Fira Sans', sans-serif"
+     font-weight="bold"
+     id="text4">generation</text>
+  <!-- Label: decoding (centered in red circle) -->
+  <text
+     x="139.68552"
+     y="203.28198"
+     text-anchor="middle"
+     dominant-baseline="central"
+     fill="#ffffff"
+     font-size="17px"
+     font-family="'Fira Sans', sans-serif"
+     font-weight="bold"
+     id="text5">decoding</text>
+</svg>
