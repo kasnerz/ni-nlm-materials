@@ -13,7 +13,7 @@
   date: "10 Mar 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 
 #section-slide(section: "Text generation")[From training to text generation]
@@ -212,6 +212,8 @@
 
   #set align(left)
 
+  #show: later
+
   #questionbox()[What is the difference between inference, generation, and decoding?]
 
 ]
@@ -389,11 +391,13 @@
 
   === 🧑‍🍳 Recipe: How to generate text autoregressively
 
-  + *Start with the context*: a sequence of tokens (a "prompt" if instruction-tuned).
-  + *Feed the context* into the LLM.
-  + *Select the next token* from the model-generated probability distribution.
-  + *Append the selected token* to the sequence.
-  + *Repeat* from (3) until the `EOS` (end-of-sequence) token is selected.
+  #item-by-item[
+    + *Start with the context*: a sequence of tokens (a "prompt" if instruction-tuned).
+    + *Feed the context* into the LLM.
+    + *Select the next token* from the model-generated probability distribution.
+    + *Append the selected token* to the sequence.
+    + *Repeat* from (3) until the `EOS` (end-of-sequence) token is selected.
+  ]
 ]
 
 
@@ -460,16 +464,19 @@
 #slide[
   = Exact inference
 
-  🏆 *Holy grail*: Find the the most probable continuation to our prompt:
+  🏆 *Holy grail*: Find the most probable continuation to our prompt:
   #v(-1em)
 
   $ y^* = arg max_(y in cal(Y)) P(y) = arg max_(y in cal(Y)) product_(i=1)^(t) P(y_i | y_1, dots, y_(t-1)) $
 
   #questionbox()[
-    Why this is not possible in practice?
+    Why is this not possible in practice?
   ]
+  #show: later
 
   *Intractable* (exponential search space) → we need to approximate it.
+
+  #show: later
 
   #questionbox()[
     And is it even our goal?
@@ -584,6 +591,8 @@
 
   #set align(left)
 
+  #show: later
+
   #questionbox()[
     Why is this sampling from the entire vocabulary not a good idea?
   ]
@@ -634,7 +643,7 @@
 
   The shape of the output distribution can be adjusted using the *temperature* $T$:
 
-  $ "softmax"(y_t) = exp(y_t \/ T) / (sum_(j) exp(y_j \/ T)) $
+  $ "softmax"(z) = exp(z_t / T) / (sum_(j) exp(z_j / T)) $
 
   #set text(size: 18pt)
 
@@ -692,21 +701,7 @@
 ]
 
 
-// ============================================================
-// SECTION 3: Navigating the LLM zoo
-// ============================================================
-#section-slide(section: "Navigating the LLM zoo")[Navigating the LLM zoo]
-
-
-// #slide[
-//   = LLM evolutionary tree
-
-//   #source-slide("https://arxiv.org/abs/2304.13712", title: "Yang et al. (2023)")
-
-//   #set align(center + horizon)
-
-//   #image("img/lecture04/llm_evolutionary_tree.jpg", width: 500pt)
-// ]
+// #section-slide(section: "Navigating the LLM zoo")[Navigating the LLM zoo]
 
 
 // #slide[
@@ -718,62 +713,58 @@
 //   )
 
 //   #set align(center + horizon)
-
-//   #image("img/lecture04/llm_size_capabilities.png", width: 500pt)
+//   #image("img/lecture04/screen-2026-03-08-15-19-31.png", width: 800pt)
 // ]
 
 
-#slide[
-  = HuggingFace: source of open LLMs
+// #slide[
+//   = HuggingFace: source of open LLMs
 
-  *HuggingFace*: the largest repository of open LLMs. As of March 2026, it contains ~2.7M models (many of these are derivatives).
+//   *HuggingFace*: the largest repository of open LLMs. As of March 2026, it contains ~2.7M models (many of these are derivatives).
 
-  #set align(center + horizon)
+//   #set align(center + horizon)
 
-  #bordered-box(image("img/lecture04/screen-2026-03-08-14-51-25.png", width: 500pt))
-  #source-slide("https://huggingface.co/models", title: "HuggingFace Models")
-]
-
-
-#slide[
-  = Model sources and leaderboards
-
-  *Arena.ai*: Elo rating of LLMs: for a pair of answers from different models, users decide which is better.
-  #v(-0.5em)
-
-  #set align(center + horizon)
-  #bordered-box(image("img/lecture04/screen-2026-03-03-10-13-59.png", width: 450pt))
-
-  #source-slide("https://arena.ai/leaderboard", title: "Arena.ai")
-]
-
-#slide[
-  = Model sources and leaderboards
-
-  *OpenRouter*: routing traffic to various LLM providers, tracks real model usage through their proxy.
-  #v(-0.5em)
-
-  #set align(center + horizon)
-  #bordered-box(image("img/lecture04/screen-2026-03-08-14-52-53.png", width: 650pt))
-  #source-slide("https://openrouter.ai/rankings", title: "OpenRouter")
-]
-
-#slide[
-  = Model sources and leaderboards
-
-  *Artificial Analysis LLM Leaderboard*: rating LLMs across many dimensions (context, window size, price, speed, performance...).
-
-  Model performance is grouped under a single #link("https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index")["Intelligence index"] (=combined score from 10 benchmarks).
-  #v(-0.5em)
-  #set align(center + horizon)
-  #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 550pt))
-  #source-slide("https://artificialanalysis.ai/leaderboards/models", title: "Artificial Analysis")
-]
+//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-51-25.png", width: 500pt))
+//   #source-slide("https://huggingface.co/models", title: "HuggingFace Models")
+// ]
 
 
-// ============================================================
-// SECTION 4: Running LLMs locally
-// ============================================================
+// #slide[
+//   = Model sources and leaderboards
+
+//   *Arena.ai*: Elo rating of LLMs: for a pair of answers from different models, users decide which is better.
+//   #v(-0.5em)
+
+//   #set align(center + horizon)
+//   #bordered-box(image("img/lecture04/screen-2026-03-03-10-13-59.png", width: 450pt))
+
+//   #source-slide("https://arena.ai/leaderboard", title: "Arena.ai")
+// ]
+
+// #slide[
+//   = Model sources and leaderboards
+
+//   *OpenRouter*: routing traffic to various LLM providers, tracks real model usage through their proxy.
+//   #v(-0.5em)
+
+//   #set align(center + horizon)
+//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-52-53.png", width: 650pt))
+//   #source-slide("https://openrouter.ai/rankings", title: "OpenRouter")
+// ]
+
+// #slide[
+//   = Model sources and leaderboards
+
+//   *Artificial Analysis LLM Leaderboard*: rating LLMs across many dimensions (context, window size, price, speed, performance...).
+
+//   Model performance is grouped under a single #link("https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index")["Intelligence index"] (=combined score from 10 benchmarks).
+//   #v(-0.5em)
+//   #set align(center + horizon)
+//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 550pt))
+//   #source-slide("https://artificialanalysis.ai/leaderboards/models", title: "Artificial Analysis")
+// ]
+
+
 #section-slide(section: "Running LLMs locally")[Running LLMs locally]
 
 #slide[
@@ -829,7 +820,7 @@
 #slide[
   = Frameworks for running open LLMs
 
-  *Ollama*: running a local server, easy to use, focus on quantized models.
+  *Ollama*: running LLMs locally, easy to use, focus on quantized models.
 
   #set align(center + horizon)
 
@@ -842,7 +833,7 @@
 #slide[
   = Frameworks for running open LLMs
 
-  *vLLM*: efficient library for serving of LLMs on an enterprise level.
+  *vLLM*: efficient library for serving of LLMs at scale.
 
   #set align(center + horizon)
 
@@ -851,6 +842,18 @@
   #source-slide("https://vllm.ai", title: "vLLM")
 ]
 
+#slide[
+  = Text generation
+
+  #set align(center + horizon)
+
+  #set text(size: 26pt)
+
+  == Hands-on session 🧑‍💻
+
+
+  http://tiny.cc/nlm-gen
+]
 
 // #slide[
 //   = Text generation
