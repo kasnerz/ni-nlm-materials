@@ -13,7 +13,7 @@
   date: "17 Mar 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 
 #section-slide(section: "Training data")[Training data for LLMs]
@@ -58,7 +58,7 @@
 #slide[
   = Pretraining data: web-scale corpora
 
-  Current pre-training data is largely based on filtered #link("https://commoncrawl.org")[Common Crawl] snapshots:
+  Current pretraining is dependent on filtered #link("https://commoncrawl.org")[Common Crawl] snapshots:
   // Modern LLMs train on data scraped from the *entire web*. The main pipeline starts with *Common Crawl* -- a nonprofit that crawls the web monthly since 2007.
 
   #v(0.5em)
@@ -66,10 +66,10 @@
   #set text(size: 16pt)
 
   #table(
-    columns: (0.8fr, 0.5fr, 0.3fr, 0.7fr),
+    columns: (0.8fr, 0.5fr, 0.4fr, 0.7fr),
     inset: 0.5em,
     align: left,
-    table.header[*Dataset*][*Provider*][*Size*][*Note*],
+    table.header[*Dataset*][*Provider*][*Size* (approx).][*Note*],
     [C4 #link("https://arxiv.org/abs/1910.10683")[(Raffel et al., 2019)]],
     [#link("https://www.tensorflow.org/datasets/catalog/c4")[Google] / #link("https://huggingface.co/datasets/allenai/c4")[AllenAI]],
     [806 GB],
@@ -89,11 +89,11 @@
     [RedPajama v2 #link("https://arxiv.org/abs/2411.12372")[(Weber et al., 2024)]],
     [#link("https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2")[Together.AI + univ.]],
     [170 TB],
-    [5 languages (en,de,fr,sp,it)],
+    [5 languages (en,de,fr,es,it)],
 
     [Dolma #link("https://arxiv.org/abs/2402.00159")[(Soldaini et al., 2024)]],
     [#link("https://huggingface.co/datasets/allenai/dolma")[AllenAI]],
-    [4.5 TB],
+    [11 TB],
 
     [Mostly English],
     [FineWeb #link("https://arxiv.org/abs/2406.17557")[(Penedo et al., 2024)]],
@@ -112,10 +112,10 @@
 
 
 #slide[
-  = Open pretraning dataset: Dolma
-  *Dolma:* 11TB of cleaned data from 200 TB of raw text.
+  = Open pretraining dataset: Dolma
+  *Dolma:* 11 TB of cleaned data from 200 TB of raw text.
 
-  #image("img/lecture05/screen-2026-03-15-10-15-21.png")
+  #image("img/lecture05/dolma_dataset_composition.png")
 
   #source-slide("https://arxiv.org/pdf/2402.00159", title: "Soldaini et al. (2024)")
 ]
@@ -124,9 +124,11 @@
 #slide[
   = Pretraining data processing
 
+  #source-slide("https://arxiv.org/abs/2402.18041", title: "Liu et al. (2024)")
+
   #set align(center + horizon)
 
-  #image("img/lecture05/screen-2026-03-15-10-11-46.png")
+  #image("img/lecture05/pretraining_data_pipeline.png")
 ]
 
 
@@ -146,7 +148,6 @@
     + *Toxic content filtering*: remove hate speech, harmful content
   ]
 
-  #source-slide("https://arxiv.org/abs/2406.17557", title: "FineWeb (Penedo et al., 2024)")
 ]
 
 
@@ -158,7 +159,7 @@
 
   #source-slide("https://arxiv.org/abs/2211.04325", title: "Villalobos et al. (2022)")
 
-  #image("img/lecture05/figure2-banner.png", width: 600pt)
+  #image("img/lecture05/data_exhaustion_timeline.png", width: 600pt)
 
 ]
 
@@ -166,7 +167,6 @@
 #slide[
   = Instruction tuning & preference optimization
 
-  #source-slide("https://arxiv.org/abs/2203.02155", title: "Ouyang et al. (2022)")
 
   #questionbox()[Where can we get the data for instruction tuning and preference optimization?]
 
@@ -178,7 +178,7 @@
   - *Synthetic*: Generate data using a stronger LLM.
 
 
-  #infobox()[For InstructGPT (2023), OpenAI used around 40 human annotators.]
+  #infobox()[For InstructGPT, OpenAI used around 40 human annotators #link("https://arxiv.org/abs/2203.02155")[(Ouyang et al., 2022).]]
 
 ]
 
@@ -188,7 +188,7 @@
   #set align(center)
   #v(-1em)
 
-  #image("img/lecture05/screen-2026-03-15-10-19-32.png", width: 550pt)
+  #image("img/lecture05/openai_human_annotators.png", width: 550pt)
 
   #grid(
     columns: (1fr, 3fr, 1fr),
@@ -309,7 +309,7 @@
   )[Training on synthetic data from previous model generations can lead to *model collapse* -- progressive degradation of quality #link("https://arxiv.org/abs/2305.17493")[(Shumailov et al., 2023)].]
 ]
 
-#section-slide(section: "Model sources")[Where to get the LLMs?]
+#section-slide(section: "Model sources")[Where to find the LLMs?]
 
 
 
@@ -331,7 +331,7 @@
 #slide[
   = Ollama: repository of quantized models
 
-  *Ollama*: quantized versions of LLMs, models originally from Huggingface.
+  *Ollama*: quantized variants of open LLMs.
 
   #set align(center + horizon)
 
@@ -342,7 +342,7 @@
 
 
 
-#section-slide(section: "Evaluation")[Evaluating LLMs]
+#section-slide(section: "Evaluating LLMs")[Evaluating LLMs]
 
 
 #slide[
@@ -352,7 +352,7 @@
     columns: (1fr, 1fr),
     gutter: 1em,
   )[
-    === Intrinsic evaluation
+    === #iconify("ph", "microscope") Intrinsic evaluation
 
     Evaluates a *specific quality of the model in isolation*.
 
@@ -365,7 +365,7 @@
     ]
 
   ][
-    === Extrinsic evaluation
+    === #iconify("ph", "users") Extrinsic evaluation
 
     Evaluates the model *in the context of a downstream system*.
 
@@ -376,11 +376,32 @@
       - Time to finish a task
       - Successful cases after deployment
     ]
-
   ]
-
 ]
 
+#slide[
+  = What we will cover
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      === #iconify("ph", "microscope") Intrinsic evaluation
+      - *Perplexity*: how well can the model predict the next token
+      - *Standard benchmarks*
+        - *Accuracy / F1-score*: when we can match the answer exactly
+        - *Text similarity metrics*: for comparing textual answers
+        - *LLM-as-a-judge*: for flexible evaluation
+    ],
+    [
+      === #iconify("ph", "users") Extrinsic evaluation
+
+      - *Agentic benchmarks*: benchmarks based on completing tasks
+      - *LM arenas*: human preference judgements on custom tasks
+      - *Real-world traffic*: how people are actually using the models
+    ],
+  )
+]
 
 #slide[
   = Perplexity
@@ -395,20 +416,29 @@
 
   - *Lower is better* -- the model assigns higher probability to the actual text.
   - Directly related to cross-entropy loss from training.
-  - A model can have low perplexity and still generate bad text.
+  - However, a model can have low perplexity and still not be very useful.
 ]
 
 
 #slide[
   = How good _actually_ are the LLMs?
 
-  *Artificial Analysis LLM Leaderboard*: the "Intelligence index" (...what is that?)
+  *Artificial Analysis LLM Leaderboard*: the "Intelligence index" (→ aggregated performance on 10 benchmarks) + price, speed, latency...
   #v(-1em)
 
   #set align(center + horizon)
-  #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 800pt))
+  #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 600pt))
   #source-slide("https://artificialanalysis.ai/leaderboards/models", title: "Artificial Analysis")
+
+  #set align(left)
+
+  → We will focus mostly on the "intelligence" part: how to evaluate *model outputs*.
+
 ]
+
+
+#section-slide(section: "Benchmarks")[Benchmarks]
+
 
 #slide[
   = Benchmarks
@@ -446,6 +476,19 @@
   )
 ]
 
+#slide[
+  = Is our model "state-of-the-art"?
+
+
+  #source-slide(
+    "https://blog.google/products-and-platforms/products/gemini/gemini-3/#gemini-3",
+    title: "A new era of intelligence with Gemini 3",
+  )
+  #set align(center + horizon)
+  #v(-1em)
+
+  #image("img/lecture05/gemini_3_table_final_HLE_Tools_on.gif")
+]
 
 #slide[
   = Evaluating MCQA benchmarks
@@ -496,7 +539,7 @@
 
   #set text(size: 20pt)
 
-  Experiments from #link("https://magazine.sebastianraschka.com/p/llm-evaluation-4-approaches")[Sebasian Raschka] on MMLU: (1) 21.48%, (2) 34.44%, (3) 31.85% acc.
+  Experiments from #link("https://magazine.sebastianraschka.com/p/llm-evaluation-4-approaches")[Sebastian Raschka] on MMLU: (1) 21.48%, (2) 34.44%, (3) 31.85% acc.
 ]
 
 
@@ -512,7 +555,7 @@
 
   #set align(center + horizon)
 
-  #bordered-box(image("img/lecture05/screen-2026-03-11-18-13-35.png", width: 500pt))
+  #bordered-box(image("img/lecture05/mcqa_answer_order_sensitivity.png", width: 500pt))
 ]
 
 
@@ -553,12 +596,8 @@
 
   #v(0.25em)
 
-  *Example:* #link("https://dl.acm.org/doi/10.3115/1073083.1073135")[BLEU] score -- precision-focused n-gram overlap:
-  #v(-0.25em)
+  *Example:* #link("https://dl.acm.org/doi/10.3115/1073083.1073135")[BLEU] score= exp(weighted average of *n-gram precisions*)  ×  brevity penalty
 
-  $
-    "BLEU" = "BP" dot exp(sum_(n=1)^(N) w_n log p_n), quad p_n = frac(sum_("ngram" in hat(y)) min("cnt"("ngram", hat(y)), "cnt"("ngram", y)), sum_("ngram" in hat(y)) "cnt"("ngram", hat(y)))
-  $
 
   #grid(columns: (1fr, 1fr), gutter: 1em)[
     ```
@@ -573,10 +612,12 @@
 
   #v(0.25em)
 
-  *Other metrics*: #link("https://aclanthology.org/W04-1013/")[ROUGE] (recall-focused), #link("https://aclanthology.org/W05-0909/")[METEOR] (synonyms), #link("https://aclanthology.org/W15-3049/")[chrF] (character-level)...
+  *Other metrics*: #link("https://aclanthology.org/W04-1013/")[ROUGE] (recall-focused), #link("https://aclanthology.org/W05-0909/")[METEOR] (synonyms), #link("https://aclanthology.org/W15-3049/")[chrF] (character-level), ...
 
 
-  →  Fast, but nowadays considered mostly obsolete for benchmark eval.
+  - These metrics are fast and (somehow) explainable.
+  - Worked when the outputs from the models were below human quality.
+  - Nowadays considered mostly obsolete for benchmark eval.
 
 
 
@@ -593,14 +634,14 @@
 
   *Example:* #link("https://arxiv.org/abs/1904.09675")[BERTScore]: embeddings computed by BERT:
 
-  #image("img/lecture05/screen-2026-03-16-10-27-55.png")
+  #image("img/lecture05/bertscore_illustration.png")
   #v(-2.1em)
 
   #source("https://arxiv.org/pdf/1904.09675", title: "Zhang et al. (2020)")
   #v(0.5em)
 
 
-  *Other metrics:* #link("https://arxiv.org/abs/2004.04696")[BLEURT] (also based on BERT), #link("https://arxiv.org/abs/2009.09025")[COMET] (used for MT)...
+  *Other metrics:* #link("https://arxiv.org/abs/2004.04696")[BLEURT] (also based on BERT), #link("https://arxiv.org/abs/2009.09025")[COMET] (used for MT), ...
 
   → Slower, but suitable for standardized reference-based matching.
 ]
@@ -634,7 +675,7 @@
 
 
 #slide[
-  = LLM judge biases: self-preference
+  = LLM-as-a-judge biases: self-preference
 
 
 
@@ -647,7 +688,7 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture05/screen-2026-03-12-09-11-36.png", width: 300pt)
+      #image("img/lecture05/llm_judge_self_recognition.png", width: 300pt)
       #v(-1em)
 
       #source("https://arxiv.org/abs/2404.13076", title: "Panickssery et al. (2024)")
@@ -655,11 +696,11 @@
       #set text(size: 18pt)
       #v(1em)
 
-      Self-recognition correlates with self-prefrence.
+      Self-recognition correlates with self-preference.
 
     ],
     [
-      #image("img/lecture05/screen-2026-03-11-18-26-29.png")
+      #image("img/lecture05/llm_judge_family_preference.png")
 
       #source("https://arxiv.org/pdf/2508.06709", title: "Spiliopoulou et al. (2025)")
 
@@ -680,7 +721,7 @@
 
 
 #slide[
-  = LLM judge biases: score calibration
+  = LLM-as-a-judge biases: score calibration
 
   #source-slide("https://arxiv.org/abs/2405.01724", title: "Stureborg et al. (2024)")
 
@@ -689,7 +730,7 @@
   #v(-1em)
 
   #set align(center + horizon)
-  #image("img/lecture05/screen-2026-03-12-09-37-58.png", width: 300pt)
+  #image("img/lecture05/llm_judge_score_calibration.png", width: 300pt)
 
   #set align(left)
 
@@ -700,24 +741,99 @@
 
 
 #slide[
-  = LLM judge biases
+  = LLM-as-a-judge biases
 
   #source-slide("https://arxiv.org/abs/2410.02736", title: "Ye et al. (2024)")
 
   *Many more types of biases* of LLM-as-a-judge:
 
   #set align(center + horizon)
-  #image("img/lecture05/screen-2026-03-11-18-46-03.png", width: 700pt)
+  #image("img/lecture05/llm_judge_biases_1.png", width: 700pt)
 ]
 
 #slide()[
-  = LLM judge biases
-
+  = LLM-as-a-judge biases
 
   #source-slide("https://arxiv.org/abs/2410.02736", title: "Ye et al. (2024)")
 
   (continued...)
-  #image("img/lecture05/screen-2026-03-11-18-46-10.png")
+  #image("img/lecture05/llm_judge_biases_2.png")
+]
+
+#slide[
+  = LLM-as-a-judge: explanations
+
+
+]
+
+#slide[
+  = LLM-as-a-judge: best practices
+
+  #source-slide("https://cme295.stanford.edu/slides/fall25-cme295-lecture8.pdf", title: "CME295")
+
+  #grid(
+    columns: (1fr, 1fr, 1fr),
+    gutter: 0.8em,
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(dir: ttb, spacing: 1em, iconify("ph", "pencil-line", height: 2em), text(weight: "bold")[Prompt], text(
+          size: 0.85em,
+        )[Write clear and detailed guidelines.])
+      ]
+    ],
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(
+          dir: ttb,
+          spacing: 1em,
+          iconify("ph", "sliders", height: 2em),
+          text(weight: "bold")[Rating scale],
+          text(size: 0.85em)[Avoid numerical ratings, use binary scale where possible.],
+        )
+      ]
+    ],
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(dir: ttb, spacing: 1em, iconify("ph", "chat-text", height: 2em), text(weight: "bold")[Output], text(
+          size: 0.85em,
+        )[Let the model write an explanation for the score.])
+      ]
+    ],
+
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(
+          dir: ttb,
+          spacing: 1em,
+          iconify("ph", "warning", height: 2em),
+          text(weight: "bold")[Biases],
+          text(size: 0.85em)[Mind the biases when interpreting the results.],
+        )
+      ]
+    ],
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(
+          dir: ttb,
+          spacing: 1em,
+          iconify("ph", "check-circle", height: 2em),
+          text(weight: "bold")[Sanity check],
+          text(size: 0.85em)[Make sure model outputs fit human judgements.],
+        )
+      ]
+    ],
+    rect(width: 100%, radius: 0.5em, fill: white, inset: 0.6em)[
+      #align(center)[
+        #stack(
+          dir: ttb,
+          spacing: 1em,
+          iconify("ph", "arrows-clockwise", height: 2em),
+          text(weight: "bold")[Reproducibility],
+          text(size: 0.85em)[Disable sampling or use fixed random seed.],
+        )
+      ]
+    ],
+  )
 ]
 #slide[
   = Agent benchmarks
@@ -727,11 +843,11 @@
   #show: later
   *SWE-bench* #link("https://arxiv.org/abs/2310.06770")[(Jimenez et al., 2024)]: software-engineering benchmark.
 
-  *Goal*: to resolve real GitHub issues, code need to pass unit tests.
+  *Goal*: resolving real GitHub issues, the code needs to pass unit tests.
 
   #set align(center + horizon)
 
-  #image("img/lecture05/screen-2026-03-16-11-29-37.png", width: 500pt)
+  #image("img/lecture05/swebench_overview.png", width: 500pt)
 ]
 
 
@@ -744,7 +860,7 @@
 
   #set align(center)
 
-  #image("img/lecture05/screen-2026-03-16-11-39-45.png", width: 500pt)
+  #image("img/lecture05/webarena_tasks.png", width: 500pt)
 
   #set align(left)
 
@@ -762,13 +878,13 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #bordered-box(image("img/lecture05/screen-2026-03-16-11-32-12.png"))
+      #bordered-box(image("img/lecture05/swebench_agent_cheating.png"))
 
       #source("https://bayes.net/swebench-hack/")
 
     ],
     [
-      #bordered-box(image("img/lecture05/screen-2026-03-13-11-49-58.png"))
+      #bordered-box(image("img/lecture05/agent_cheating_nist.png"))
 
       #source("https://www.nist.gov/blogs/caisi-research-blog/cheating-ai-agent-evaluations", title: "NIST website")
 
@@ -779,7 +895,7 @@
 
   - Cheating on *coding benchmarks* by looking up more recent code versions, disabling assertions, and adding test-specific logic.
   - Finding walkthroughs and answers for *cyber CTF challenges* online.
-  - Using *DDOS attacks* to crash servers instead of exploiting vulnerabilities.
+  - Launching *DDoS attacks* to crash servers instead of exploiting vulnerabilities.
 
 
 
@@ -820,7 +936,7 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture05/screen-2026-03-13-12-37-38.png", width: 300pt)
+      #image("img/lecture05/data_contamination_examples.png", width: 300pt)
       #v(-0.5em)
 
       #source(
@@ -828,14 +944,14 @@
         title: "https://github.com/lyy1994/awesome-data-contamination",
       )
 
-      #image("img/lecture05/screen-2026-03-13-12-28-51.png", width: 300pt)
+      #image("img/lecture05/data_contamination_balloccu.png", width: 300pt)
       #v(-0.5em)
 
       #source("https://arxiv.org/abs/2402.03927", title: "Balloccu et al. (2024)")
 
     ],
     [
-      #image("img/lecture05/screen-2026-03-13-12-26-53.png", width: 350pt)
+      #image("img/lecture05/data_contamination_scale_ai.png", width: 350pt)
       #source("https://arxiv.org/pdf/2405.00332", title: "Scale AI (2024)")
 
 
@@ -898,20 +1014,19 @@
   ]
 ]
 
-
-
+#section-slide(section: "Other evaluation methods")[Other evaluation methods]
 #slide[
   = LM arenas
 
-  #source-slide("https://arena.ai", title: "arena.ai")
+  #source-slide("https://arxiv.org/abs/2403.04132", title: "(Chiang et al., 2024)")
 
-  *Chatbot Arena* #link("https://arxiv.org/abs/2403.04132")[(Chiang et al., 2024)]: users compare *anonymous* responses from two models and pick the better one → Elo ratings.
+  #link("Arena.ai")[*Arena.ai*]: users compare *anonymous* responses from two models and pick the better one → Elo ratings.
 
   #set align(center + horizon)
 
   #v(-1em)
 
-  #bordered-box(image("img/lecture05/screen-2026-03-11-13-50-38.png", width: 450pt))
+  #bordered-box(image("img/lecture05/arena_ai_leaderboard.png", width: 450pt))
 ]
 
 
@@ -926,6 +1041,18 @@
   #source-slide("https://openrouter.ai/rankings", title: "OpenRouter")
 ]
 
+#slide[
+  = Vibe checks
+
+  #source-slide("https://arxiv.org/pdf/2410.12851", title: "Dunlap et al. (2024)")
+
+  For the aspects that any formal methodology misses:
+
+  #set align(center + horizon)
+
+  #image("img/lecture05/vibe_check_example.png", width: 500pt)
+
+]
 
 #section-slide(section: "Summary")[Summary]
 
@@ -940,9 +1067,7 @@
   - *Intrinsic metrics* (perplexity) vs. *extrinsic metrics* (user satisfaction).
   - *Benchmarks* (MMLU, GSM8K, SWE-bench, ...) are useful but have *many pitfalls*:
     - Answer parsing, score calibration, data contamination, saturation.
-  - *LLM-as-a-judge* is scalable but suffers from *biases*.
-  - *Human evaluation* is the gold standard but *expensive and slow*.
-  - *Agent benchmarks* introduce new challenges (cheating, instability).
+  - *Data contamination* makes LLM benchmark scores often inflated.
 ]
 
 
