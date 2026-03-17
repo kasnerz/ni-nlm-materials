@@ -302,12 +302,12 @@
   - *Synthetic preference data*: using LLM feedback instead of human feedback (RLAIF).
   - *Data augmentation*: paraphrasing, back-translation, perturbation.
 
-  #v(0.5em)
 
-  #infobox(
+  #warnbox(
     title: "Model collapse",
-  )[Training on synthetic data from previous model generations can lead to *model collapse* -- progressive degradation of quality #link("https://arxiv.org/abs/2305.17493")[(Shumailov et al., 2023)].]
+  )[Training on synthetic data can cause progressive degradation of model output quality: so called *"model collapse"* #link("https://arxiv.org/abs/2305.17493")[(Shumailov et al., 2023)]. However, this is largely preventable, e.g. by mixing in human data #link("https://arxiv.org/abs/2406.07515")[(Feng et al., 2024)].]
 ]
+
 
 #section-slide(section: "Model sources")[Where to find the LLMs?]
 
