@@ -22,11 +22,23 @@
 #slide[
   = LLMs getting exponentially bigger
 
-  Until 2021, it seemed that the way to improve the models is *adding  more parameters*:
+  Until 2021, it seemed that the way to improve the models (lower their loss/perplexity on the training set) is *adding  more parameters*:
 
   #set align(center + horizon)
-  #image("img/lecture06/model_sizes.png", width: 550pt)
+  #image("img/lecture06/model_sizes.png", width: 500pt)
+]
 
+#slide[
+  = LLM scaling laws
+
+  #source-slide("https://arxiv.org/abs/2001.08361", title: "Kaplan et al. (2020)")
+
+
+  This trend was supported by the research from OpenAI #link("https://arxiv.org/abs/2001.08361")[(Kaplan et al., 2020)], who showed that larger models *learn more efficiently and can attain lower loss*:
+
+  #set align(center + horizon)
+
+  #image("img/lecture06/screen-2026-03-18-08-47-26.png", width: 600pt)
 ]
 
 
@@ -35,40 +47,56 @@
 
   #source-slide("https://arxiv.org/abs/2001.08361", title: "Kaplan et al. (2020)")
 
-  #link("https://arxiv.org/abs/2001.08361")[Kaplan et al. (2020)] showed that language model *loss $L$ follows empirical laws*:
+  According to Kaplan et al., test *loss $L$*  can be predicted solely based on $N$ (\# of parameters), $D$ (\# of training tokens), and $C$ (compute budget in FLOPs).
 
-  #v(0.25em)
+  They derived the following *empirical laws*:
+  #v(-1em)
 
-
-  #v(0.25em)
-  $ L(N) approx (N_c / N)^(alpha_N), #h(1em) L(D) approx (D_c / D)^(alpha_D), #h(1em) L(C) approx (C_c / C)^(alpha_C) $
-  $N$ = \# of parameters, $D$ = \# of training tokens, $C$ = compute budget (FLOPs).
-
+  #set text(size: 18pt)
   #set align(center + horizon)
 
-  #image("img/lecture06/scaling_laws_simple_power_laws.png", width: 550pt)
-]
-
-
-
-
-#slide[
-  = LLM scaling laws
-
-  #source-slide("https://arxiv.org/abs/2001.08361", title: "Kaplan et al. (2020)")
-
-  Kaplan et al.'s takeaway: for a *fixed compute budget*, it is better to train a *larger model on less data* (and stop early) than a smaller model on more data.
-
-  #v(0.5em)
-
-  #infobox(title: "Example")[
-    Given a 10× increase in compute, Kaplan et al. suggest to increase model size $approx$ 5.5× but data only $approx$ 1.8×.
+  #bordered-box(padding: 10pt)[
+    #{
+      set par(leading: 0.35em)
+      $
+        L(N) = (N_c "/" N)^(alpha_N); & #h(1em) alpha_N approx 0.076, & #h(1em) N_c approx 8.8 times 10^13 & #h(0.5em) "parameters" \
+        L(D) = (D_c "/" D)^(alpha_D); & #h(1em) alpha_D approx 0.095, & #h(1em) D_c approx 5.4 times 10^13 & #h(0.5em) "tokens" \
+        L(C) = (C_c "/" C)^(alpha_C); & #h(1em) alpha_C approx 0.050, & #h(1em) C_c approx 3.1 times 10^8 & #h(0.5em) "PFLOP-days"
+      $
+    }
   ]
 
+  #set align(left)
+  #set text(size: 20pt)
 
-  → Large models like GPT-3 (175B) were trained on  limited data ($approx$ 300B tokens).
+  #infobox(title: "Practical consequence")[
+    Given a 10× increase in compute, Kaplan et al. suggest to increase model size $approx$ 5.5× but data only $approx$ 1.8×.
+  ]
+]
 
-  #questionbox()[Which issues do you see with rapidly the number of model parameters?]
+
+
+
+#slide[
+  = LLM scaling laws
+
+  #source-slide("https://arxiv.org/abs/2001.08361", title: "Kaplan et al. (2020)")
+
+
+  #quote[As the computational budget C increases, it should be spent primarily on larger models, without dramatic increases in training time or dataset size.]
+  #v(-1em)
+
+  #set align(center + horizon)
+  #image("img/lecture06/scaling_laws_simple_power_laws.png", width: 550pt)
+
+
+  #set align(left)
+
+  → These findings lead to large models like GPT-3 (175B) being trained on relatively limited data ($approx$ 300B tokens).
+
+
+
+
 ]
 
 
@@ -77,8 +105,9 @@
 
   #source-slide("https://arxiv.org/abs/2203.15556", title: "Hoffmann et al. (2022)")
 
-  #link("https://arxiv.org/abs/2203.15556")[Hoffmann et al. (2022)] *challenged the Kaplan et al. scaling laws* by training models on a wider range of $N$ and $D$.
-  They found that model size and data size should be scaled *equally*:
+  Research from DeepMind (#link("https://arxiv.org/abs/2203.15556")[Hoffmann et al., 2022]) *challenged the scaling laws*.
+
+  They trained on a wider range of $N$ and $D$ and found that they should be scaled *equally*:
   #v(-1em)
 
   $ N_"opt" prop C^a, #h(2em) D_"opt" prop C^b, #h(2em) a approx b approx 0.5 $
@@ -101,11 +130,13 @@
 
   #source-slide("https://arxiv.org/abs/2203.15556", title: "Hoffmann et al. (2022)")
 
-  Most existing LLMs at the time (GPT-3, Gopher, Megatron) were * undertrained*:
+  → They found that most existing LLMs at the time (GPT-3, Gopher, Megatron) were * undertrained*:
 
   #set align(center + horizon)
 
-  #image("img/lecture06/chinchilla_tokens_vs_params.png", width: 330pt)
+  #v(-1em)
+
+  #image("img/lecture06/chinchilla_tokens_vs_params.png", width: 300pt)
 
 ]
 
@@ -116,7 +147,7 @@
 
   #source-slide("https://arxiv.org/abs/2401.00448", title: "Sardana & Frankle (2024)")
 
-  If the model will be used for inference billions of times, it may be worth training *a smaller model on more data* to reduce inference cost.
+  Moreover, another line of research #link("https://arxiv.org/abs/2401.00448")[(Sardana & Franklem, 2024)] pointed out that it may be worth training *a smaller model on more data* to reduce inference cost.
   #set align(center + horizon)
   #v(-1em)
 
@@ -157,59 +188,46 @@
   = What can we scale next?
 
   Scaling *pretraining* has its limits:
-  - We are running out of *high-quality text data* (see Lecture 5).
-  - Training compute costs are *enormous* (\$100M+ for frontier models).
+  - We are running out of high-quality text data (see Lecture 5).
+  - Training compute costs are enormous (\$100M+ for frontier models).
   - Returns are *diminishing*: each 10× in compute yields smaller improvements.
 
   #questionbox()[Can you think of another ways to improve model performance?]
 
   #ideabox(title: "Idea")[
-    "Squeeze out" more from the models during inference → test-time scaling.
+    "Squeeze out" more from the models during inference → *test-time scaling.*
   ]
 ]
 
 
-// ============================================================
-// SECTION 2: CHAIN-OF-THOUGHT
-// ============================================================
-
 #section-slide(section: "Chain-of-thought")[Chain-of-thought prompting]
 
-
 #slide[
-  = The origin story
+  = Chain-of-thought (CoT) prompting
 
   #source-slide("https://arxiv.org/abs/2201.11903", title: "Wei et al. (2022)")
+  #v(-0.5em)
+
+  #ideabox()[#link("https://arxiv.org/abs/2201.11903")[Wei et al. (2022)]: LLMs struggle with math and multi-step reasoning. What if we showed them *how to do intermediate reasoning steps*?]
 
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
   )[
-    #link("https://arxiv.org/abs/2201.11903")[Wei et al. (2022)]: LLMs struggle with math and multi-step reasoning. What if we showed them *how to do intermediate reasoning steps*?
+    #set align(center + horizon)
 
-    #v(0.5em)
-
-    *Chain-of-thought (CoT) prompting*: include step-by-step reasoning examples in the prompt.
-
-    #v(0.5em)
-
-    → Dramatic improvement on arithmetic, commonsense, and symbolic reasoning tasks.
+    #image("img/lecture06/cot_main_figure.png", width: 350pt)
   ][
-    #image("img/lecture06/cot_meme_1.png")
+    #set align(center + horizon)
+
+    #image("img/lecture06/cot_meme_1.png", width: 150pt)
   ]
+
+  → Dramatic improvement on arithmetic, commonsense, and symbolic reasoning.
 ]
 
 
-#slide[
-  = Chain-of-thought prompting: the idea
-
-  #source-slide("https://arxiv.org/abs/2201.11903", title: "Wei et al. (2022)")
-
-  #set align(center + horizon)
-
-  #image("img/lecture06/cot_main_figure.png", width: 600pt)
-]
 
 
 #slide[
@@ -217,42 +235,48 @@
 
   #source-slide("https://arxiv.org/abs/2205.11916", title: "Kojima et al. (2022)")
 
+  #v(-0.5em)
+
+  #ideabox[#link("https://arxiv.org/abs/2205.11916")[Kojima et al. (2022)]: Assembling the steps is tricky. Do we need to do that at all?]
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1.5fr),
     gutter: 1em,
   )[
-    #link("https://arxiv.org/abs/2205.11916")[Kojima et al. (2022)]: Finding good examples is tricky. Do we need to do that at all?
+    #set align(center + horizon)
 
-    #v(0.5em)
+    #image("img/lecture06/cot_meme_2.jpg", width: 200pt)
 
-    Simply appending *"Let's think step by step"* to the prompt is enough to trigger reasoning behavior.
-
-    #v(0.5em)
-
-    #image("img/lecture06/cot_kojima_example.png", width: 350pt)
   ][
     #set align(center + horizon)
-    #image("img/lecture06/cot_meme_2.jpg", width: 200pt)
+    #image("img/lecture06/cot_kojima_example.png", width: 400pt)
   ]
+
+  → Prompting with *"Let's think step by step"* is enough to trigger reasoning behavior.
 ]
 
 
 #slide[
-  = CoT: standard prompting technique
+  = Chain-of-thought (CoT) prompting
+  #set align(horizon)
 
-  Chain-of-thought prompting is nowadays a *standard* prompting method:
 
-  #v(0.5em)
+  #grid(
+    columns: (1.8fr, 1fr),
+    gutter: 1em,
+    [
 
-  - Generally increases performance on problems requiring *multi-step reasoning*.
-  - Does not require more than appending (a variant of) *"Think step-by-step"* to the prompt.
-  - *Works best with larger models* -- small models can generate plausible-looking but incorrect reasoning chains.
-
-  #v(0.5em)
-
-  #set align(center + horizon)
-  #image("img/lecture06/cot_meme_3.png", width: 200pt)
+      - Can be applied to any instruction-tuned model.
+        - Does not require more than appending (a variant of) "Think step-by-step" to the prompt.
+      - Generally increases performance on problems requiring *multi-step reasoning*
+        - Helps to break down complex problems into simpler subproblems.
+      - Nowadays falling out of favor compared to *large reasoning models* trained to reason explicitly.
+    ],
+    [
+      #set align(center + horizon)
+      #image("img/lecture06/cot_meme_3.png", width: 230pt)
+    ],
+  )
 ]
 
 
@@ -266,46 +290,19 @@
     gutter: 1em,
   )[
     Several hypotheses:
+    - The "emergent" ability can be *learned from pretraining on code* data (#link("https://arxiv.org/abs/2402.09567")[Ma et al., 2024]\; #link("https://arxiv.org/abs/2411.01259")[Puerto et al., 2024]).
+    - However, the model may be using *extended inference time* to perform more computation #link("https://arxiv.org/abs/2407.01687")[(Pfau et al., 2024)].
 
-    - The "emergent" ability can be *learned from pretraining on code* data #link("https://arxiv.org/abs/2402.09567")[(Ma et al., 2024)]; #link("https://arxiv.org/abs/2411.01259")[(Puerto et al., 2024)].
-    - The model may be using *extended inference time* to perform more computation #link("https://arxiv.org/abs/2407.01687")[(Pfau et al., 2024)].
-    - CoT makes the model *break down complex problems* into simpler subproblems that are within its capabilities.
 
-    #v(0.5em)
-
-    #warnbox(title: "Faithfulness")[
-      The reasoning chain may *not* reflect the actual computation inside the model. The model can arrive at the correct answer for wrong reasons.
-    ]
   ][
-    #image("img/lecture06/cot_why_works.png")
+    #image("img/lecture06/cot_why_works.png", width: 250pt)
+  ]
+  #warnbox(title: "Faithfulness")[
+    The reasoning chain may *not* reflect the actual computation inside the model.
   ]
 ]
 
 
-#slide[
-  = Self-consistency: sampling multiple paths
-
-  #source-slide("https://arxiv.org/abs/2203.11171", title: "Wang et al. (2022)")
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    CoT prompting generates a *single* reasoning path. But what if the model makes a wrong step?
-
-    #v(0.5em)
-
-    *Self-consistency* #link("https://arxiv.org/abs/2203.11171")[(Wang et al., 2022)]:
-    + Generate *multiple* CoT reasoning paths for the same problem.
-    + Use *majority voting* to select the final answer.
-
-    #v(0.5em)
-
-    → Uses more compute at test time, but substantially improves accuracy.
-  ][
-    #image("img/lecture06/self_consistency.png")
-  ]
-]
 
 
 // ============================================================
@@ -315,55 +312,41 @@
 #section-slide(section: "Test-time scaling")[Test-time scaling]
 
 
+
 #slide[
-  = From pretraining scaling to test-time scaling
+  = Test-time scaling
 
-  #source-slide("https://arxiv.org/abs/2408.03314", title: "Snell et al. (2024)")
+  #source-slide("https://arxiv.org/abs/2203.11171", title: "Wang et al. (2022)")
 
-  CoT and self-consistency showed a new direction: *test-time compute scaling*.
 
-  Instead of making the model bigger, give the model *more time to think* at inference.
-
-  #v(0.5em)
-
+  #ideabox(
+    "Idea: test-time scaling",
+  )[Can we make use of the reasoning capability to improve model performance without further training, solely at *inference time*?]
   #grid(
-    columns: (1fr, 1fr),
+    columns: (1fr, 1.3fr),
     gutter: 1em,
   )[
-    === Pretraining scaling 📈
-    - Bigger model
-    - More data
-    - More training compute
-    - Fixed cost per query
+    The simplest example of *test-time scaling*:
+
+    - Generate multiple CoT paths for the given problem.
+    - Use majority voting to select the final answer.
+
   ][
-    === Test-time scaling 🤔
-    - Same model
-    - More inference compute
-    - *Variable* cost per query
-    - Adaptive to problem difficulty
+    #image("img/lecture06/self_consistency.png")
   ]
-
-  #v(0.5em)
-
-  #infobox()[Test-time compute scaling can be *more efficient* than pretraining scaling for hard problems #link("https://arxiv.org/abs/2408.03314")[(Snell et al., 2024)].]
 ]
-
 
 #slide[
   = Test-time scaling strategies
 
   #source-slide("https://arxiv.org/abs/2408.03314", title: "Snell et al. (2024)")
 
-  More advanced strategies involve *tree-like search* and *verification*:
+  More advanced extensions involve *tree search* and a verifying the solution with a *verifier model* (e.g., code interpreter):
+
 
   #set align(center + horizon)
-  #image("img/lecture06/test_time_tree_search.png", width: 600pt)
+  #image("img/lecture06/test_time_tree_search.png", width: 480pt)
 
-  #set align(left)
-
-  - *Best-of-N*: generate $N$ answers, pick the best using a verifier.
-  - *Tree search*: explore multiple reasoning branches (beam search, MCTS).
-  - *Verifiers*: reward models, code interpreters, or external tools for checking intermediate steps.
 ]
 
 
@@ -375,118 +358,117 @@
 
 
 #slide[
-  = From prompting to training
+  = LLMs → LRMs
 
-  CoT works as a *prompting technique*, but the reasoning behaviour is not a part of the model itself.
+  #source-slide(
+    "https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1",
+    title: "https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1",
+  )
 
-  #v(0.5em)
+  #ideabox()[What if we trained the model to *always produce the reasoning trace* before answering?]
 
-  #questionbox()[What if we trained the model to *always reason* before answering?]
+  #set align(center)
+
+
+  #image("img/lecture06/623a9dbf-c76e-438c-ba69-43ae9613ebbe_2930x1496 (2).png", width: 500pt)
+
+  #set align(left)
+
+  #v(1em)
+
+  We call such a model a *large reasoning model (LRM)*.
+]
+
+#slide[
+  = LLMs with CoT → LRMs
+
+  #questionbox()[Why not just use the chain-of-thought prompting?]
 
   #show: later
 
+  Chain-of-thought reasoning is not robust -- it is largely an artifact of training data (most likely due to code data, #link("https://arxiv.org/pdf/2309.16298")[Ma et al., 2023)].
   #v(0.5em)
 
-  *Large reasoning models (LRMs)*: models trained to produce detailed *reasoning traces* that include:
-  - Problem decomposition
-  - Intermediate reasoning steps
-  - Self-correction and backtracking
-  - Verification of intermediate results
+  It is also *too simple*. We would like to a degree *automate test-time scaling*, giving the model the ability to:
 
-  #v(0.5em)
+  - Decompose the problem into subproblems.
+  - Follow multiple reasoning paths.
+  - Back-track from invalid paths.
 
-  → The reasoning process is *internalized* into the model through training.
 ]
-
-
-#slide[
-  = Examples of reasoning models
-
-  #set text(size: 16pt)
-
-  #table(
-    columns: (1fr, 0.5fr, 0.5fr, 1fr),
-    inset: 0.5em,
-    align: left,
-    table.header[*Model*][*Provider*][*Year*][*Notes*],
-    [o1, o3, o4-mini], [OpenAI], [2024--25], [Closed-source, first widely known LRMs],
-    [DeepSeek-R1], [DeepSeek], [2025], [Open-source, 671B MoE + distilled variants],
-    [Gemini 2.5 Pro/Flash], [Google], [2025], ["Thinking" mode],
-    [Claude 3.7 Sonnet], [Anthropic], [2025], [Extended thinking],
-    [QwQ, Qwen3], [Alibaba], [2025], [Open-source reasoning models],
-    [GPT-OSS / Phi-4-reasoning], [Microsoft], [2025], [Open-source reasoning models],
-  )
-
-  #set text(size: 20pt)
-
-  #v(0.5em)
-
-  The key question: *how to train reasoning models?*
-]
-
 
 #slide[
   = DeepSeek-R1: overview
 
   #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
-  *DeepSeek-R1* #link("https://arxiv.org/abs/2501.12948")[(DeepSeek-AI, 2025)]: one of the first open-source reasoning models, competitive with OpenAI o1.
+  *DeepSeek-R1* #link("https://arxiv.org/abs/2501.12948")[(DeepSeek-AI, 2025)]: the first *open* reasoning model. 671B parameters, competitive with OpenAI o1.
 
+  Their recipe on how to build a strong reasoning model:
   #v(0.5em)
 
-  #set align(center + horizon)
-  #image("img/lecture06/alammar_deepseek_r1_training.jpg", width: 600pt)
 
-  #source("https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1", title: "Jay Alammar (2025)")
+  #grid(
+    columns: (1.2fr, 1fr),
+    gutter: 1em,
+    [
+
+
+      1. Take a *base model* (they took their `deepseek-v3-base`).
+      2. *Finetune* the model on a dataset of reasoning traces.
+      3. Improve the reasoning process using *reinforcement learning*.
+    ],
+    [
+      #set align(center + horizon)
+      #image("img/lecture06/4caea6a5-52a1-4651-8c71-4586c0637f3e_924x427.png", width: 400pt)
+      #source("https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1", title: "Jay Alammar (2025)")
+
+    ],
+  )
 ]
 
 
 #slide[
-  = DeepSeek-R1-Zero: pure RL
+  = DeepSeek-R1-Zero
 
-  #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
-  *Step 1*: Can we get reasoning behaviour from RL alone, *without any supervised data*?
+  #questionbox()[Sounds good, but where to get the dataset with reasoning traces in step 2?]
 
-  #v(0.5em)
+  #show: later
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1.2fr),
     gutter: 1em,
-  )[
-    *DeepSeek-R1-Zero*:
-    + Start from a base LLM (DeepSeek-V3, no SFT).
-    + Train with RL using *accuracy rewards* (verifier for math/code) and *format rewards* (rule-based).
-    + The model *naturally learns* to produce longer reasoning traces, self-verify, and backtrack.
-  ][
-    #image("img/lecture06/deepseek_r1_zero_rl.png")
-  ]
+    [
+      Recipe of DeepSeek-R1-Zero:
+      1. Apply the model with a *regular CoT prompting* on difficult problems.
+      2. Automatically *verify the solutions*.
+      3. *Reward* the model for good solutions with using RL.
+    ],
+    [
+      #image("img/lecture06/deepseek_r1_zero_rl.png", width: 400pt)
 
-  #v(0.5em)
+    ],
+  )
 
-  #infobox(title: "\"Aha moment\"")[
-    During RL training, the model *spontaneously* learns to re-evaluate its reasoning and try alternative approaches -- without being explicitly taught to do so.
-  ]
 ]
 
 
+
+
+
 #slide[
-  = DeepSeek-R1-Zero: emergent reasoning
+  = DeepSeek-R1-Zero
 
   #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    The model responses get *progressively longer* during RL training -- the model learns to "think more":
+  During RL training, the model *spontaneously* learns to re-evaluate its reasoning and try alternative approaches:
 
-    #image("img/lecture06/deepseek_r1_response_length.png")
-  ][
-    #image("img/lecture06/deepseek_r1_zero_aha_moment.png")
+  #set align(center)
 
-    Self-reflection and backtracking emerge naturally.
-  ]
+  #image("img/lecture06/30f8e37b-ba60-49d2-a95e-9c06b2033ee4_1600x1019.jpg", width: 400pt)
+
+
 ]
 
 
@@ -495,80 +477,28 @@
 
   #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
+  #questionbox()[Aren't we done? Can we just use DeepSeek-R1-Zero as _the_ reasoning model?]
+
   Pure RL training has issues:
 
-  - *Unstable cold start*: early RL training is volatile without a good starting point.
-  - *Poor readability*: the model mixes languages and produces messy formatting.
-  - *Missing general capabilities*: good at math/code but struggles with general tasks.
+  - Early RL training is unstable and hard to get going.
+  - The model mixes languages and produces messy formatting.
+  - The model gets is good at math/code but struggles with general tasks.
 
   #v(0.5em)
 
-  → We need a more structured training pipeline.
+
+  → However, we can still use the model to *generate a dataset of reasoning traces* for the finetuning step.
 ]
 
-
 #slide[
-  = DeepSeek-R1: full training pipeline
+  = DeepSeek-R1: Full training pipeline
 
-  #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
   #set align(center + horizon)
+  #v(-1em)
 
-  #image("img/lecture06/deepseek_r1_pipeline.png", width: 600pt)
-
-  #set align(left)
-
-  #set text(size: 16pt)
-  + *Cold start SFT*: fine-tune on a small set of long CoT examples (curated from R1-Zero outputs + human annotation) to bootstrap reasoning.
-  + *Reasoning-oriented RL*: train with accuracy and format rewards on math/code.
-  + *Rejection sampling + SFT*: generate many outputs, keep the best, combine with general SFT data for a balanced model.
-  + *Diverse RL*: final RL stage with both reasoning rewards and human preference rewards (helpfulness, safety).
-]
-
-
-#slide[
-  = GRPO: Group Relative Policy Optimization
-
-  #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
-
-  DeepSeek-R1 uses *GRPO* instead of PPO for RL training:
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    - Standard RLHF uses PPO with a separate *critic (value) model* -- expensive to train and serve.
-    - GRPO estimates the *baseline from a group of sampled outputs* instead:
-      + Sample $G$ outputs for each prompt.
-      + Compute rewards for each.
-      + Normalize rewards within the group.
-      + Update the policy based on relative quality.
-  ][
-    #set align(center + horizon)
-    #image("img/lecture06/deepseek_grpo.png")
-  ]
-]
-
-
-#slide[
-  = DeepSeek-R1: results
-
-  #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
-
-  DeepSeek-R1 achieves performance *competitive with OpenAI o1* across multiple benchmarks:
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    #image("img/lecture06/deepseek_aime_results.png")
-  ][
-    #image("img/lecture06/deepseek_math_performance.png")
-  ]
+  #image("img/lecture06/45ca8c84-6eb6-4879-ab53-035174b17ce1_1620x700.png", width: 700pt)
 ]
 
 
@@ -577,33 +507,26 @@
 
   #source-slide("https://arxiv.org/abs/2501.12948", title: "DeepSeek-AI (2025)")
 
-  We don't always need a 671B model. *Distillation*: fine-tune smaller models on reasoning traces generated by DeepSeek-R1.
+  #ideabox()[Now we have a _strong_ reasoning model. Can we use its outputs to get the dataset of reasoning traces and make our life simpler?]
 
-  #v(0.5em)
+  Yes: we can *finetune a model directly on the reasoning traces* of DeepSeek-R1-671B.
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    #image("img/lecture06/deepseek_math_breakdown.png")
-  ][
-    Distilled models (1.5B--70B, based on Qwen and Llama) achieve strong results on math and coding tasks.
+  → This idea lead to *distilled models* based on Llama and Qwen (between 1.5B to 70B).
 
-    #v(0.5em)
 
-    #infobox()[
-      Distillation is *much cheaper* than running the full RL pipeline -- but is limited by the teacher model's capabilities.
-    ]
+  #infobox("Why distillation?")[
+    Distillation -- in this context -- means fine-tuning smaller models ("students") on reasoning traces generated by a larger model ("teacher").
   ]
 ]
 
 
 #slide[
-  = Summary: three approaches to reasoning
+  = Summary: how to build a reasoning model
 
   #source-slide("https://magazine.sebastianraschka.com/p/understanding-reasoning-llms", title: "Raschka (2025)")
 
-  #set text(size: 16pt)
+  #set align(horizon)
+
 
   #grid(
     columns: (1fr, 1fr, 1fr),
@@ -614,7 +537,8 @@
       - Base LLM + RL with verifier rewards
       - Emergent reasoning
       - Unstable, poor readability
-      - → DeepSeek-R1-Zero
+
+      → DeepSeek-R1-Zero
     ],
     rect(width: 100%, radius: 0.5em, fill: primary-color.lighten(95%), inset: 0.8em)[
       #text(weight: "bold", fill: primary-color)[Option 2: SFT + RL]
@@ -622,130 +546,75 @@
       - SFT on reasoning traces, then RL
       - Stable training
       - Expensive
-      - → DeepSeek-R1, OpenAI o1
+
+      → DeepSeek-R1, current frontier LRMs
     ],
     rect(width: 100%, radius: 0.5em, fill: primary-color.lighten(95%), inset: 0.8em)[
       #text(weight: "bold", fill: primary-color)[Option 3: Pure SFT]
       #v(0.3em)
-      - SFT on distilled reasoning traces
+      - SFT on reasoning traces distilled  from the teacher model
       - Cheapest approach
-      - Limited by teacher
-      - → DeepSeek-R1-Distill, Sky-T1
+      - Limited performance
+
+      → distilled LRMs
     ],
   )
 
-  #set text(size: 20pt)
-]
-
-
-#slide[
-  = Three approaches: overview
-
-  #source-slide("https://magazine.sebastianraschka.com/p/understanding-reasoning-llms", title: "Raschka (2025)")
-
-  #set align(center + horizon)
-  #image("img/lecture06/raschka_training_approaches.jpg", width: 550pt)
-]
-
-
-// ============================================================
-// SECTION 5: FRONTIERS & PRACTICAL ASPECTS
-// ============================================================
-
-#section-slide(section: "Current frontiers")[Current frontiers]
-
-
-#slide[
-  = LLMs and math competitions
-
-  Reasoning models have achieved remarkable results in mathematical competitions:
-
+  #set text(size: 18pt)
   #v(0.5em)
 
-  - *AIME 2024*: OpenAI o3 scored in the top 0.1% of participants.
-  - *International Mathematical Olympiad 2025*: both Google's Gemini and OpenAI models have started *solving IMO problems* at the gold-medal level.
-  - *FrontierMath* #link("https://arxiv.org/abs/2411.04872")[(Glazer et al., 2024)]: benchmark of original, unpublished math problems -- initially \<2% solved, now approaching 25%+.
-
-  #v(0.5em)
-
-  #infobox()[
-    These results were unthinkable just 2 years ago. Mathematical reasoning has been one of the biggest areas of improvement.
-  ]
+  RL = reinforcement learning, SFT = supervised finetuning
 ]
 
-
 #slide[
-  = ARC-AGI: pattern recognition challenge
-
-  #source-slide("https://arcprize.org/", title: "ARC Prize")
-
-  *ARC-AGI* #link("https://arxiv.org/abs/1911.01547")[(Chollet, 2019)]: a benchmark for abstract reasoning, designed to resist memorization.
-
-  #v(0.5em)
+  = Thoughtology
+  #source-slide("https://arxiv.org/abs/2504.07128", title: "Marjanović et al. (2025)")
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
-  )[
-    - Each task is a unique visual pattern puzzle with very few examples.
-    - Humans solve $tilde$85% of tasks, LLMs historically struggled ($<$5%).
-    - *ARC-AGI-1 is now close to saturation*: OpenAI o3 reached 87.5% in December 2024.
-    - ARC-AGI-2 has been released as a harder successor.
-  ][
-    #todo[Insert ARC-AGI task example figure]
-  ]
-]
+    [
+      Many properties of reasoning models are *yet to be properly investigated*, such as:
+      - How well does the trace reflect the internal thinking process?
+      - What is the optimal length of the trace? Can we enforce certain length?
+      - (etc.)
+    ],
+    [
+      #set align(center + horizon)
 
-
-#slide[
-  = Benchmark saturation revisited
-
-  Reasoning models have *rapidly saturated* many benchmarks:
-
-  #v(0.5em)
-
-  #set text(size: 16pt)
-
-  #table(
-    columns: (1fr, 0.5fr, 0.5fr, 0.7fr),
-    inset: 0.4em,
-    align: left,
-    table.header[*Benchmark*][*2023 SOTA*][*2025 SOTA*][*Status*],
-    [MATH], [$approx$50%], [97.3%], [✅ Saturated],
-    [GSM8K], [$approx$80%], [99%+], [✅ Saturated],
-    [GPQA Diamond], [$approx$36%], [79.7%], [⚠ Close],
-    [AIME 2024], [$approx$10%], [87%], [⚠ Close],
-    [ARC-AGI-1], [$approx$5%], [87.5%], [⚠ Close],
-    [SWE-bench Verified], [$approx$20%], [72%], [❌ Active],
-    [HLE], [--], [53.1%], [❌ Active],
-    [FrontierMath], [--], [$approx$25%], [❌ Active],
+      #v(-1.5em)
+      #image("img/lecture06/screen-2026-03-18-16-50-22.png", width: 300pt)
+    ],
   )
 
-  #set text(size: 20pt)
+  #set align(center + horizon)
 
-  #v(0.5em)
-
-  → The community keeps releasing *harder benchmarks*: HLE #link("https://arxiv.org/abs/2501.14249")[(Phan et al., 2025)], FrontierMath, ARC-AGI-2, ...
+  #v(-1.5em)
+  #image("img/lecture06/screen-2026-03-18-16-51-58.png", width: 500pt)
 ]
 
-
 #slide[
-  = Open-source reasoning models
+  = When to use reasoning models
 
-  The release of DeepSeek-R1 has catalyzed an *open-source reasoning ecosystem*:
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+  )[
+    === Makes sense:
+    - Math and logic problems
+    - Complex coding tasks
+    - Multi-step planning
+  ][
+    === A bit of an overkill:
+    - Simple Q&A
+    - Factual retrieval
+    - Text summarization
+  ]
 
   #v(0.5em)
 
-  - *QwQ / Qwen3* (Alibaba): open-source reasoning models, various sizes.
-  - *Phi-4-reasoning* (Microsoft): compact reasoning model based on Phi-4.
-  - *Sky-T1* (NovaSky): trained with only 17k SFT samples for $tilde$\$450.
-  - *Open-R1* (HuggingFace): community effort to reproduce DeepSeek-R1 training.
-  - *LIMO* #link("https://arxiv.org/abs/2502.03387")[(Ye et al., 2025)]: reasoning with only 817 curated training examples.
-
-  #v(0.5em)
-
-  #infobox()[
-    The barrier to training reasoning models is *rapidly dropping*. The key ingredients are public: RL algorithms (GRPO), open base models, and distillation from strong models.
+  #warnbox(title: "Why not use reasoning models for all the tasks")[
+    Reasoning models use *significantly more tokens* (→ cost and time) per query. The "thinking" tokens can take up 10--100× the output length of a regular instruction-tuned model.
   ]
 ]
 
@@ -756,11 +625,11 @@
 #slide[
   = What does reasoning look like in practice?
 
-  Reasoning models produce *structured thinking traces* wrapped in `<think>` tags:
+  Reasoning models typically wrap their *thinking traces* in `<think>` tags:
 
   #v(0.25em)
 
-  #set text(size: 13pt)
+  #set text(size: 15pt)
 
   ```
   User: How many r's are in "strawberry"?
@@ -779,110 +648,97 @@
 
   #set text(size: 20pt)
 
-  The thinking part is typically *hidden* from the user in chat interfaces but *exposed through the API*.
+  The thinking part is typically hidden from the user in chat interfaces.
 ]
 
 
 #slide[
   = Accessing reasoning in APIs
 
-  Most LLM APIs now expose reasoning content separately:
+  Open LLM APIs expose the reasoning content in a separate field.
 
-  #v(0.5em)
+  Example: vLLM (https://docs.vllm.ai/en/latest/features/reasoning_outputs):
 
-  #set text(size: 13pt)
-
+  #set text(size: 14pt)
   ```python
-  from openai import OpenAI
-  client = OpenAI()
+  messages = [{"role": "user", "content": "9.11 and 9.8, which is greater?"}]
+  response = client.chat.completions.create(model=model, messages=messages)
 
-  response = client.chat.completions.create(
-      model="o4-mini",
-      messages=[{"role": "user", "content": "How many r's in strawberry?"}]
-  )
-
-  # Reasoning trace (the "thinking" part)
-  print(response.choices[0].message.reasoning_content)
-
-  # Final answer
-  print(response.choices[0].message.content)
+  reasoning = response.choices[0].message.reasoning
+  content = response.choices[0].message.content
   ```
+
 
   #set text(size: 20pt)
 
-  #v(0.5em)
+  #warnbox(title: "Warning")[
+    Full reasoning traces are typically *not* available with commercial models.
 
-  The `reasoning_content` field (or equivalent) is available in OpenAI, Anthropic, and other APIs. Open models use `<think>...</think>` tags in the raw output.
-]
+    For example, Google only offers so called "thinking summaries": https://ai.google.dev/gemini-api/docs/thinking
 
-
-#slide[
-  = Thinking with Ollama
-
-  For open reasoning models run locally, e.g. using Ollama:
-
-  #v(0.5em)
-
-  #set text(size: 13pt)
-
-  ```python
-  import ollama
-
-  response = ollama.chat(
-      model='deepseek-r1:8b',
-      messages=[{'role': 'user', 'content': 'How many r\'s in strawberry?'}],
-  )
-  # Response includes <think>...</think> tags in the content
-  print(response['message']['content'])
-  ```
-
-  #set text(size: 20pt)
-
-  #v(0.5em)
-
-  #infobox(title: "Thinking effort / budget")[
-    Some APIs allow controlling the *thinking budget* -- how many tokens the model can use for reasoning. More thinking = better results but higher cost and latency.
   ]
 ]
 
+#slide[
+  = Where to get LRMs
+  Now there is quite a lot of open LRMs to choose from (most of them Chinese):
+
+  #set align(center + horizon)
+
+  #image("img/lecture06/screen-2026-03-18-15-27-04.png", width: 350pt)
+  #source-slide("https://docs.vllm.ai/en/latest/features/reasoning_outputs/#supported-models", title: "vLLM docs")
+
+]
+
+#section-slide(section: "LRMs and current frontiers")[LRMs and current frontiers]
 
 #slide[
-  = When to use reasoning models
+  = LRMs and current frontiers
 
-  Reasoning models are *not always* the best choice:
-
-  #v(0.5em)
 
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
-  )[
-    === ✅ Good fit
-    - Math and logic problems
-    - Complex coding tasks
-    - Multi-step planning
-    - Scientific reasoning
-    - Tasks requiring self-verification
-  ][
-    === ❌ Overkill
-    - Simple Q&A / factual retrieval
-    - Text summarization
-    - Translation
-    - Creative writing
-    - Latency-sensitive applications
-  ]
+    [
+      #set align(center + horizon)
 
-  #v(0.5em)
+      #image("img/lecture06/screen-2026-03-18-16-40-17.png")
+      #image("img/lecture06/screen-2026-03-18-16-42-21.png", width: 280pt)
+    ],
+    [
+      #set align(center + horizon)
 
-  #warnbox(title: "Cost")[
-    Reasoning models use *significantly more tokens* (and thus cost and time) per query. The "thinking" tokens can be 10--100× the output length.
-  ]
+      #image("img/lecture06/screen-2026-03-18-16-43-38.png")
+      #image("img/lecture06/screen-2026-03-18-16-41-20.png", width: 310pt)
+    ],
+  )
+
+]
+
+#slide[
+  = LRMs and current frontiers
+  #set align(center + horizon)
+
+  #source-slide("https://agi.safe.ai", title: "https://agi.safe.ai")
+
+  #image("img/lecture06/screen-2026-03-18-16-46-02.png")
 ]
 
 
-// ============================================================
-// SUMMARY
-// ============================================================
+#slide[
+  = LRMs and current frontiers
+
+  Reasoning models are the main driver of the remarkable results of LLMs in mathematical competitions and other difficult benchmarks:
+
+  #v(0.5em)
+
+  - *AIME 2024* (math olympiad difficulty-level problems): OpenAI o3 #link("https://openai.com/index/introducing-o3-and-o4-mini/")[scored 91.6%].
+  - *International Mathematical Olympiad 2025*: both #link("https://deepmind.google/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/")[Google's Gemini] and #link("https://x.com/OpenAI/status/1946594928945148246")[OpenAI] models have started solving IMO problems at the gold-medal level.
+  - *ARC-AGI:* benchmark for abstract reasoning, even its successor is (ARC-AGI-2) is now #link("https://arcprize.org/leaderboard")[approaching saturation] (83.3% for GPT-5.4).
+  - *Humanity's Last Exam (HLE)*: benchmark of questions that LLMs were not able to solve in 2024 → as of 03/26, #link("https://agi.safe.ai")[the best models have above 40%]
+]
+
+
 
 #section-slide(section: "Summary")[Summary]
 
@@ -890,13 +746,10 @@
 #slide[
   = Summary
 
-  - *Scaling laws*: LLM performance follows predictable power laws in model size, data size, and compute.
-  - *Chinchilla*: model size and data should be scaled equally; most early LLMs were undertrained.
-  - *Inference-aware scaling*: overtrain smaller models to reduce inference cost.
+  - *Scaling laws*: LLM performance follows predictable empirical laws based on model size, data size, and compute.
   - *Chain-of-thought*: prompting with intermediate reasoning steps dramatically improves multi-step reasoning.
   - *Test-time scaling*: using more compute at inference can be more efficient than scaling pretraining.
-  - *Reasoning models* (o1/o3, DeepSeek-R1, ...): train models to produce reasoning traces using RL and/or SFT.
-  - *DeepSeek-R1*: open-source reasoning model trained via cold-start SFT → RL → rejection sampling → diverse RL.
+  - *Large reasoning models* (o1/o3, DeepSeek-R1, ...): train models to produce reasoning traces using RL and/or SFT.
   - Reasoning abilities are *rapidly improving*: math olympiad results, ARC-AGI saturation.
 ]
 

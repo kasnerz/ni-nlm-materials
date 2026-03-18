@@ -851,6 +851,7 @@
 
   == Hands-on session 🧑‍💻
 
+  (continue until 14:50)
 
   http://tiny.cc/nlm-gen
 ]

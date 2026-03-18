@@ -30,7 +30,7 @@ plt.rcParams.update(
     {
         "font.family": "sans-serif",
         "font.sans-serif": ["Fira Sans", "DejaVu Sans", "Helvetica", "Arial"],
-        "font.size": 17,
+        "font.size": 19,
         "axes.linewidth": 1.1,
         "axes.edgecolor": "#333333",
         "axes.labelcolor": "#222222",
@@ -45,7 +45,7 @@ plt.rcParams.update(
     }
 )
 
-fig, ax = plt.subplots(figsize=(10.2, 5.7))
+fig, ax = plt.subplots(figsize=(8.5, 4.8))
 
 # ── Exponential fit ─────────────────────────────────────────────────────────
 date_nums = mdates.date2num(dates)
@@ -102,18 +102,18 @@ ax.annotate(
 
 # ── Data points (small circles) ────────────────────────────────────────────
 DOT_COLOR = "#2b2b2b"
-ax.scatter(dates, sizes, s=42, color=DOT_COLOR, zorder=10, clip_on=False)
+ax.scatter(dates, sizes, s=90, color=DOT_COLOR, zorder=10, clip_on=False)
 
 # ── Labels ──────────────────────────────────────────────────────────────────
 # Name offsets in points. Parameter counts are placed below the name in grey.
 label_config: dict[str, dict] = {
-    "Transformer": {"dx": 0, "dy": 34, "ha": "center", "va": "bottom"},
-    "GPT": {"dx": 0, "dy": 34, "ha": "center", "va": "bottom"},
-    "BERT": {"dx": 0, "dy": 34, "ha": "center", "va": "bottom"},
-    "GPT-2": {"dx": 0, "dy": 34, "ha": "center", "va": "bottom"},
-    "T-NLG": {"dx": 10, "dy": 34, "ha": "center", "va": "bottom"},
-    "GPT-3": {"dx": 0, "dy": 38, "ha": "center", "va": "bottom"},
-    "Switch Transformer": {"dx": 0, "dy": -54, "ha": "center", "va": "top"},
+    "Transformer": {"dx": 0, "dy": 40, "ha": "center", "va": "bottom"},
+    "GPT": {"dx": -8, "dy": 40, "ha": "center", "va": "bottom"},
+    "BERT": {"dx": 8, "dy": 40, "ha": "center", "va": "bottom"},
+    "GPT-2": {"dx": 0, "dy": 40, "ha": "center", "va": "bottom"},
+    "T-NLG": {"dx": 0, "dy": 40, "ha": "center", "va": "bottom"},
+    "GPT-3": {"dx": 0, "dy": 40, "ha": "center", "va": "bottom"},
+    "Switch Transformer": {"dx": 0, "dy": -30, "ha": "center", "va": "top"},
 }
 
 
@@ -126,7 +126,7 @@ def fmt_size(s: float) -> str:
 
 
 for date, name, size, company in zip(dates, names, sizes, companies):
-    cfg = label_config.get(name, {"dx": 0, "dy": 34, "ha": "center", "va": "bottom"})
+    cfg = label_config.get(name, {"dx": 0, "dy": 40, "ha": "center", "va": "bottom"})
     dx, dy, ha, va = cfg["dx"], cfg["dy"], cfg["ha"], cfg["va"]
 
     # Model name
@@ -135,7 +135,7 @@ for date, name, size, company in zip(dates, names, sizes, companies):
         xy=(date, size),
         xytext=(dx, dy),
         textcoords="offset points",
-        fontsize=15.5,
+        fontsize=18,
         fontweight="semibold",
         color="#222222",
         ha=ha,
@@ -144,13 +144,13 @@ for date, name, size, company in zip(dates, names, sizes, companies):
     )
 
     # Parameter count below the name
-    count_dy = dy - 16 if va == "bottom" else dy + 16
+    count_dy = dy - 18 if va == "bottom" else dy + 18
     ax.annotate(
         fmt_size(size),
         xy=(date, size),
         xytext=(dx, count_dy),
         textcoords="offset points",
-        fontsize=13,
+        fontsize=15,
         fontweight="medium",
         color="#7a7a7a",
         ha=ha,
@@ -159,12 +159,13 @@ for date, name, size, company in zip(dates, names, sizes, companies):
     )
 
 # ── Axes formatting ────────────────────────────────────────────────────────
-ax.set_xlabel("Year", fontsize=17, fontweight="medium", labelpad=8)
-ax.set_ylabel("Model size (parameters)", fontsize=17, fontweight="medium", labelpad=8)
+ax.set_xlabel("Year", fontsize=19, fontweight="medium", labelpad=8)
+ax.set_ylabel("Model size (parameters)", fontsize=19, fontweight="medium", labelpad=8)
 
 ax.xaxis.set_major_locator(mdates.YearLocator())
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
 
+ax.set_yticks([0, 500, 1000, 1500])
 ax.yaxis.set_major_formatter(
     FuncFormatter(lambda v, _: f"{v/1000:.1f}T" if v >= 1000 else f"{v:.0f}B")
 )
@@ -172,7 +173,7 @@ ax.yaxis.set_major_formatter(
 ax.set_xlim(datetime(2017, 1, 1), datetime(2021, 7, 15))
 ax.set_ylim(-40, 1875)
 
-ax.tick_params(axis="both", which="major", length=5, width=0.8, labelsize=15)
+ax.tick_params(axis="both", which="major", length=5, width=0.8, labelsize=17)
 
 # Remove top/right spines
 ax.spines["top"].set_visible(False)
