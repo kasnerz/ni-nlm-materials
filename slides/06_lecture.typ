@@ -80,15 +80,27 @@
 #slide[
   = LLM scaling laws
 
-  #source-slide("https://arxiv.org/abs/2001.08361", title: "Kaplan et al. (2020)")
-
-
-  #quote[As the computational budget C increases, it should be spent primarily on larger models, without dramatic increases in training time or dataset size.]
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-reasoning-llms",
+    title: "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-reasoning-llms",
+  )
   #v(-1em)
 
   #set align(center + horizon)
-  #image("img/lecture06/scaling_laws_simple_power_laws.png", width: 550pt)
 
+  #image("img/lecture06/c2a70247-3a21-4048-adb8-2ed2f9c15b01_1384x508.jpg", width: 500pt)
+
+  #set align(left)
+
+  #v(-1em)
+
+  #quote(
+    attribution: "Kaplan et al. 2020",
+  )[As the computational budget C increases, it should be spent primarily on larger models, without dramatic increases in training time or dataset size.]
+
+  #set align(center + horizon)
+
+  #v(-0.5em)
 
   #set align(left)
 
@@ -775,5 +787,7 @@
   - #link(
       "https://magazine.sebastianraschka.com/p/understanding-reasoning-llms",
     )[Sebastian Raschka: Understanding Reasoning LLMs]
-  - #link("https://github.com/hijkzzz/Awesome-LLM-Strawberry")[Awesome LLM Strawberry: reasoning model resources]
+  - #link(
+      "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-reasoning-llmsy",
+    )[Maarten Grootendorst: A Visual Guide to Reasoning LLMs]
 ]

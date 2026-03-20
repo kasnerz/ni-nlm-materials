@@ -13,22 +13,10 @@
   date: "10 Mar 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 #section-slide(section: "Text generation")[From training to text generation]
-
-
-// #slide[
-//   = Today's learning outcomes
-
-//   After today's lecture, you should be able to:
-
-//   - Understand how to *generate text* with a Transformer-based language model.
-//   - Explain differences between *decoding algorithms* and the role of decoding parameters.
-//   - *Choose a suitable LLM* for your task.
-//   - *Run a LLM* locally on your computer or computational cluster.
-// ]
 
 
 #slide[
@@ -701,70 +689,6 @@
 ]
 
 
-// #section-slide(section: "Navigating the LLM zoo")[Navigating the LLM zoo]
-
-
-// #slide[
-//   = LLM size and capabilities
-
-//   #source-slide(
-//     "https://informationisbeautiful.net/visualizations/the-rise-of-generative-ai-large-language-models-llms-like-chatgpt/",
-//     title: "informationisbeautiful.net",
-//   )
-
-//   #set align(center + horizon)
-//   #image("img/lecture04/screen-2026-03-08-15-19-31.png", width: 800pt)
-// ]
-
-
-// #slide[
-//   = HuggingFace: source of open LLMs
-
-//   *HuggingFace*: the largest repository of open LLMs. As of March 2026, it contains ~2.7M models (many of these are derivatives).
-
-//   #set align(center + horizon)
-
-//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-51-25.png", width: 500pt))
-//   #source-slide("https://huggingface.co/models", title: "HuggingFace Models")
-// ]
-
-
-// #slide[
-//   = Model sources and leaderboards
-
-//   *Arena.ai*: Elo rating of LLMs: for a pair of answers from different models, users decide which is better.
-//   #v(-0.5em)
-
-//   #set align(center + horizon)
-//   #bordered-box(image("img/lecture04/screen-2026-03-03-10-13-59.png", width: 450pt))
-
-//   #source-slide("https://arena.ai/leaderboard", title: "Arena.ai")
-// ]
-
-// #slide[
-//   = Model sources and leaderboards
-
-//   *OpenRouter*: routing traffic to various LLM providers, tracks real model usage through their proxy.
-//   #v(-0.5em)
-
-//   #set align(center + horizon)
-//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-52-53.png", width: 650pt))
-//   #source-slide("https://openrouter.ai/rankings", title: "OpenRouter")
-// ]
-
-// #slide[
-//   = Model sources and leaderboards
-
-//   *Artificial Analysis LLM Leaderboard*: rating LLMs across many dimensions (context, window size, price, speed, performance...).
-
-//   Model performance is grouped under a single #link("https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index")["Intelligence index"] (=combined score from 10 benchmarks).
-//   #v(-0.5em)
-//   #set align(center + horizon)
-//   #bordered-box(image("img/lecture04/screen-2026-03-08-14-55-00.png", width: 550pt))
-//   #source-slide("https://artificialanalysis.ai/leaderboards/models", title: "Artificial Analysis")
-// ]
-
-
 #section-slide(section: "Running LLMs locally")[Running LLMs locally]
 
 #slide[
@@ -855,20 +779,6 @@
 
   http://tiny.cc/nlm-gen
 ]
-
-// #slide[
-//   = Text generation
-
-//   #set align(center + horizon)
-
-//   == Demo time 🧑‍💻
-
-//   #v(1em)
-
-//   👉 #link("https://huggingface.co/docs/transformers/llm_tutorial")[HuggingFace LLM tutorial]
-
-//   👉 #link("https://mlabonne.github.io/blog/posts/2023-06-07-Decoding_strategies.html")[Decoding strategies tutorial]
-// ]
 
 
 #section-slide(section: "Summary")[Summary]
