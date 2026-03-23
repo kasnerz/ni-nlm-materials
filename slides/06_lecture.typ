@@ -751,6 +751,34 @@
 ]
 
 
+#slide[
+  = Midterm feedback
+
+  #set align(center + horizon)
+
+
+  #set text(size: 24pt)
+
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
+
+      #image("img/lecture06/screen-2026-03-23-11-17-53.png", width: 50pt)
+
+      Please fill in! 👇
+
+      *#link("https://forms.gle/5vK6HhgPBhKHQAtB7")[https://forms.gle/5vK6HhgPBhKHQAtB7]*
+    ],
+    [
+      #image("img/lecture06/QR Code c8f422d2-a40b-4736-baee-e86e10469206.png", width: 300pt)
+    ],
+  )
+
+
+]
+
+
 
 #section-slide(section: "Summary")[Summary]
 

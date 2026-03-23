@@ -901,6 +901,28 @@
 
 ]
 
+#slide[
+  = Agents can cheat
+  #source-slide(
+    "https://www.anthropic.com/engineering/eval-awareness-browsecomp",
+    title: "https://www.anthropic.com/engineering/eval-awareness-browsecomp",
+  )
+  #set align(center + horizon)
+  #v(-1em)
+
+  #image("img/lecture05/screen-2026-03-22-16-28-32.png", width: 550pt)
+
+  #set text(size: 19pt)
+  #set align(left)
+
+  #quote()[Instead of inadvertently coming across a leaked answer, Claude Opus 4.6 independently hypothesized that it was being evaluated, identified which benchmark it was running in, then located and decrypted the answer key.]
+
+
+
+
+]
+
+
 
 
 #slide[
@@ -1013,6 +1035,7 @@
     When a measure becomes a target, it ceases to be a good measure.
   ]
 ]
+
 
 #section-slide(section: "Other evaluation methods")[Other evaluation methods]
 #slide[

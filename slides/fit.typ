@@ -573,7 +573,17 @@
   ]
 }
 
-#let warnbox(title: none, body) = {
+#let warnbox(..args) = {
+  let pos = args.pos()
+  let named = args.named()
+  let title = if "title" in named {
+    named.title
+  } else if pos.len() > 1 {
+    pos.at(0)
+  } else {
+    "Warning"
+  }
+  let body = pos.last()
   let title-text = [⚠ #h(0.1em) #title]
   block(
     width: 100%,
@@ -582,10 +592,8 @@
     fill: rgb("#dab307").lighten(90%),
     stroke: (left: (paint: rgb("#dab307"), thickness: 6pt)),
   )[
-    #if title != none [
-      #text(weight: "bold", fill: rgb("#dab307"))[#title-text]
-      #v(-0.1em)
-    ]
+    #text(weight: "bold", fill: rgb("#dab307"))[#title-text]
+    #v(-0.1em)
     #body
   ]
 }
