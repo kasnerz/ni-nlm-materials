@@ -1008,25 +1008,6 @@
 ]
 
 
-#slide[
-  = Other PEFT methods
-
-  LoRA is not the only parameter-efficient finetuning method:
-
-  #v(0.5em)
-
-  - *Prefix tuning* #link("https://arxiv.org/abs/2101.00190")[(Li & Liang, 2021)]: prepend learnable "virtual tokens" to the input.
-  - *Prompt tuning* #link("https://arxiv.org/abs/2104.08691")[(Lester et al., 2021)]: similar to prefix tuning, but only for the input layer.
-  - *Adapters* #link("https://arxiv.org/abs/1902.00751")[(Houlsby et al., 2019)]: insert small bottleneck layers into each Transformer block.
-  - *DoRA* #link("https://arxiv.org/abs/2402.09353")[(Liu et al., 2024)]: weight-decomposed LoRA – decomposes weight updates into magnitude and direction.
-
-  #v(0.5em)
-
-  #infobox(
-    title: "In practice",
-  )[LoRA and QLoRA remain the *most popular* PEFT methods by far, thanks to their simplicity and strong performance.]
-]
-
 
 #section-slide(section: "Mixture of experts")[Mixture of experts]
 
@@ -1034,43 +1015,64 @@
 #slide[
   = Mixture of experts (MoE)
 
-  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
 
+  We need to re-run the full Transformer stack for every decoded token
+
+  → Inference with large models can get very *slow*.
+
+  #infobox()[For Llama 3.1 405B, Oracle got around #link("https://docs.oracle.com/en-us/iaas/Content/generative-ai/benchmark-meta-llama-3-1-405b-instruct.htm#:~:text=to%20100%20tokens.-,The%20meta.llama-3.1-405b-instruct%20model%20hosted")[27 tokens/sec] on a specialized HW.]
+
+  But perhaps the model does not need _all_ of its parameters for _each_ token?
   #ideabox(
     title: "Idea",
-  )[Replace the single feed-forward network (MLP) in each Transformer layer with *multiple experts*. A *router* selects which experts to use for each token.]
+  )[Let's (1) force the model to *specialize* subsets of its parameters for different tasks and (2) only *activate* the specific subset → Mixture of experts.]
+
+
+]
+
+#slide[
+  = Mixture of experts (MoE)
+
+
+  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
+  *"Experts"* = multiple feed-forward networks in each MLP layer of the Transformer.
 
   #set align(center + horizon)
   #image("img/lecture08/moe_architecture.png", width: 450pt)
+
 ]
 
-
 #slide[
-  = MoE routing
+  = Mixture of experts (MoE)
 
-  #source-slide("https://arxiv.org/abs/2401.04088", title: "Fedus et al. (2024)")
+  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
 
-  We can choose a *different expert at each layer* and a *different set of experts for each token*:
+  #v(3em)
 
-  #set align(center + horizon)
+  #set align(center)
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
   )[
+    We can choose a different expert at each *layer*...
     #image("img/lecture08/moe_routing_layers.png", width: 350pt)
   ][
+
+    and a different set of experts for each *token*:
+    #v(1em)
+
     #image("img/lecture08/moe_routing_tokens.png", width: 250pt)
   ]
 ]
 
 
 #slide[
-  = Why MoE works
+  = Mixture of experts (MoE)
 
   #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1fr),
     gutter: 1em,
   )[
     Why is this a good idea?
@@ -1079,94 +1081,39 @@
     - *Faster training* for the same number of total parameters (we only backpropagate through selected experts).
     - *Faster inference* (although we still need to load the full model into memory).
 
-    #v(0.25em)
 
-    Example: Mixtral 8×7B → 8 expert MLPs, approximately equivalent to a *47B dense model* (not 56B, since attention layers and embeddings are shared).
+
   ][
     #set align(center + horizon)
-    #image("img/lecture08/moe_specialization.png", width: 230pt)
+    #image("img/lecture08/moe_specialization.png", width: 400pt)
   ]
+
+
 ]
 
-
 #slide[
-  = The router
-
-  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
-
-  The *router* (or "gating network") is a small learned network that decides which experts to activate:
-
-  $ G(x) = "softmax"("TopK"(x dot W_g)) $
-
-  - $W_g$ is a learnable weight matrix.
-  - *TopK*: only the top $K$ experts (typically $K = 1$ or $K = 2$) are activated.
-  - The router outputs *weights* for combining expert outputs.
-
-  #v(0.5em)
-
-  #warnbox(
-    title: "Load balancing",
-  )[If the router always picks the same experts, some experts are underutilized. MoE models use *auxiliary losses* to encourage balanced expert utilization.]
-]
+  = MoE: Mixtral
 
 
-#slide[
-  = MoE models in practice
-
-  MoE has become a very popular architecture for recent LLMs:
-
-  #v(0.5em)
-
-  #set text(size: 18pt)
-
-  #table(
-    columns: 4,
-    align: (left, center, center, center),
-    table.header([*Model*], [*Total params*], [*Active params*], [*Experts*]),
-    [Mixtral 8×7B], [46.7B], [12.9B], [8 (top-2)],
-    [Mixtral 8×22B], [176B], [39B], [8 (top-2)],
-    [DeepSeek-V3], [671B], [37B], [256 (top-8)],
-    [Qwen3-235B], [235B], [22B], [128 (top-8)],
-    [GPT-4 (rumored)], [$approx$ 1.8T], [$approx$ 220B], [16 (top-2)],
-  )
-
-  #set text(size: 20pt)
-
-  #v(0.25em)
-
-  #infobox(
-    title: "Key insight",
-  )[MoE models can be much larger in *total* parameters while keeping the *active* parameter count (and thus inference cost) comparable to smaller dense models.]
-]
-
-
-#slide[
-  = MoE: tradeoffs
+  *Example*: Mixtral 8×7B → 8 expert MLPs, approximately equivalent to a 47B dense model (not 56B, since attention layers and embeddings are shared).
 
   #grid(
-    columns: (1fr, 1fr),
+    columns: (1.3fr, 1fr),
     gutter: 1em,
-  )[
-    === Advantages
-    - Faster training and inference for a given quality level.
-    - Experts can specialize.
-    - Scales well with more experts.
-  ][
-    === Disadvantages
-    - *Memory*: the full model must be loaded (all experts), even though only a few are active.
-    - *Load balancing*: uneven expert utilization wastes capacity.
-    - *Communication overhead*: in distributed settings, tokens need to be routed across devices.
-  ]
+    [
+      #set align(center + horizon)
 
-  #v(0.5em)
+      #image("img/lecture08/cc3d48d5-8afc-4477-af98-5817b1a145ae_1376x988.png", width: 370pt)
+    ],
+    [
+      #set align(center + horizon)
 
-  #questionbox()[MoE models are often paired with *quantization* to address the memory issue. Why does this make sense?]
+      #image("img/lecture08/1dfd20b4-d3b7-433b-8072-2e67fc70afaa_1376x544.png")
+    ],
+  )
+
 ]
 
-
-// ============================================================
-// SECTION 6: EFFICIENT ATTENTION
-// ============================================================
 
 #section-slide(section: "Efficient attention")[Efficient attention]
 
@@ -1174,84 +1121,140 @@
 #slide[
   = Linear attention
 
-  #source-slide("https://haileyschoelkopf.github.io/blog/2024/linear-attn/", title: "Schoelkopf (2024)")
+  #source-slide(
+    "https://haileyschoelkopf.github.io/blog/2024/linear-attn/
+",
+    title: "https://haileyschoelkopf.github.io/blog/2024/linear-attn/
+",
+  )
 
-  Standard attention has $O(N^2)$ complexity due to the softmax over all pairs of queries and keys:
+  Let's revisit the $O(#box(fill: rgb("#e1d5f2"), outset: (x: 2.5pt, y: 5pt), radius: 3pt)[$N^2$])$ attention. Can we do better?
 
-  #set align(center + horizon)
 
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    #image("img/lecture08/attention_softmax.png", width: 250pt)
-    Very expensive similarity computation
-  ][
-    #image("img/lecture08/attention_formula.png", width: 280pt)
-    Standard attention formula
-  ]
+  #text(size: 24pt)[$ "Attention"(Q, K, V) = "softmax" (Q K^top)V $]
 
-  #set align(left)
+  Let's zoom in! 🕵️
 
-  #questionbox()[Can we find a cheaper way to compute attention?]
+  #set align(center)
+
+  #set text(size: 24pt)
+
+
+  #diagram(
+    node(
+      (0, 0),
+      $
+        "softmax" (Q K^top)V = (#box(stroke: red + 3pt, radius: 4pt, outset: 6pt)[$exp(Q K^top)$]) / (sum_(i=1)^L #box(stroke: red + 3pt, radius: 4pt, outset: 6pt)[$exp(Q K_i^top)$]) V
+      $,
+      name: <eq>,
+      stroke: none,
+    ),
+    node(
+      (1, -0.3),
+      align(center)[#text(size: 14pt)[very expensive \ way to measure \ similarity between \ queries and keys]],
+      width: 140pt,
+      stroke: (dash: "dashed", paint: gray),
+      corner-radius: 5pt,
+      name: <box>,
+    ),
+    edge(<box>, (0.4, -0.2), "-|>", stroke: gray + 1pt),
+    edge(<box>, (0.3, 0.1), "-|>", stroke: gray + 1pt),
+  )
 ]
 
 
 #slide[
   = Linear attention: rearranging the computation
 
-  #source-slide("https://haileyschoelkopf.github.io/blog/2024/linear-attn/", title: "Schoelkopf (2024)")
+  We can use a cheaper way of computing similarity:
 
-  We can replace softmax with a cheaper kernel function $phi$:
+  #v(1em)
 
-  $ "Attention"(Q, K, V) = phi(Q) (phi(K)^top V) $
+  #set align(center)
 
-  #v(0.25em)
-
-  This allows us to *rearrange* matrix multiplications:
-
-  #set align(center + horizon)
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 0.5em,
-  )[
-    Standard: $Q K^top in RR^(N times N)$
-
-    → $O(N^2 dot D)$
-  ][
-    Linear: $K^top V in RR^(D times D)$
-
-    → $O(N dot D^2)$
-  ]
+  #diagram(
+    node((0, 0), $ ("sim"(Q, K)) / (sum_(i=1)^L "sim"(Q, K_i)) V $, stroke: none),
+    node(
+      (1.5, 0),
+      $
+        "sim"(Q, K) = #box(stroke: green.darken(20%) + 2pt, radius: 4pt, inset: 4pt)[$phi(Q) dot phi(K)$] = phi(Q)phi(K)^top
+      $,
+      stroke: none,
+    ),
+    node(
+      (1.5, 0.5),
+      align(center)[#text(size: 14pt)[$phi$ = optional dimensionality \ mapping, can be also identity]],
+      width: 280pt,
+      stroke: (dash: "dashed", paint: gray),
+      corner-radius: 5pt,
+    ),
+  )
 
   #set align(left)
 
-  #v(0.25em)
+  This also allows us to re-arrange matrix multiplications:
 
-  The resulting operations are $O(N dot D^2)$, which is *linear in sequence length*.
+  #v(1em)
+
+  #set align(center)
+
+  #diagram(
+    node(
+      (-0.9, 0),
+      align(center)[#set par(leading: 0.8em); #v(0.5em) $Q dot K in$ \ $RR^(N times N)$ #v(0.5em)],
+      width: 120pt,
+      stroke: (dash: "dashed", paint: gray),
+      corner-radius: 5pt,
+    ),
+    node(
+      (0, 0),
+      $
+        ( #box(stroke: red + 2pt, radius: 4pt, inset: 4pt)[$phi(Q)phi(K)^top$] ) / (sum_(i=1)^L phi(Q)phi(K_i)^top) V = ( phi(Q) #box(stroke: green.darken(20%) + 2pt, radius: 4pt, inset: 4pt)[$phi(K)^top V$] ) / (phi(Q) sum_(i=1)^L phi(K_i)^top)
+      $,
+      stroke: none,
+    ),
+    node(
+      (0.9, 0),
+      align(center)[#set par(leading: 0.8em); #v(0.5em) $K dot V in$ \ $RR^(D times D)$ #v(0.5em)],
+      width: 120pt,
+      stroke: (dash: "dashed", paint: gray),
+      corner-radius: 5pt,
+    ),
+  )
 ]
 
 
 #slide[
-  = Linear attention: does it work?
+  = Linear attention
 
-  #source-slide("https://haileyschoelkopf.github.io/blog/2024/linear-attn/", title: "Schoelkopf (2024)")
+  The resulting operations are $O(N dot D^2)$, which is linear in sequence length.
+
+
+  Wo-hoo! 🎉
+  #v(1em)
 
   #grid(
-    columns: (1fr, 1fr),
+    columns: (1fr, 1.5fr),
     gutter: 1em,
-  )[
-    In theory, linear attention is very attractive (linear vs. quadratic).
+    [
+      #set align(center + horizon)
 
-    In practice, performance *degrades* compared to full softmax attention.
+      #image("img/lecture08/linear_attn_perf.jpg", width: 250pt)
+      #v(1.5em)
 
-    #v(0.5em)
+    ],
+    [
+      #set align(center + horizon)
 
-    Recent models like *Mamba* (#link("https://arxiv.org/abs/2312.00752")[Gu & Dao, 2023]) and *RWKV* use variants of linear attention with additional tricks to close the gap.
-  ][
-    #set align(center + horizon)
-    #image("img/lecture08/linear_attn_perf.jpg", width: 250pt)
-  ]
+      #bordered-box[#image("img/lecture08/screen-2026-03-23-15-38-59.png")]
+      #source(
+        "https://www.reddit.com/r/MachineLearning/comments/10eolfl/d_why_arent_we_all_using_linear_transformers/",
+        title: "Reddit",
+      )
+
+    ],
+  )
+
 ]
 
 
@@ -1260,38 +1263,45 @@
 
   #source-slide("https://arxiv.org/abs/2205.14135", title: "Dao et al. (2022)")
 
-  Approximations like linear attention can degrade performance. Meanwhile, *hardware optimizations* of the full attention mechanism can go a long way.
+  Approximations like linear attention can degrade performance.
+
+  Meanwhile, *hardware optimizations* of the full attention mechanism can go a long way.
+
+  #v(-1em)
 
   #set align(center + horizon)
-  #image("img/lecture08/flashattention.png", width: 550pt)
+  #image("img/lecture08/flashattention.png", width: 400pt)
 ]
 
 
 #slide[
-  = FlashAttention: how it works
+  = FlashAttention
 
   #source-slide("https://arxiv.org/abs/2205.14135", title: "Dao et al. (2022)")
 
-  FlashAttention re-arranges the attention computation to better use the *GPU memory hierarchy*:
 
-  #v(0.5em)
+  *FlashAttention* re-arranges the operations to use the GPU memory more efficiently.
 
-  - Uses *tiling* to break the attention computation into small blocks that fit in fast GPU SRAM.
-  - Avoids materializing the full $N times N$ attention matrix in slow GPU HBM.
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
+      It is:
+      - *Fast*: 2-3x faster than baselines.
+      - *Memory-efficient*: linear in sequence length.
+      - *Exact*: uses no approximations.
 
-  #v(0.5em)
+      It is now implemented in major LLM frameworks (PyTorch, HuggingFace, vLLM, ...)
 
-  Properties:
-  - *Fast*: 2--3× faster than standard attention.
-  - *Memory-efficient*: linear in sequence length.
-  - *Exact*: uses no approximations (unlike linear attention).
-  - Now *commonly implemented* in all major LLM frameworks (PyTorch, HuggingFace, vLLM, ...).
+    ],
+    [
+      #set align(center + horizon)
+
+      #image("img/lecture08/flashattention2.png", width: 200pt)
+    ],
+  )
 ]
 
-
-// ============================================================
-// SECTION 7: SUMMARY
-// ============================================================
 
 #section-slide(section: "Summary")[Summary]
 
@@ -1299,40 +1309,36 @@
 #slide[
   = Summary
 
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    === Quantization
-    - Reduce precision (float16 → int8 → int4).
-    - Huge memory savings with small accuracy loss.
-    - GPTQ, GGUF for practical deployment.
-
-    === Distillation
-    - Train a small student from a large teacher.
-    - Soft labels transfer more knowledge.
-    - White-box vs. black-box approaches.
-  ][
-    === LoRA / QLoRA
-    - Freeze base model, train low-rank adapters.
-    - Dramatic reduction in finetuning memory.
-    - Can be combined with quantization (QLoRA).
-
-    === Mixture of experts
-    - Multiple expert MLPs, only a few active.
-    - More capacity without proportional compute.
-    - Used in Mixtral, DeepSeek, Qwen3.
-  ]
+  - *Quantization*: reducing the precision of model weights to save memory and speed up inference with minimal quality loss.
+  - *Knowledge distillation*: training a *student* model to mimic a *teacher* model.
+  - *LoRA*: low-rank adaptation; efficient approach for finetuning LLMs.
+  - *QLoRA* combines quantization with LoRA for even higher efficiency.
+  - *Mixture of Experts (MoE)*: only a subset of model parameters (*experts*) is activated per token, enabling faster inference with large total parameter counts.
+  - *Efficient attention*: linear attention reduces complexity from $O(N^2)$ to $O(N)$.
+  - *FlashAttention* provides exact attention with hardware-optimized memory access.
 ]
 
 
 #slide[
-  = Next lecture
+  = Links and resources
 
-  // TODO: fill in the next lecture topic
+  #set text(size: 15pt)
 
-  #v(2em)
-
-  *Questions?*
+  - #link("https://huggingface.co/docs/transformers/quantization/overview")[HuggingFace: Quantization overview]
+  - #link("https://arxiv.org/abs/2208.07339")[Dettmers et al. (2022): LLM.int8() -- 8-bit Matrix Multiplication]
+  - #link("https://arxiv.org/abs/2310.11453")[Ma et al. (2024): The Era of 1-bit LLMs (BitNet)]
+  - #link("https://arxiv.org/abs/1503.02531")[Hinton et al. (2015): Distilling the Knowledge in a Neural Network]
+  - #link("https://arxiv.org/abs/2106.09685")[Hu et al. (2021): LoRA: Low-Rank Adaptation of Large Language Models]
+  - #link(
+      "https://arxiv.org/abs/2305.14314",
+    )[Dettmers et al. (2023): QLoRA: Efficient Finetuning of Quantized Language Models]
+  - #link("https://arxiv.org/abs/2401.04088")[Jiang et al. (2024): Mixtral of Experts]
+  - #link(
+      "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe",
+    )[Grootendorst (2024): A Visual Guide to Mixture of Experts]
+  - #link("https://arxiv.org/abs/2205.14135")[Dao et al. (2022): FlashAttention]
+  - #link("https://haileyschoelkopf.github.io/blog/2024/linear-attn/")[Schoelkopf (2024): Linear Attention]
+  - #link("https://github.com/hiyouga/LLaMA-Factory")[LLaMA-Factory: finetuning framework]
+  - #link("https://huggingface.co/docs/peft")[HuggingFace PEFT: Parameter-Efficient Fine-Tuning]
 ]
 
