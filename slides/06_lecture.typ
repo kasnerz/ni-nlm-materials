@@ -13,7 +13,7 @@
   date: "24 Mar 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 #section-slide(section: "Scaling laws")[Scaling laws]
@@ -38,7 +38,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture06/screen-2026-03-18-08-47-26.png", width: 600pt)
+  #image("img/lecture06/kaplan_scaling_laws.png", width: 600pt)
 ]
 
 
@@ -90,7 +90,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture06/c2a70247-3a21-4048-adb8-2ed2f9c15b01_1384x508.jpg", width: 500pt)
+  #image("img/lecture06/grootendorst_scaling_overview.jpg", width: 500pt)
 
   #set align(left)
 
@@ -167,7 +167,7 @@
   #set align(center + horizon)
   #v(-1em)
 
-  #image("img/lecture06/screen-2026-03-17-13-45-31.png", width: 700pt)
+  #image("img/lecture06/sardana_inference_cost.png", width: 700pt)
 
   #set align(left)
 
@@ -183,16 +183,16 @@
     columns: (1.3fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture06/screen-2026-03-17-13-54-43.png", width: 320pt)
+      #image("img/lecture06/gpt45_sam_altman_tweet.png", width: 320pt)
 
       #source("https://x.com/sama/status/1895203654103351462")
 
     ],
     [
-      #image("img/lecture06/screen-2026-03-17-13-56-45.png")
+      #image("img/lecture06/gpt45_api_pricing.png")
       #source("https://dev.to/aibyamdad/gpt-45-api-pricing-explained-is-it-really-worth-it-3fon", title: "dev.to")
 
-      #image("img/lecture06/screen-2026-03-17-13-58-05.png")
+      #image("img/lecture06/gpt45_openai_deprecations.png")
 
       #source("https://developers.openai.com/api/docs/deprecations", title: "OpenAI")
 
@@ -390,7 +390,7 @@
   #set align(center)
 
 
-  #image("img/lecture06/623a9dbf-c76e-438c-ba69-43ae9613ebbe_2930x1496 (2).png", width: 500pt)
+  #image("img/lecture06/alammar_lrm_overview.png", width: 500pt)
 
   #set align(left)
 
@@ -440,7 +440,7 @@
     ],
     [
       #set align(center + horizon)
-      #image("img/lecture06/4caea6a5-52a1-4651-8c71-4586c0637f3e_924x427.png", width: 400pt)
+      #image("img/lecture06/alammar_deepseek_r1_recipe.png", width: 400pt)
       #source("https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1", title: "Jay Alammar (2025)")
 
     ],
@@ -486,7 +486,7 @@
 
   #set align(center)
 
-  #image("img/lecture06/30f8e37b-ba60-49d2-a95e-9c06b2033ee4_1600x1019.jpg", width: 400pt)
+  #image("img/lecture06/deepseek_r1_zero_aha_moment.jpg", width: 400pt)
 
 
 ]
@@ -518,7 +518,7 @@
   #set align(center + horizon)
   #v(-1em)
 
-  #image("img/lecture06/45ca8c84-6eb6-4879-ab53-035174b17ce1_1620x700.png", width: 700pt)
+  #image("img/lecture06/deepseek_r1_pipeline_full.png", width: 700pt)
 ]
 
 
@@ -612,14 +612,14 @@
       #set align(center + horizon)
 
       #v(-1.5em)
-      #image("img/lecture06/screen-2026-03-18-16-50-22.png", width: 300pt)
+      #image("img/lecture06/thoughtology_paper.png", width: 300pt)
     ],
   )
 
   #set align(center + horizon)
 
   #v(-1.5em)
-  #image("img/lecture06/screen-2026-03-18-16-51-58.png", width: 500pt)
+  #image("img/lecture06/thoughtology_overview.png", width: 500pt)
 ]
 
 #slide[
@@ -714,7 +714,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture06/screen-2026-03-18-15-27-04.png", width: 350pt)
+  #image("img/lecture06/vllm_supported_models.png", width: 350pt)
   #source-slide("https://docs.vllm.ai/en/latest/features/reasoning_outputs/#supported-models", title: "vLLM docs")
 
 ]
@@ -731,15 +731,15 @@
     [
       #set align(center + horizon)
 
-      #bordered-box[#image("img/lecture06/screen-2026-03-18-16-40-17.png", width: 320pt)]
-      #bordered-box[#image("img/lecture06/screen-2026-03-18-16-42-21.png", width: 320pt)]
+      #bordered-box[#image("img/lecture06/frontier_models_1.png", width: 320pt)]
+      #bordered-box[#image("img/lecture06/frontier_models_2.png", width: 320pt)]
 
     ],
     [
       #set align(center + horizon)
 
-      #bordered-box[#image("img/lecture06/screen-2026-03-18-16-43-38.png", width: 320pt)]
-      #bordered-box[#image("img/lecture06/screen-2026-03-18-16-41-20.png", width: 320pt)]
+      #bordered-box[#image("img/lecture06/frontier_models_3.png", width: 320pt)]
+      #bordered-box[#image("img/lecture06/frontier_models_4.png", width: 320pt)]
     ],
   )
 
@@ -751,7 +751,7 @@
 
   #source-slide("https://agi.safe.ai", title: "https://agi.safe.ai")
 
-  #image("img/lecture06/screen-2026-03-18-16-46-02.png")
+  #image("img/lecture06/agi_safe_benchmarks.png")
 ]
 
 
@@ -782,14 +782,14 @@
     gutter: 1em,
     [
 
-      #image("img/lecture06/screen-2026-03-23-11-17-53.png", width: 50pt)
+      #image("img/lecture06/feedback_form_icon.png", width: 50pt)
 
       Please fill in! 👇
 
       *#link("https://forms.gle/5vK6HhgPBhKHQAtB7")[https://forms.gle/5vK6HhgPBhKHQAtB7]*
     ],
     [
-      #image("img/lecture06/QR Code c8f422d2-a40b-4736-baee-e86e10469206.png", width: 300pt)
+      #image("img/lecture06/feedback_form_qr.png", width: 300pt)
     ],
   )
 

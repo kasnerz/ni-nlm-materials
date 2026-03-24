@@ -13,7 +13,7 @@
   date: "17 Mar 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 #section-slide(section: "Training data")[Training data for LLMs]
@@ -308,6 +308,21 @@
   )[Training on synthetic data can cause progressive degradation of model output quality: so called *"model collapse"* #link("https://arxiv.org/abs/2305.17493")[(Shumailov et al., 2023)]. However, this is largely preventable, e.g. by mixing in human data #link("https://arxiv.org/abs/2406.07515")[(Feng et al., 2024)].]
 ]
 
+
+#slide[
+  = More  reading on synthetic data
+
+  #set align(center + horizon)
+  #link("https://huggingface.co/spaces/HuggingFaceFW/finephrase")[#image(
+    "img/lecture06/screen-2026-03-24-13-43-18.png",
+  )]
+  #source-slide(
+    "https://huggingface.co/spaces/HuggingFaceFW/finephrase",
+    title: "Huggingface",
+  )
+
+
+]
 
 #section-slide(section: "Model sources")[Where to find the LLMs?]
 
