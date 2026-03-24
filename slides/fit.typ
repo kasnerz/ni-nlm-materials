@@ -533,7 +533,7 @@
 
 #let bordered-box(img, padding: 0pt) = {
   block(
-    stroke: 1pt + rgb("#828282"),
+    stroke: 2pt + rgb("#828282"),
     inset: padding,
     radius: 0pt,
   )[
