@@ -13,7 +13,7 @@
   date: "31 Mar 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 
 
@@ -24,17 +24,23 @@
 
   LLM knowledge is *static, lossy and incomplete*.
 
-  #v(0.5em)
+  #show: later
 
-  This is a problem especially when we need:
-  - Up-to-date information (news, stock prices, weather).
-  - Domain-specific knowledge (internal company docs, medical records).
-  - Verifiable answers with sources.
+  #questionbox()[When this can become a problem?]
 
   #v(0.5em)
 
+  When we need the model to access:
+  - Up-to-date information (news, weather, timetables, ...).
+  - Domain-specific knowledge (internal company docs, law / medical / ...).
 
-  #questionbox()[How can we give LLMs access to external knowledge *without retraining*?]
+
+  We may also want to access external knowledge *ourselves* to check the LLM's answers.
+
+  #v(0.5em)
+
+
+
 ]
 
 
@@ -59,28 +65,37 @@
 #slide[
   = RAG pipeline
 
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
+    title: "Maarten Grootendorst's blog",
+  )
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      === Phase \#1: Indexing
-      + Chunk the documents.
-      + Compute the embeddings.
-      + Store them in a vector database.
+      #uncover("1-")[
+        === Phase \#1: Indexing
+        + Split the documents into chunks.
+        + Compute their embeddings.
+        + Store them in a vector database.
+      ]
 
 
-      === Phase \#2: Querying
-      + Embed the user prompt.
-      + Retrieve relevant chunks.
-      + Concatenate them with the prompt.
-      + Generate an answer.
+      #uncover("2-")[
+        === Phase \#2: Querying
+        + Embed the user prompt.
+        + Retrieve relevant chunks.
+        + Concatenate them with the prompt.
+        + Generate an answer.
+      ]
     ],
     [
       #v(-1em)
 
-      #image("img/lecture07/8420e846-ec02-4101-a0c1-ad9ba1d4a4d7_1028x660.png", width: 250pt)
-      #image("img/lecture07/47304195-33bd-4637-b18e-ad7c57c8aa2c_1028x756.png", width: 250pt)
+      #uncover("1-")[
+        #image("img/lecture07/8420e846-ec02-4101-a0c1-ad9ba1d4a4d7_1028x660.png", width: 250pt)]
+      #uncover("2-")[#image("img/lecture07/47304195-33bd-4637-b18e-ad7c57c8aa2c_1028x756.png", width: 250pt)]
     ],
   )
 ]
@@ -107,7 +122,7 @@
       title: "Medium.com",
     )
   ]
-  Typical chunk sizes: 256--1024 tokens, with 10--20% overlap.
+  Good starting point: \~256--1024 tokens, with 10--20% overlap.
 
   Too small → loss of context. Too large → diluted relevance and noise.
 ]
@@ -117,7 +132,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
 
   Each chunk is converted to a dense vector (embedding).
@@ -130,29 +145,41 @@
   #set align(left)
   #v(0.5em)
 
-  Popular embedding models: OpenAI's `text-embedding-3`, `e5`, `qwen3-embedding`, ... → based on Transformer *decoders*.
+  *Embedding models*:
+  - encoder-based: finetuned BERT-like models, see the #link("https://sbert.net/index.html")[SentenceTransformers library].
+  - decoder-based: OpenAI's `text-embedding-3`, `e5`, `qwen3-embedding`, ...
 
-  *Encoder-based embedding models* are available in the #link("https://sbert.net/index.html")[SentenceTransformers library].
 ]
 
 #slide[
-  = Intermezzo: When prompting is critical
+  = Indexing -- Step 2: Embedding
 
   #source-slide("https://dspace.cuni.cz/handle/20.500.11956/206938", title: "Sajdoková (2026)")
 
-  Decoder-based embedding models perform much worse if not prompted properly:
+  #warnbox()[
+    Decoder embedding models perform much worse if not *prompted* properly.
+  ]
+  #grid(
+    columns: (1fr, 1.25fr),
+    gutter: 1em,
+    [
+      #set text(size: 16pt)
+      ```python
+      # Each query must come with a one-sentence instruction that describes the task
+      task = 'Given a web search query, retrieve relevant passages that answer the query'
+      ```
+      #source(
+        "https://huggingface.co/Qwen/Qwen3-Embedding-8B",
+        title: "https://huggingface.co/Qwen/Qwen3-Embedding-8B",
+      )
+      #set text(size: 20pt)
 
-  #set text(size: 16pt)
-
-  ```python
-  # Each query must come with a one-sentence instruction that describes the task
-  task = 'Given a web search query, retrieve relevant passages that answer the query'
-  ```
-  #source("https://huggingface.co/Qwen/Qwen3-Embedding-8B", title: "https://huggingface.co/Qwen/Qwen3-Embedding-8B")
-
-  #set align(center + horizon)
-
-  #image("img/lecture07/screen-2026-03-20-10-42-36.png", width: 450pt)
+      Note there is no actual retrieval → we just *"prime" the model* to build a good representation of the query.
+    ],
+    [
+      #image("img/lecture07/screen-2026-03-20-10-42-36.png", width: 450pt)
+    ],
+  )
 ]
 
 
@@ -193,7 +220,7 @@
     title: "CME295",
   )
 
-  At query time, we embed the user query and find the *most similar* chunks:
+  At *query time*, we embed the user query and find the most similar chunks:
 
   #set align(center + horizon)
   #image("img/lecture07/screen-2026-03-20-10-25-57.png", width: 500pt)
@@ -266,10 +293,10 @@
   )[
     The basic pipeline can be improved at every step:
 
-    - *Query rewriting*: rephrase the query for better retrieval.
-    - *Hybrid search*: combine dense retrieval with keyword-based (BM25) search.
-    - *Reranking*: use a cross-encoder to re-score the top-$k$ results.
-    - *Iterative retrieval*: multiple retrieval-generation cycles.
+    - We can apply *query rewriting* to rephrase the query for better retrieval.
+    - We can use *hybrid search* -- combine dense retrieval with keyword-based search (e.g. BM25).
+    - We can *rerank* the retrieved results e.g. using a cross-encoder (heavier, but more precise).
+    - We can retrieve the documents *iteratively* (→ heading towards LLM agents).
   ][
     #set align(center + horizon)
 
@@ -281,21 +308,54 @@
 #slide[
   = RAG in practice
 
-  RAG is now a standard for building knowledge-intensive LLM applications:
-
-  #v(0.5em)
-
-  - *Customer support bots*: retrieve from internal knowledge bases.
-  - *Code assistants*: retrieve from documentation and codebase.
-  - *Legal / medical AI*: retrieve from domain-specific corpora.
-  - *Enterprise search*: "talk to your documents".
+  RAG is now a standard for building knowledge-intensive LLM applications (in combination with LLM agents):
 
 
-  Frameworks: #link("https://www.langchain.com/")[LangChain], #link("https://www.llamaindex.ai/")[LlamaIndex], #link("https://haystack.deepset.ai/")[Haystack], ...
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
+      - *Company internal knowledge*: "talk to your knowledge base".
+      - *Customer support bots* with access to the internal knowledge bases.
+      - *Code assistants* that retrieve from documentation and codebase.
+      - *Legal / medical AI*: retrieve from domain-specific corpora.
+    ],
+    [
 
-  #warnbox(title: "RAG is not a silver bullet")[
-    RAG depends heavily on retrieval quality. If the right documents are not retrieved, the LLM still hallucinates or produces wrong answers.
-  ]
+      There are now many frameworks that facilitate RAG:
+
+      #v(1em)
+
+
+      #grid(
+        columns: (1fr, 1fr),
+        gutter: 1em,
+        [
+          #link("https://github.com/deepset-ai/haystack")[#image("img/lecture07/logo_haystack.png", width: 120pt)]
+          #link("https://python.langchain.com/docs/modules/data_connection/")[#image(
+            "img/lecture07/logo_langchain.svg",
+            width: 150pt,
+          )]
+        ],
+        [
+          #link("https://docs.llamaindex.ai/en/stable/optimizing/production_rag/")[#image(
+            "img/lecture07/logo_llamaindex.svg",
+            width: 150pt,
+          )]
+          #link("https://github.com/infiniflow/ragflow")[#image("img/lecture07/logo_ragflow.svg", width: 150pt)]
+        ],
+      )
+
+      (...and #link("https://github.com/Danielskry/Awesome-RAG?tab=readme-ov-file#-frameworks-that-facilitate-rag")[many more]).
+    ],
+  )
+
+
+
+
+  // Frameworks: #link("https://www.langchain.com/")[LangChain], #link("https://www.llamaindex.ai/")[LlamaIndex], #link("https://haystack.deepset.ai/")[Haystack], ...
+
+
 ]
 
 
@@ -307,7 +367,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
 
   RAG works as long as the information can be fetched based on the user query.
@@ -337,10 +397,10 @@
     columns: (1.3fr, 1fr),
     gutter: 1em,
     [
-      - A Transformer model finetuned on a corpus containing tool calls.
+      - An LLM finetuned on a corpus containing *examples of tool calls*.
       - The corpus built in a self-supervised way:
-        - A model suggests prompt calls
-        - The good suggestions (the ones that reduce LM loss after exectuing the query) are kept.
+        - Another (few-shot prompted) LLM suggests prompt calls.
+        - The suggestions that reduce LM loss are inserted in the corpus.
       - *Tools:* QA system, Wikipedia search, calculator, calendar, MT system
     ],
     [
@@ -373,9 +433,9 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
-  There are many tools that a model can potentially call. Describing the interface of each of them can get cumbersome.
+  There are many tools that a model can potentially call → describing the interface of each of them can be cumbersome.
 
   #set align(center + horizon)
   #v(-1em)
@@ -421,10 +481,10 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
 
-  MCP describes not just the JSON format, but the entire architecture around it:
+  MCP describes not just the JSON format, but the entire tool-calling architecture:
 
   - *MCP client*: the application managing the LLM (VSCode, Claude Code, ...)
   - *MCP server*: the application that can be managed with tools (Github, database, ...)
@@ -450,7 +510,7 @@
 
   → This is currently and open issue.
 
-  Can be mitigated with #link("https://cursor.com/blog/dynamic-context-discovery#")[dynamic content discovery] or using #link("https://claude.com/skills")[Skills] (`.md` files that include description of the tool's CLI) instead.
+  Can be mitigated with #link("https://cursor.com/blog/dynamic-context-discovery#")[dynamic content discovery] or replacing MCP with #link("https://claude.com/skills")[skills] (`.md` files that include description of the tool's CLI) instead.
 
   #source-slide(
     "https://demiliani.com/2025/09/04/model-context-protocol-and-the-too-many-tools-problem/",
@@ -463,7 +523,7 @@
 #slide[
   = Enforcing output format
 
-  By default, there is no guarantee whatsoever on how the LLM output will look like.
+  There is no guarantee whatsoever on how the LLM output will look like.
 
   #grid(
     columns: (1fr, 1fr),
@@ -588,9 +648,9 @@
     columns: (1fr, 1.5fr),
     gutter: 1em,
     [
-      *Token masking*
+      How? *Token masking!*
 
-      → At each step, allow only the tokens that are valid according to our constraints.
+      → At each step, we allow *only the tokens that are valid* according to our constraints.
     ],
     [
       #set align(center + horizon)
@@ -671,7 +731,7 @@
 
 
 #slide[
-  = Intermezzo: JSON schema vs Pydantic models
+  = JSON schema vs Pydantic models
 
   #toolbox.side-by-side(gutter: 1em, columns: (1fr, 1fr))[
     *Pydantic models*
@@ -776,7 +836,7 @@
 #slide[
   = Can we go deeper?
 
-  For arbitrarily nested structures (JSON with deep nesting, HTML, code), we need *context-free grammars (CFGs)* and *pushdown automata*:
+  For arbitrarily nested structures (JSON with arbitrary nesting, HTML, code), we need *context-free grammars (CFGs)* and *pushdown automata*:
 
   #set align(center + horizon)
   #image("img/lecture07/cfg-pushdown-automaton.png", width: 600pt)
@@ -790,7 +850,6 @@
 
   Libraries for *local open models* support JSON mode, enums, regexes, CFGs, ...:
 
-  #v(0.5em)
 
   #set text(size: 17pt)
 
@@ -803,6 +862,7 @@
     [*Libraries*], [Outlines, XGrammar, Guidance, BAML], [For custom integration],
     [*Low-level*], [HF Transformers `LogitsProcessor`], [Low-level implementation],
   )
+  #v(0.5em)
 
   #set text(size: 20pt)
 
@@ -836,9 +896,11 @@
 
 
   *Main issues:*
-  + The model may perform worse if forced to output a *JSON instead of a "natural format"* (e.g., plain text, code diffs).
-  + Some libraries still do not support *separating structured content from reasoning* → reasoning may be prevented with structured outputs.
-  + *Token boundaries* do not match the FSM states based on characters (e.g., the sequence #text(fill: rgb("#FF0000"))[{"name":"] can be a single token)
+  #item-by-item()[
+    + The model may perform worse if forced to output a *JSON instead of a "natural format"* (e.g., plain text, code diffs).
+    + Some libraries still do not support *separating structured content from reasoning* → reasoning may be prevented with structured outputs.
+    + *Token boundaries* do not match the FSM states based on characters (e.g., the sequence #text(fill: rgb("#FF0000"))[{"name":"] can be a single token)
+  ]
 ]
 
 
@@ -872,11 +934,17 @@
 #slide[
   = Reasoning and acting
 
-  So far, we considered reasoning and acting to be separate processes:
+  So far, we considered reasoning and acting (=tool calling) to be separate processes:
 
   #set align(center + horizon)
 
   #image("img/lecture07/5e3d90c2-c007-4fef-a8df-176d68ae5fd6_1844x652.png", width: 700pt)
+
+
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
+    title: "Maarten Grootendorst's blog",
+  )
 ]
 
 #slide[
@@ -887,6 +955,11 @@
   → A base paradigm for what is now called "LLM agents."
 
   #image("img/lecture07/ca0a3091-bcf9-4da6-9a28-242d82f12acf_1844x652.png")
+
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
+    title: "Maarten Grootendorst's blog",
+  )
 ]
 
 
@@ -896,7 +969,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
   The agent in ReAct iterates through the *thought* → *action* → *observation* loop  until it reaches a final answer:
 
@@ -922,10 +995,10 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
 
-  To a degree, the LLM agents classical AI agent definitions.
+  To a degree, the LLM agents follow the classical AI agent definitions.
 
   They can *observe* the environment (→input), *plan* (→reasoning), and *act* (→tools):
 
@@ -942,12 +1015,9 @@
     ],
   )
 
-
   #set align(left)
 
-
 ]
-
 
 
 #slide[
@@ -964,7 +1034,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    title: "Grootendorst (2025)",
+    title: "Maarten Grootendorst's blog",
   )
 
   *Multi-agent systems*: multiple specialized agents, each with their own tools and memory, coordinated by a supervisor:
@@ -978,8 +1048,21 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture07/screen-2026-03-20-13-54-01.png")
-  #source-slide("https://openclaw.ai", title: "https://openclaw.ai")
+  #grid(
+    columns: (1.4fr, 1fr),
+    gutter: 1em,
+    [
+      #image("img/lecture07/screen-2026-03-20-13-54-01.png")
+      #source("https://openclaw.ai", title: "https://openclaw.ai")
+    ],
+    [
+      #image("img/lecture07/The-Claw-Singularity.png")
+      #source("https://a16z.com/100-gen-ai-apps-6/", title: "https://a16z.com/100-gen-ai-apps-6/")
+
+    ],
+  )
+
+
 
 ]
 
@@ -1059,5 +1142,5 @@
     )[Shinn et al. (2023): Reflexion: Language Agents with Verbal Reinforcement Learning]
   - #link(
       "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
-    )[Grootendorst (2025): A Visual Guide to LLM Agents]
+    )[Maarten Grootendorst's blog: A Visual Guide to LLM Agents]
 ]
