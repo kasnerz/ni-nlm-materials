@@ -58,7 +58,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture07/screen-2026-03-18-17-53-07.png", width: 550pt)
+  #image("img/lecture07/rag_lewis2020.png", width: 550pt)
 ]
 
 
@@ -94,8 +94,8 @@
       #v(-1em)
 
       #uncover("1-")[
-        #image("img/lecture07/8420e846-ec02-4101-a0c1-ad9ba1d4a4d7_1028x660.png", width: 250pt)]
-      #uncover("2-")[#image("img/lecture07/47304195-33bd-4637-b18e-ad7c57c8aa2c_1028x756.png", width: 250pt)]
+        #image("img/lecture07/rag_indexing.png", width: 250pt)]
+      #uncover("2-")[#image("img/lecture07/rag_querying.png", width: 250pt)]
     ],
   )
 ]
@@ -116,7 +116,7 @@
     - *Semantic chunking*: split at sentence/paragraph/section boundaries.
     - *Sliding-window with overlaps*: fixed-size chunks with some overlap to preserve context.
   ][
-    #image("img/lecture07/1_EQB2VpBvU46F_CJAKwo_tg.png")
+    #image("img/lecture07/chunking_strategies.png")
     #source(
       "https://masteringllm.medium.com/11-chunking-strategies-for-rag-simplified-visualized-df0dbec8e373",
       title: "Medium.com",
@@ -177,7 +177,7 @@
       Note there is no actual retrieval → we just *"prime" the model* to build a good representation of the query.
     ],
     [
-      #image("img/lecture07/screen-2026-03-20-10-42-36.png", width: 450pt)
+      #image("img/lecture07/embedding_prompt_comparison.png", width: 450pt)
     ],
   )
 ]
@@ -223,7 +223,7 @@
   At *query time*, we embed the user query and find the most similar chunks:
 
   #set align(center + horizon)
-  #image("img/lecture07/screen-2026-03-20-10-25-57.png", width: 500pt)
+  #image("img/lecture07/rag_retrieval_query.png", width: 500pt)
 
 
   #set align(left)
@@ -440,7 +440,7 @@
   #set align(center + horizon)
   #v(-1em)
 
-  #image("img/lecture07/4392e0ed-f13e-4f6c-9b26-7804498a94ae_1624x828.png", width: 450pt)
+  #image("img/lecture07/mcp_too_many_tools.png", width: 450pt)
 ]
 
 #slide[
@@ -598,7 +598,7 @@
 
     #v(60pt)
 
-    #align(center)[#image("img/lecture07/screen-2025-09-18-20-15-17.png", width: 100%)
+    #align(center)[#image("img/lecture07/llm_format_prompt_tweet.png", width: 100%)
       #source("https://xcancel.com/ChatGPTapp/status/1768486286527173049", title: "@ChatGPTapp")]
 
   ]
@@ -636,7 +636,7 @@
 
   Finetune a small model to generate only the output in the desired format → use it to post-process the output from the large LLM.
 
-  #align(center)[#image("img/lecture07/screen-2025-09-20-11-42-22.png", width: 400pt)]
+  #align(center)[#image("img/lecture07/structured_output_finetuning.png", width: 400pt)]
   #source-slide("https://arxiv.org/abs/2505.04016v1", title: "Wang et al. (2025)")
 ]
 
@@ -873,12 +873,12 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture07/screen-2026-03-20-13-20-19.png")
+      #image("img/lecture07/openai_structured_outputs_docs.png")
       #source("https://developers.openai.com/api/docs/guides/structured-outputs", title: "OpenAI docs")
 
     ],
     [
-      #image("img/lecture07/screen-2026-03-20-13-19-41.png")
+      #image("img/lecture07/claude_structured_outputs_docs.png")
       #source("https://platform.claude.com/docs/en/build-with-claude/structured-outputs", title: "Claude docs")
 
     ],
@@ -939,7 +939,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture07/5e3d90c2-c007-4fef-a8df-176d68ae5fd6_1844x652.png", width: 700pt)
+  #image("img/lecture07/react_separate_steps.png", width: 700pt)
 
 
   #source-slide(
@@ -955,7 +955,7 @@
 
   → A base paradigm for what is now called "LLM agents."
 
-  #image("img/lecture07/ca0a3091-bcf9-4da6-9a28-242d82f12acf_1844x652.png")
+  #image("img/lecture07/react_combined_steps.png")
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
@@ -1012,7 +1012,7 @@
       #image("img/lecture07/agent_framework.png", width: 400pt)
     ],
     [
-      #image("img/lecture07/screen-2026-03-20-13-47-19.png")
+      #image("img/lecture07/agent_definition.png")
     ],
   )
 
@@ -1026,7 +1026,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture07/screen-2026-03-20-13-52-18.png")
+  #image("img/lecture07/agent_code_assistant.png")
 ]
 
 
@@ -1053,11 +1053,11 @@
     columns: (1.4fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture07/screen-2026-03-20-13-54-01.png")
+      #image("img/lecture07/openclaw_website.png")
       #source("https://openclaw.ai", title: "https://openclaw.ai")
     ],
     [
-      #image("img/lecture07/The-Claw-Singularity.png")
+      #image("img/lecture07/claw_singularity.png")
       #source("https://a16z.com/100-gen-ai-apps-6/", title: "https://a16z.com/100-gen-ai-apps-6/")
 
     ],
@@ -1083,10 +1083,10 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture07/HB1b5DuXgAAKG63.jpeg")
+      #image("img/lecture07/openclaw_demo_1.jpeg")
     ],
     [
-      #image("img/lecture07/HB1b5DuXgAAKG63 (kopie).jpeg")
+      #image("img/lecture07/openclaw_demo_2.jpeg")
 
       #source(
         "https://x.com/JFPuget/status/2025877071939911791/photo/1",
