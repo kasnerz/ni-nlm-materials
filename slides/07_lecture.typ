@@ -390,7 +390,7 @@
 #slide[
   = Toolformer
 
-  *Toolformer* #link("https://arxiv.org/abs/2302.04761")[(Schick et al. 2023)]: a paper that introduced the idea of *LLM tool-calling*.
+  *Toolformer* #link("https://arxiv.org/abs/2302.04761")[(Schick et al. 2023)]: one of the most influential *LLM tool-calling* papers.
 
   #source-slide("https://arxiv.org/abs/2302.04761", title: "Schick et al. (2023)")
   #grid(
@@ -399,7 +399,7 @@
     [
       - An LLM finetuned on a corpus containing *examples of tool calls*.
       - The corpus built in a self-supervised way:
-        - Another (few-shot prompted) LLM suggests prompt calls.
+        - Another (few-shot prompted) LLM suggests tool calls.
         - The suggestions that reduce LM loss are inserted in the corpus.
       - *Tools:* QA system, Wikipedia search, calculator, calendar, MT system
     ],
@@ -457,19 +457,20 @@
   #set text(size: 17pt)
   *Example tool specification*
   ```json
-  tools = [{"type": "function",
-      "function": {
-          "name": "get_weather",
-          "description": "Get current weather for a city",
-          "parameters": {
-              "type": "object",
-              "properties": {
-                  "city": {"type": "string", "description": "City name"}}}}]
+  {
+    "name": "get_weather",
+    "description": "Get current weather for a city",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "city": {"type": "string", "description": "City name"}},
+      "required": ["city"]}
+  }
   ```
 
   *Example: what the model returns*
-  ```python
-  tool_calls = [{function: {name: "get_weather", arguments: '{"city": "Prague"}'}}]
+  ```json
+  {"name": "get_weather", "arguments": {"city": "Prague"}}
   ```
 
 ]
@@ -508,7 +509,7 @@
 
   #set align(left)
 
-  → This is currently and open issue.
+  → This is currently an open issue.
 
   Can be mitigated with #link("https://cursor.com/blog/dynamic-context-discovery#")[dynamic content discovery] or replacing MCP with #link("https://claude.com/skills")[skills] (`.md` files that include description of the tool's CLI) instead.
 
@@ -691,7 +692,7 @@
 
     ```python
     # positive decimal
-    r"(^[1-9][0-9]*$)
+    r"(^[1-9][0-9]*$)"
 
     # e-mail address (simple version)
     r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -799,7 +800,7 @@
     )[
       *Regular expression*
 
-      (positive decimal number)
+      (positive integer)
 
       #set text(size: 18pt)
       ```python
@@ -1111,7 +1112,7 @@
   - *Tool calling*: LLMs can use external tools (APIs, code, search). Pioneered by Toolformer, now a standard feature.
   - *MCP*: an open protocol for standardizing tool access across LLM applications.
   - *Structured outputs*: constrained decoding forces valid output formats (JSON, regex, CFG) during generation.
-  - *Agents*: LLMs wrapped with memory, tools, and planning (ReAct, Reflexion). Increasingly used in code assistants and autonomous systems.
+  - *Agents*: Reasoning LLMs equipped with tools, applying these in a loop to achieve a goal.
 ]
 
 
@@ -1137,9 +1138,6 @@
   - #link(
       "https://arxiv.org/abs/2210.03629",
     )[Yao et al. (2023): ReAct: Synergizing Reasoning and Acting in Language Models]
-  - #link(
-      "https://arxiv.org/abs/2303.11366",
-    )[Shinn et al. (2023): Reflexion: Language Agents with Verbal Reinforcement Learning]
   - #link(
       "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents",
     )[Maarten Grootendorst's blog: A Visual Guide to LLM Agents]
