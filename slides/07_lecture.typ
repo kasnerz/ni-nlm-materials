@@ -13,7 +13,7 @@
   date: "31 Mar 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 

@@ -368,10 +368,6 @@
 ]
 
 
-// ============================================================
-// SECTION 4: REASONING MODELS
-// ============================================================
-
 #section-slide(section: "Reasoning models")[Large reasoning models]
 
 
@@ -473,10 +469,6 @@
 
 ]
 
-
-
-
-
 #slide[
   = DeepSeek-R1-Zero
 
@@ -487,8 +479,6 @@
   #set align(center)
 
   #image("img/lecture06/deepseek_r1_zero_aha_moment.jpg", width: 400pt)
-
-
 ]
 
 
@@ -792,14 +782,9 @@
       #image("img/lecture06/feedback_form_qr.png", width: 300pt)
     ],
   )
-
-
 ]
 
-
-
 #section-slide(section: "Summary")[Summary]
-
 
 #slide[
   = Summary
