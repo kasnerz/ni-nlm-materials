@@ -13,12 +13,8 @@
   date: "31 Mar 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
-
-// ============================================================
-// SECTION 1: WHY EFFICIENCY MATTERS
-// ============================================================
 
 #section-slide(section: "Efficiency")[Why efficiency matters]
 
@@ -30,12 +26,10 @@
 
   #v(0.5em)
 
-  - *Training*: GPT-4 cost an estimated \$100M+ in compute.
-  - *Inference*: serving billions of queries per day requires massive GPU clusters.
-  - *Storage*: a 70B model in float32 takes $approx$ 280 GB of disk space.
-  - *Memory*: loading even a 7B model requires $approx$ 14 GB of GPU memory.
+  - *Training*: GPT-4 used an #link("https://hai.stanford.edu/ai-index/2024-ai-index-report")[estimated] \$78 million worth of compute to train.
+  - *Memory*: a 70B model in `float32` (=4 bits per parameter) requires $approx$ 280 GB of GPU memory / disk space.
+  - *Inference*: OpenAI #link("https://www.arcade.dev/blog/ai-inference-economics")[spent] \$8.67 billion on inference in the first nine months of 2025 (nearly double their revenue for the same period).
 
-  #v(0.5em)
 
   #questionbox()[Can you think of ways how to make LLMs smaller, faster, and cheaper (without sacrificing too much performance?)]
 ]
@@ -456,7 +450,7 @@
 #slide[
   = Efficient algorithms: overview
 
-  We will go over the following techniques:
+  Techniques we will cover:
 
   #set text(size: 17pt)
   #set align(center)
@@ -470,6 +464,7 @@
     ),
     [Quantization], [Reducing param. size], [--], [--], [✓✓], [✓],
     [Distillation], [Reducing \# of params], [--], [--], [✓✓], [✓✓],
+    [(Q)LoRA], [Efficient finetuning], [✓✓], [✓], [--], [--],
     [MoE], [Reducing active params], [--], [✓✓], [--], [✓],
     [Linear attention],
     [Faster attention using math tricks
@@ -480,7 +475,6 @@
     [✓],
 
     [FlashAttention], [Faster attention using HW optimizations], [✓✓], [✓], [✓], [✓✓],
-    [(Q)LoRA], [Efficient finetuning], [✓✓], [✓], [--], [--],
   )
 ]
 
@@ -725,7 +719,7 @@
 
   #infobox(
     title: "Rule of thumb",
-  )[Going from `float16` to `int4` reduces model size by $approx$ 4× with often less than 5% performance drop on standard benchmarks.]
+  )[Going from `float16` to `int4` reduces model size by $approx$ 4× with #link("https://developers.redhat.com/articles/2024/10/17/we-ran-over-half-million-evaluations-quantized-llms")[negligible performance degradation] for larger models.]
 ]
 
 
@@ -865,8 +859,10 @@
 
   → To get a *smaller, more efficient* model (→ knowledge distillation).
 
+  #show: later
+
   #warnbox("But finetuning is computationally expensive")[
-    We saw that finetuning a 7B model requires $approx$ *112 GB* of GPU memory. For comparison, a single H100 (96GB GPU) costs around \$25,000.]
+    We saw that finetuning a 7B model requires $approx$ *112 GB* of GPU memory. For reference, a single H100 (96GB GPU) costs around \$25,000.]
 
 ]
 
@@ -877,6 +873,8 @@
   #source-slide("https://arxiv.org/abs/2106.09685", title: "Hu et al. (2021)")
 
   The issue is alleviated by *LoRA* (#link("https://arxiv.org/abs/2106.09685")[Hu et al., 2021]) : low-rank adaptation method.
+
+  #show: later
 
   #v(0.25em)
 
@@ -1038,7 +1036,7 @@
   *"Experts"* = multiple feed-forward networks in each MLP layer of the Transformer.
 
   #set align(center + horizon)
-  #image("img/lecture08/moe_architecture.png", width: 450pt)
+  #image("img/lecture08/moe_architecture.png", width: 500pt)
 
 ]
 

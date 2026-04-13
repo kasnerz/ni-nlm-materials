@@ -15,7 +15,7 @@
 #let muted-color = rgb("#888888")
 
 // ===== FONTS =====
-#let font-sans = ("Fira Sans", "Liberation Sans", "Arial")
+#let font-sans = ("Fira Sans", "Liberation Sans")
 #let font-mono = ("Consolas", "Liberation Mono")
 
 // ===== LOGOS =====
