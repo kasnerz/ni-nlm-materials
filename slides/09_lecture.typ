@@ -182,14 +182,42 @@
 
 
 #slide[
-  = The idea behind probing
+  = The sentiment neuron
+
+  #source-slide("https://arxiv.org/abs/1704.01444", title: "Radford et al. (2017)")
+  #link("https://arxiv.org/abs/1704.01444")[Radford et al. (2017)] trained a recurrent neural network (LSTM) on 82 million Amazon reviews with the language modeling objective.
+
+  #v(0.5em)
+
+
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+  )[
+
+    - One specific neuron strongly tracked *positive 😃 vs. negative 😒 sentiment* of the review.
+    - Using just this single feature achieved near state-of-the-art sentiment analysis.
+
+    #v(0.5em)
+
+    → An early demonstration that language model representations may *linearly encode* interpretable concepts.
+  ][
+    #set align(center + horizon)
+
+    #image("img/lecture09/screen-2026-04-13-16-00-55.png")
+
+  ]
+]
+
+#slide[
+  = Probing
 
   #source-slide(
     "https://aclanthology.org/2024.eacl-tutorials.4/",
     title: "Transformer-specific Interpretability (ACL tutorial)",
   )
 
-  #ideabox()[Take the hidden states from a Transformer model and train a *small classifier* on top. If the classifier succeeds, the representation _encodes_ that information.]
+  #ideabox()[Take a Transformer model and train a *small classifier* on top. If the classifier succeeds, the representation _encodes_ that information.]
 
   #set align(center + horizon)
 
@@ -201,7 +229,7 @@
 ]
 
 #slide[
-  = The idea behind probing
+  = Probing
 
   #source-slide(
     "https://aclanthology.org/2024.eacl-tutorials.4/",
@@ -216,6 +244,8 @@
   #image("img/lecture09/screen-2026-04-13-11-22-19.png", width: 420pt)
 
 ]
+
+
 
 
 #slide[
@@ -251,68 +281,18 @@
 
   #warnbox(
     "Caution",
-  )[A successful probe doesn't mean the model _uses_ that information -- it only shows the information _is present_.]
+  )[Once again, probing is not a perfect explanation. A successful probe doesn't mean the model _uses_ that information, only that the information _is present_.]
 
   #v(0.5em)
 
-  - A powerful enough probe can decode almost anything, even random representations.
   - Probing tells us _what is encoded_, not _how it's used_.
-
-  #v(0.5em)
-
-  → To understand the model's actual computations, we need to prove that casual interventions have the intended effect.
+  - A powerful enough probe can decode almost anything, even random representations.
 ]
 
 
 
-#section-slide(section: "Linear representations")[Linear representations and world models]
+#section-slide(section: "World models")[World models]
 
-#slide[
-  = The sentiment neuron
-
-  #source-slide("https://arxiv.org/abs/1704.01444", title: "Radford et al. (2017)")
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    An mLSTM trained on *82 million Amazon reviews* for next-character prediction:
-
-    - No sentiment supervision -- only language modeling.
-    - One neuron emerged whose activation strongly tracked *positive vs. negative sentiment*.
-    - Using just this single feature achieved near state-of-the-art sentiment analysis.
-
-    #v(0.5em)
-
-    An early demonstration that language model representations *linearly encode* interpretable concepts.
-
-    → Precursor to the linear representation hypothesis and probing research.
-  ][
-    #set align(center + horizon)
-    // TODO: figure showing sentiment neuron activation on a review snippet
-    #todo[Figure: sentiment neuron activation trace from Radford et al. (2017).]
-  ]
-]
-
-#slide[
-  = The linear representation hypothesis
-
-  #source-slide("https://arxiv.org/abs/2311.03658", title: "Park et al. (2024)")
-
-  #ideabox()[Concepts in LLMs are often represented as *directions* (linear subspaces) in the activation space.]
-
-  #v(0.5em)
-
-  This means we can potentially:
-
-  - *Find* a concept by identifying its direction vector.
-  - *Read* whether a concept is active by projecting onto that direction.
-  - *Steer* the model by adding or subtracting the direction from the activations.
-
-  #v(0.5em)
-
-  This hypothesis has been validated for many kinds of features: sentiment, truthfulness, toxicity, spatial location, time, ...
-]
 
 
 #slide[
@@ -320,44 +300,91 @@
 
   #source-slide("https://arxiv.org/abs/2310.02207", title: "Gurnee & Tegmark (2023)")
 
+  #infobox("World model")[
+    \= an internal representation of the external world.
+  ]
+
+  #link("https://arxiv.org/abs/2310.02207")[Gurnee & Tegmark (2023)] showed that Llama 2 has  linear internal representations of:
+
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
   )[
-    Llama-2 develops linear internal representations of:
-
-    - *Geographic space*: probes can decode latitude/longitude of cities from activations -- at world, US, and NYC scales.
+    - *Geographic space*: probes can decode GPS coordinates of geographical locations (world, US, NYC) from activations.
     - *Historical time*: probes can decode the year associated with historical events.
 
-    Individual "space neurons" and "time neurons" can be identified.
+    But does the model *use* the representation?
 
-    → LLMs form something resembling *world models* through next-token prediction alone.
   ][
     #set align(center + horizon)
     #image("img/lecture09/gurnee_space_probes.png", width: 100%)
-
-    #source("https://arxiv.org/abs/2310.02207", title: "Gurnee & Tegmark (2023)")
   ]
 ]
 
 
 #slide[
-  = Othello-GPT: emergent board state
+  = Improving upon simple probing
+
+  #questionbox(
+    "Question",
+  )[How can we tell that the model not only *encodes* a concept, but also *uses* it for its predictions?]
+
+
+  *Causal intervention*: if we change the representation and the model's output changes accordingly, the representation is _causally_ involved.
+
+  #set align(center + horizon)
+
+  #v(-0.5em)
+
+  #image("/assets/screen-2026-04-13-16-27-53.png", width: 500pt)
+  #v(-0.5em)
+  #source("http://arxiv.org/abs/2202.05262", title: "Meng et al. (2022)")
+
+]
+
+
+#slide[
+  = Causal intervention
+
+  + Run the model on input $x$ and record the activations $h$.
+  + *Modify* $h$ -- e.g. replace it with the activation from a different input, add/subtract a direction, or zero it out.
+  + Feed the modified $h$ back and observe whether the output changes as predicted.
+
+  #v(0.5em)
+
+  If the output changes in the expected way → the representation is *causally* responsible.
+
+
+  #infobox(
+    title: "Terminology",
+  )[This technique goes by many names: *activation patching*, *interchange intervention*, *causal tracing*, but the idea is mostly the same.]
+]
+
+
+
+
+
+#slide[
+  = Othello-GPT: causal evidence for world models
 
   #source-slide("https://arxiv.org/abs/2210.13382", title: "Li et al. (2023)")
+  A Transformer decoder was trained on #link("https://www.youtube.com/watch?v=zFrlu3E18BA")[Othello] (\~simpler chess) move sequences.
+
+  #v(0.5em)
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
   )[
-    A GPT model was trained only on Othello move sequences (no board state).
 
-    - It learned an *internal representation of the board state*.
-    - Interventional experiments (patching activations) confirmed the representation is *causal* -- changing it changes the output.
+    - Not only that  probes were able to *decode the board state* (the model saw no board states during training)...
+    - ...but patching activations to flip a board cell *changed the model's move predictions* 🤯
 
     #v(0.5em)
 
-    A key result for the debate: does the model "just memorize" or does it learn a "world model"?
+    → Proof that the representation was causally used by the model.
+
+    There's some evidence for #link("https://arxiv.org/pdf/2403.15498")[chess], too.
   ][
     #set align(center + horizon)
     #image("img/lecture09/othello_board_state.png", width: 100%)
@@ -366,32 +393,6 @@
   ]
 ]
 
-
-#slide[
-  = Representation engineering
-
-  #source-slide("https://arxiv.org/abs/2310.01405", title: "Zou et al. (2023)")
-
-  We can also go in the other direction: *steer* the model by manipulating representations.
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    *Representation engineering* (RepE):
-    - Identify a "reading vector" for a concept (e.g. honesty, harmlessness).
-    - Add or subtract the vector from activations at inference time.
-    - This can make the model more or less honest, more or less harmful, etc.
-
-    → A top-down approach complementary to the bottom-up circuits approach.
-  ][
-    #set align(center + horizon)
-    // TODO: figure from Zou et al. (2023) showing representation engineering steering results
-    #todo[Figure: representation engineering concept from Zou et al. (2023).]
-  ]
-]
 
 
 #section-slide(section: "Superposition")[Superposition and sparse autoencoders]
