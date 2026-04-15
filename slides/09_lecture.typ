@@ -404,105 +404,77 @@
 
   Most neurons are *polysemantic*: they fire for multiple, seemingly unrelated things (for example "legal text", "DNA sequences" and "Korean characters").
 
-  → This makes it hard to interpret the network on the level of neurons.
 
-]
-
-
-#slide[
-  = The superposition hypothesis
-
-  #source-slide("https://transformer-circuits.pub/2022/toy_model/index.html", title: "Elhage et al. (2022)")
-
-  #ideabox(
-    title: "Superposition",
-  )[The model needs to represent *more features* than it has dimensions. It packs sparse features into *overlapping directions*.]
-
-  #v(0.5em)
+  #infobox(
+    title: "The superposition hypothesis",
+  )[The number of _features_ the model needs to represent $>>$ the number of _neurons_. ]
 
   #grid(
-    columns: (1.5fr, 1fr),
+    columns: (1fr, 1.3fr),
     gutter: 1em,
-  )[
-    - If a feature is only active for a small fraction of inputs (sparse), you can share a dimension with other sparse features.
-    - This creates interference -- but if features rarely co-occur, it's a good tradeoff.
-    - Analogy: compressed sensing.
-
-    #v(0.5em)
-
-    → The number of _features_ $>>$ the number of _neurons_.
-  ][
-    #set align(center + horizon)
-    // TODO: figure from toy models paper showing superposition geometry / phase transition
-    #todo[Figure: phase transition diagram from "Toy Models of Superposition" (Elhage et al., 2022).]
-  ]
+    [
+      - It works as features are rarely active simultaneously.
+      - However, it makes it hard to interpret the network on the level of neurons.
+    ],
+    [
+      #image("img/lecture09/superposition_diagram.svg", width: 320pt)
+    ],
+  )
 ]
 
-
-#slide[
-  = Toy models of superposition
-
-  #source-slide("https://transformer-circuits.pub/2022/toy_model/index.html", title: "Elhage et al. (2022)")
-
-  Elhage et al. studied this with minimal models:
-
-  - Input: sparse features (only a few active at a time).
-  - Model: a bottleneck that has _fewer_ dimensions than features.
-  - Result: the model learns to pack features into overlapping directions.
-
-  #v(0.5em)
-
-  Key findings:
-  - A *phase transition* from monosemantic to superposed representations.
-  - The geometry of superposition relates to *uniform polytopes* (mathematical structures that maximize packing efficiency).
-  - More sparsity → more superposition (more features packed in).
-]
 
 
 #slide[
   = Can we undo superposition?
 
-  The problem is clear: neurons are polysemantic because of superposition.
-
   #ideabox()[What if we could *decompose* the activations into a larger set of interpretable features?]
 
-  #v(0.5em)
-
-  This is where *sparse autoencoders* (SAEs) come in -- a dictionary learning approach:
-
-  - Take the model's activation vector $h in RR^d$.
-  - Learn an overcomplete dictionary: $hat(h) = W_"dec" dot "ReLU"(W_"enc" dot h + b)$.
-  - The hidden layer has $d' >> d$ dimensions, but the ReLU forces most to be zero → *sparse*.
-  - Each active dimension corresponds to an interpretable *feature*.
 ]
 
 
 #slide[
   = Sparse autoencoders: architecture
 
-  #set align(center)
 
-  #v(1em)
-
-  #diagram(
-    spacing: 2em,
-    node-stroke: 1pt,
-    node((0, 0), [$h in RR^d$ \ (activation)], shape: rect, fill: rgb("#fceebb"), width: 8em),
-    edge("->", label: $W_"enc"$),
-    node((0, 1), [$z in RR^(d')$ \ ReLU \ (sparse, $d' >> d$)], shape: rect, fill: rgb("#d4edda"), width: 10em),
-    edge("->", label: $W_"dec"$),
-    node((0, 2), [$hat(h) in RR^d$ \ (reconstruction)], shape: rect, fill: rgb("#d2e5f5"), width: 8em),
+  #source-slide(
+    "https://adamkarvonen.github.io/machine_learning/2024/06/11/sae-intuitions.html",
+    title: "https://adamkarvonen.github.io",
   )
 
-  #set align(left)
 
-  #v(1em)
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 3em,
+    [
+      #set align(center + horizon)
+
+      === Regular autoencoder
+      #image("img/lecture09/autoencoder.png")
+    ],
+    [
+      #set align(center + horizon)
+      #v(1em)
+
+      === Sparse autoencoder
+
+      #image("img/lecture09/SAE_diagram.png")
+    ],
+  )
+]
+
+#slide[
+  = Title
+  *Sparseautoencoders* (SAEs) -- a dictionary learning approach:
+
+  - Take the model's activation vector $h in RR^d$.
+  - Learn an overcomplete dictionary: $hat(h) = W_"dec" dot "ReLU"(W_"enc" dot h + b)$.
+  - The hidden layer has $d' >> d$ dimensions, but the ReLU forces most to be zero → *sparse*.
+  - Each active dimension corresponds to an interpretable *feature*.
 
   - *Training*: minimize reconstruction loss + sparsity penalty: $cal(L) = ||h - hat(h)||^2 + lambda ||z||_1$.
   - Most entries of $z$ are zero → the nonzero entries correspond to _active features_.
   - Each column of $W_"dec"$ is a _feature direction_ in the original space.
 ]
-
 
 #slide[
   = Monosemanticity: features from an MLP layer

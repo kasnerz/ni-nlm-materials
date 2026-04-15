@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="550.5"
+   height="283.39999"
+   viewBox="0 0 550.5 283.39999"
+   role="img"
+   version="1.1"
+   id="svg73"
+   sodipodi:docname="superposition_diagram.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview75"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.8553266"
+     inkscape:cx="179.48322"
+     inkscape:cy="182.17817"
+     inkscape:window-width="1920"
+     inkscape:window-height="1140"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg73" />
+  <title
+     id="title2">Superposition hypothesis</title>
+  <desc
+     id="desc4">Left: orthogonal representation (2 neurons, 2 features). Right: superposition (2 neurons, 5+ features packed as non-orthogonal directions).</desc>
+  <defs
+     id="defs9">
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="8"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto-start-reverse">
+      <path
+         d="M 2,1 8,5 2,9"
+         fill="none"
+         stroke="context-stroke"
+         stroke-width="1.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         id="path6" />
+    </marker>
+  </defs>
+  <style
+     id="style11">
+    text { font-family: sans-serif; fill: #1a1a1a; }
+    .label-main { font-size: 15px; font-weight: 500; }
+    .label-sub  { font-size: 12px; fill: #555; }
+    .axis-label { font-size: 11px; fill: #888; }
+    .box { fill: #f5f5f3; stroke: #b0afa8; stroke-width: 0.5; }
+  </style>
+  <!-- === LEFT PANEL === -->
+  <text
+     class="label-main"
+     x="110.25"
+     y="11.4"
+     text-anchor="middle"
+     id="text13">Without superposition</text>
+  <text
+     class="label-sub"
+     x="110.25"
+     y="29.4"
+     text-anchor="middle"
+     id="text15">n neurons → n features</text>
+  <rect
+     x="0.25"
+     y="45.400002"
+     width="220"
+     height="220"
+     rx="8"
+     class="box"
+     id="rect17" />
+  <!-- Axes -->
+  <line
+     x1="110.25"
+     y1="255.39999"
+     x2="110.25"
+     y2="51.400002"
+     stroke="#999999"
+     stroke-width="1"
+     marker-end="url(#arrow)"
+     id="line19" />
+  <line
+     x1="6.25"
+     y1="155.39999"
+     x2="214.25"
+     y2="155.39999"
+     stroke="#999999"
+     stroke-width="1"
+     marker-end="url(#arrow)"
+     id="line21" />
+  <text
+     class="axis-label"
+     x="116.25"
+     y="57.400002"
+     id="text23">neuron 2</text>
+  <text
+     class="axis-label"
+     x="182.25"
+     y="151.39999"
+     id="text25">neuron 1</text>
+  <!-- Feature A: along neuron 1 axis -->
+  <line
+     x1="110.25"
+     y1="155.39999"
+     x2="188.25"
+     y2="155.39999"
+     stroke="#1d9e75"
+     stroke-width="2.5"
+     marker-end="url(#arrow)"
+     id="line27" />
+  <text
+     class="label-sub"
+     x="188.25"
+     y="144.39999"
+     fill="#0F6E56"
+     id="text29">feature A</text>
+  <!-- Feature B: along neuron 2 axis -->
+  <line
+     x1="110.25"
+     y1="155.39999"
+     x2="110.25"
+     y2="77.400002"
+     stroke="#534ab7"
+     stroke-width="2.5"
+     marker-end="url(#arrow)"
+     id="line31" />
+  <text
+     class="label-sub"
+     x="118.25"
+     y="75.400002"
+     fill="#3C3489"
+     id="text33">feature B</text>
+  <!-- === DIVIDER === -->
+  <line
+     x1="280.25"
+     y1="35.400002"
+     x2="280.25"
+     y2="283.39999"
+     stroke="#cccccc"
+     stroke-width="0.5"
+     stroke-dasharray="4, 4"
+     id="line35" />
+  <!-- === RIGHT PANEL === -->
+  <text
+     class="label-main"
+     x="440.25"
+     y="11.4"
+     text-anchor="middle"
+     id="text37">With superposition</text>
+  <text
+     class="label-sub"
+     x="440.25"
+     y="29.4"
+     text-anchor="middle"
+     id="text39">n neurons → many more features</text>
+  <rect
+     x="330.25"
+     y="45.400002"
+     width="220"
+     height="220"
+     rx="8"
+     class="box"
+     id="rect41" />
+  <!-- Axes -->
+  <line
+     x1="440.25"
+     y1="255.39999"
+     x2="440.25"
+     y2="51.400002"
+     stroke="#999999"
+     stroke-width="1"
+     marker-end="url(#arrow)"
+     id="line43" />
+  <line
+     x1="336.25"
+     y1="155.39999"
+     x2="544.25"
+     y2="155.39999"
+     stroke="#999999"
+     stroke-width="1"
+     marker-end="url(#arrow)"
+     id="line45" />
+  <text
+     class="axis-label"
+     x="446.25"
+     y="57.400002"
+     id="text47">neuron 2</text>
+  <text
+     class="axis-label"
+     x="502.50427"
+     y="175.56912"
+     id="text49">neuron 1</text>
+  <!-- Feature 1: ~0° -->
+  <line
+     x1="440.25"
+     y1="155.39999"
+     x2="518.25"
+     y2="155.39999"
+     stroke="#1d9e75"
+     stroke-width="2"
+     marker-end="url(#arrow)"
+     id="line51" />
+  <text
+     class="label-sub"
+     x="522.25"
+     y="153.39999"
+     fill="#0F6E56"
+     id="text53">f1</text>
+  <!-- Feature 2: ~40° -->
+  <line
+     x1="440.25"
+     y1="155.39999"
+     x2="498.25"
+     y2="104.4"
+     stroke="#534ab7"
+     stroke-width="2"
+     marker-end="url(#arrow)"
+     id="line55" />
+  <text
+     class="label-sub"
+     x="502.25"
+     y="98.400002"
+     fill="#3C3489"
+     id="text57">f2</text>
+  <!-- Feature 3: ~90° -->
+  <line
+     x1="440.25"
+     y1="155.39999"
+     x2="440.25"
+     y2="80.400002"
+     stroke="#d85a30"
+     stroke-width="2"
+     marker-end="url(#arrow)"
+     id="line59" />
+  <text
+     class="label-sub"
+     x="446.25"
+     y="77.400002"
+     fill="#993C1D"
+     id="text61">f3</text>
+  <!-- Feature 4: ~140° -->
+  <line
+     x1="440.25"
+     y1="155.39999"
+     x2="380.25"
+     y2="100.4"
+     stroke="#ba7517"
+     stroke-width="2"
+     marker-end="url(#arrow)"
+     id="line63" />
+  <text
+     class="label-sub"
+     x="356.25"
+     y="95.400002"
+     fill="#854F0B"
+     id="text65">f4</text>
+  <!-- Feature 5: ~180° -->
+  <line
+     x1="440.25"
+     y1="155.39999"
+     x2="364.25"
+     y2="155.39999"
+     stroke="#993556"
+     stroke-width="2"
+     marker-end="url(#arrow)"
+     id="line67" />
+  <text
+     class="label-sub"
+     x="336.25"
+     y="153.39999"
+     fill="#72243E"
+     id="text69">f5</text>
+  <!-- Interference note -->
+  <text
+     class="label-sub"
+     x="440.25"
+     y="239.39999"
+     text-anchor="middle"
+     fill="#888"
+     id="text71">small mutual interference</text>
+</svg>
