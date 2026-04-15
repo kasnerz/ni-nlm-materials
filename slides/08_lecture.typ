@@ -10,10 +10,10 @@
   name: "NI-NLM – Lecture 8",
   subtitle: "Efficiency: quantization, distillation, low-rank adaptation, MoE.",
   author: "Zdeněk Kasner",
-  date: "31 Mar 2026",
+  date: "14 Apr 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 #section-slide(section: "Efficiency")[Why efficiency matters]
@@ -431,7 +431,7 @@
 
   In terms of resource requirements: *pre-training* $>>$ *finetuning* $>>$ *inference*.
 
-  However, we typically want to run inference on consumer hardware → it also matters.
+  However, unlike training, we typically want to run inference on consumer hardware.
 
   *Dataset size*
 
@@ -491,7 +491,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization",
-    title: "Grootendorst (2024)",
+    title: "Maarten Grootendorst's blog",
   )
 
   Model parameters are floating point numbers. How do we store them? And can we store them more efficiently?
@@ -556,7 +556,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization",
-    title: "Grootendorst (2024)",
+    title: "Maarten Grootendorst's blog",
   )
 
   Can we go beyond a 16-bit float?
@@ -576,7 +576,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization",
-    title: "Grootendorst (2024)",
+    title: "Maarten Grootendorst's blog",
   )
   #questionbox()[The range of `int8` is $(-127, 127)$, while floats have a huge dynamic range ($approx$ $10^(-38)$ to $10^(38)$).
     How do we squeeze floating-point weights into the int range?]
@@ -605,7 +605,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization",
-    title: "Grootendorst (2024)",
+    title: "Maarten Grootendorst's blog",
   )
 
   #questionbox()[
@@ -628,7 +628,7 @@
 
   #source-slide(
     "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization",
-    title: "Grootendorst (2024)",
+    title: "Maarten Grootendorst's blog",
   )
 
   Model parameters can be quantized offline, but activations change with every input.
@@ -803,8 +803,8 @@
   $ "KL"(hat(y)_T || hat(y)_S) = sum_i hat(y)_T^((i)) log(hat(y)_T^((i)) / hat(y)_S^((i))) $
 
   #infobox("Example")[
-    - *Hard label* (ground truth): [cat: $1.0$, dog: $0.0$, car: $0.0$]
-    - *Soft label* (teacher distribution): [cat: $0.7$, dog: $0.2$, car: $0.1$]
+    - Ground truth (*hard label*): [cat: $1.0$, dog: $0.0$, car: $0.0$]
+    - Teacher's distribution (*soft label*): [cat: $0.7$, dog: $0.2$, car: $0.1$]
 
     The soft label carries more signal. It tells the student that "a cat is somewhat similar to a dog, but not to a car".
   ]
@@ -852,6 +852,8 @@
   = Finetuning and when it helps
 
   #questionbox()[In which cases we may want to finetune a model on our own?]
+
+  #show: later
 
   → To get outputs in a *consistent format* without extensive prompting.
 
@@ -941,6 +943,7 @@
     $ W' = W + B A $
     → no additional latency at inference time.
   - The LoRA weights can be stored as a separate *adapter* (typically a few MB).
+  #show: later
 
   #infobox()[
     For a rank $r = 8$ and $d = 4096$: LoRA adds only $2 times 4096 times 8 = 65,536$ parameters per layer instead of $4096^2 approx 16.7M$.
@@ -1021,6 +1024,10 @@
   #infobox()[For Llama 3.1 405B, Oracle got around #link("https://docs.oracle.com/en-us/iaas/Content/generative-ai/benchmark-meta-llama-3-1-405b-instruct.htm#:~:text=to%20100%20tokens.-,The%20meta.llama-3.1-405b-instruct%20model%20hosted")[27 tokens/sec] on a specialized HW.]
 
   But perhaps the model does not need _all_ of its parameters for _each_ token?
+
+  #show: later
+
+
   #ideabox(
     title: "Idea",
   )[Let's (1) force the model to *specialize* subsets of its parameters for different tasks and (2) only *activate* the specific subset → Mixture of experts.]
@@ -1032,7 +1039,10 @@
   = Mixture of experts (MoE)
 
 
-  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-mixture-of-experts",
+    title: "Maarten Grootendorst's blog",
+  )
   *"Experts"* = multiple feed-forward networks in each MLP layer of the Transformer.
 
   #set align(center + horizon)
@@ -1043,7 +1053,10 @@
 #slide[
   = Mixture of experts (MoE)
 
-  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-mixture-of-experts",
+    title: "Maarten Grootendorst's blog",
+  )
 
   #v(3em)
 
@@ -1067,7 +1080,10 @@
 #slide[
   = Mixture of experts (MoE)
 
-  #source-slide("https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe", title: "Grootendorst (2024)")
+  #source-slide(
+    "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-mixture-of-experts",
+    title: "Maarten Grootendorst's blog",
+  )
 
   #grid(
     columns: (1fr, 1fr),
@@ -1332,8 +1348,8 @@
     )[Dettmers et al. (2023): QLoRA: Efficient Finetuning of Quantized Language Models]
   - #link("https://arxiv.org/abs/2401.04088")[Jiang et al. (2024): Mixtral of Experts]
   - #link(
-      "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-moe",
-    )[Grootendorst (2024): A Visual Guide to Mixture of Experts]
+      "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-mixture-of-experts",
+    )[Maarten Grootendorst's blog: A Visual Guide to Mixture of Experts]
   - #link("https://arxiv.org/abs/2205.14135")[Dao et al. (2022): FlashAttention]
   - #link("https://haileyschoelkopf.github.io/blog/2024/linear-attn/")[Schoelkopf (2024): Linear Attention]
   - #link("https://github.com/hiyouga/LLaMA-Factory")[LLaMA-Factory: finetuning framework]
