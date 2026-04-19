@@ -394,15 +394,54 @@
 
 
 
-#section-slide(section: "Superposition")[Sparse autoencoders]
+#section-slide(section: "Sparse autoencoders")[Sparse autoencoders]
 
+
+#slide[
+  = Can we interpret individual neurons?
+
+
+  #source-slide(
+    "https://openai.com/index/language-models-can-explain-neurons-in-language-models/",
+    title: "OpenAI blog",
+  )
+
+  OpenAI attempted describing every neuron in GPT-2 using GPT-4:
+
+  #v(0.5em)
+
+
+  #image("img/lecture09/screen-2026-04-16-09-25-18.png")
+
+  #set align(center)
+
+  #v(-0.5em)
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      #bordered-box()[#image("img/lecture09/screen-2026-04-16-09-26-53.png", width: 370pt)]
+    ],
+    [
+      #bordered-box()[#image("img/lecture09/screen-2026-04-16-09-28-10.png", width: 320pt)]
+    ],
+  )
+
+
+  #set align(left)
+  #v(0.5em)
+
+  However, it was not a great success:
+  #quote()[(...) neurons may have very complex behavior that is impossible to describe succinctly.]
+]
 
 #slide[
   = Polysemanticity
 
   #source-slide("https://transformer-circuits.pub/2022/toy_model/index.html", title: "Elhage et al. (2022)")
 
-  Most neurons are *polysemantic*: they fire for multiple, seemingly unrelated things (for example "legal text", "DNA sequences" and "Korean characters").
+  It turns out that most neurons are *polysemantic*: they fire for multiple, seemingly unrelated things (for example "legal text", "DNA sequences" and "Korean characters").
 
 
   #infobox(
@@ -425,15 +464,7 @@
 
 
 #slide[
-  = Can we undo superposition?
-
-  #ideabox()[What if we could *decompose* the activations into a larger set of interpretable features?]
-
-]
-
-
-#slide[
-  = Sparse autoencoders: architecture
+  = Sparse autoencoders (SAEs)
 
 
   #source-slide(
@@ -441,6 +472,7 @@
     title: "https://adamkarvonen.github.io",
   )
 
+  #ideabox()[Can we decompose the neural activations into a set of interpretable features?]
 
   #grid(
     columns: (1fr, 1fr),
@@ -448,149 +480,246 @@
     [
       #set align(center + horizon)
 
-      === Regular autoencoder
-      #image("img/lecture09/autoencoder.png")
+      ==== Regular autoencoder
+      #image("img/lecture09/autoencoder.png", width: 300pt)
     ],
     [
       #set align(center + horizon)
-      #v(1em)
 
-      === Sparse autoencoder
+      ==== Sparse autoencoder
 
-      #image("img/lecture09/SAE_diagram.png")
+      #image("img/lecture09/SAE_diagram.png", width: 250pt)
     ],
   )
-]
 
-#slide[
-  = Title
-  *Sparseautoencoders* (SAEs) -- a dictionary learning approach:
-
-  - Take the model's activation vector $h in RR^d$.
-  - Learn an overcomplete dictionary: $hat(h) = W_"dec" dot "ReLU"(W_"enc" dot h + b)$.
-  - The hidden layer has $d' >> d$ dimensions, but the ReLU forces most to be zero → *sparse*.
-  - Each active dimension corresponds to an interpretable *feature*.
-
-  - *Training*: minimize reconstruction loss + sparsity penalty: $cal(L) = ||h - hat(h)||^2 + lambda ||z||_1$.
-  - Most entries of $z$ are zero → the nonzero entries correspond to _active features_.
-  - Each column of $W_"dec"$ is a _feature direction_ in the original space.
-]
-
-#slide[
-  = Monosemanticity: features from an MLP layer
-
-  #source-slide("https://transformer-circuits.pub/2023/monosemanticity/index.html", title: "Bricken et al. (2023)")
-
-  Applied SAEs to an MLP layer of a small transformer (512 neurons → 4,096 features):
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    Discovered *monosemantic features*:
-
-    - A "DNA sequences" feature.
-    - A "legal language" feature.
-    - A "Hebrew text" feature.
-    - A "Python code" feature.
-    - ...and thousands more.
-
-    Each feature activates for a clear, human-understandable concept -- unlike the polysemantic neurons.
-  ][
-    #set align(center + horizon)
-    // TODO: figure from "Towards Monosemanticity" showing example features and their top-activating texts
-    #todo[Figure: monosemantic feature examples from Bricken et al. (2023).]
-  ]
 ]
 
 
+
 #slide[
-  = Scaling monosemanticity to Claude 3 Sonnet
+  = Sparse autoencoders (SAEs)
 
   #source-slide(
-    "https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html",
-    title: "Templeton et al. (2024)",
+    "https://adamkarvonen.github.io/machine_learning/2024/06/11/sae-intuitions.html",
+    title: "https://adamkarvonen.github.io",
   )
-
-  Anthropic scaled SAEs to a production model (Claude 3 Sonnet) → *millions* of features.
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    Found features for abstract concepts:
-
-    - "The inner conflict between following rules and taking forbidden actions."
-    - A "Golden Gate Bridge" feature.
-    - Features corresponding to specific people, places, ideas.
-
-    *Feature steering*: clamping a feature to a high value changes model behavior predictably.
-  ][
-    #set align(center + horizon)
-    // TODO: figure from "Scaling Monosemanticity" showing feature neighborhoods or the Golden Gate Bridge feature
-    #todo[Figure: Golden Gate Bridge feature or similar from Templeton et al. (2024). Try #link("https://www.neuronpedia.org")[Neuronpedia].]
-  ]
-]
-
-#slide[
-  = Tools for exploring features
-
-  #v(1em)
 
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
-  )[
-    === #link("https://www.neuronpedia.org")[Neuronpedia]
-    - Browse millions of SAE features across many models (GPT-2, Gemma, Llama, DeepSeek-R1, ...).
-    - Semantic search over features.
-    - Feature steering experiments.
+    [
+      - SAE is applied to the model's activation vector $h in RR^d$.
+      - A linear projection up → ReLU → a linear projection down.
+      - *Training*: minimize reconstruction loss + L1-loss to promote enforce sparsity: $cal(L) = ||h - hat(h)||^2 + lambda ||z||_1$.
+      - The goal is that each non-zero dimension corresponds to an interpretable feature.
+    ],
+    [
+      #set align(center + horizon)
 
-    === #link("https://neuroscope.io")[Neuroscope]
-    - Top-activating examples for every neuron.
-    - Useful for seeing polysemanticity.
-  ][
-    === #link("https://github.com/TransformerLensOrg/TransformerLens")[TransformerLens]
-    - Python library for mechanistic interpretability.
-    - Hooks for accessing all intermediate activations.
-    - Used in most published mech-interp research.
+      #image("img/lecture09/SAE_forward_pass.png")
+    ],
+  )
 
-    === #link("https://github.com/jbloomAus/SAELens")[SAELens]
-    - Library for training and analyzing SAEs.
-    - Integrates with TransformerLens.
-    - Pre-trained SAEs available.
-  ]
 ]
+
+#slide[
+  = Labeling the features
+  #questionbox()[How can we tell _which_ feature the dimension corresponds to?]
+
+  #source-slide(
+    "https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html",
+    title: "https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html",
+  )
+
+  We look at the inputs that maximally activate the feature → make a guess.
+
+  #set align(center + horizon)
+  #grid(
+    columns: (1fr, 1.7fr),
+    gutter: 1em,
+    [
+      #set align(left)
+
+      - We can make the guess automatically, e.g. using language models.
+      - Or we can employ human annotators.
+    ],
+    [
+      #image("img/lecture09/download.png", width: 450pt)
+    ],
+  )
+]
+
+#slide[
+  = Visualizations
+
+  From Antropic's blogpost #link("https://transformer-circuits.pub/2023/monosemantic-features/index.html")[Towards Monosemanticity]:
+  #source-slide(
+    "https://transformer-circuits.pub/2023/monosemantic-features/index.html",
+    title: "https://transformer-circuits.pub/2023/monosemantic-features/index.html",
+  )
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      #set align(center + horizon)
+
+
+      #image("img/lecture09/screen-2026-04-16-16-35-42.png", width: 280pt)
+
+      *#link("https://transformer-circuits.pub/2023/monosemantic-features/vis/a1.html")[Features and where they activate]*
+    ],
+    [
+      #set align(center + horizon)
+
+
+      #image("img/lecture09/screen-2026-04-16-16-36-27.png", width: 280pt)
+
+      *#link("https://transformer-circuits.pub/2023/monosemantic-features/vis/a1-alice.html")[Features for each token in text]*
+
+    ],
+  )
+
+
+]
+
+#slide[
+  = SAEs & casual interventions
+
+  #source-slide(
+    "https://www.anthropic.com/news/mapping-mind-language-model",
+    title: "https://www.anthropic.com/news/mapping-mind-language-model",
+  )
+
+  With SAEs, we can perform *causal interventions*: increase/decrease the strength of the feature to alter the model behavior.
+
+
+  #grid(
+    columns: (1.47fr, 1fr),
+    gutter: 1em,
+    [
+      #image("img/lecture09/4effa33dab919f9bc1779848d5c8abd5405f2275-2200x1320.png")
+    ],
+    [
+      #link("https://www.anthropic.com/news/golden-gate-claude")[#image("img/lecture09/screen-2026-04-16-09-53-27.png")]
+    ],
+  )
+]
+
+
 
 
 #section-slide(section: "Circuits")[Circuits: reverse-engineering computations]
 
+#slide[
+  = Motivation for finding circuits
+  #source-slide("http://arxiv.org/abs/2410.21272", title: "http://arxiv.org/abs/2410.21272")
+
+  #questionbox()[
+    How does an LLM *add two numbers* (e.g. for completing "456 + 789 = ")? Does it...
+    - perform the same kind of "manual" algorithm that we would apply on paper?
+    - memorize a look up table?
+    - make an educated guess?
+    - a combination of all of these?
+    - something else entirely?
+  ]
+
+  → We would like to find *specific, identifiable algorithms* that the Transformer model uses during its computations.
+
+]
 
 #slide[
-  = What is a circuit?
+  = What is a "circuit"?
 
   #source-slide("https://transformer-circuits.pub/2021/framework/index.html", title: "Elhage et al. (2021)")
 
-  #ideabox(
-    title: "Circuits",
-  )[A *circuit* is a subgraph of the model's computation that implements a specific, interpretable function.]
 
-  #v(0.5em)
 
-  The Transformer can be viewed as:
+  A *circuit* is a graph that shows how the model manipulates  with features to implement a specific, interpretable function.
 
-  - The *residual stream* is a communication bus -- information flows through it.
-  - Each attention head and MLP layer *reads from* and *writes to* the residual stream.
-  - *QK circuit*: determines _where_ to attend.
-  - *OV circuit*: determines _what_ to write.
 
-  → We can trace information flow and identify minimal subnetworks responsible for specific behaviors.
+  #set align(center + horizon)
+
+
+  #image("img/lecture09/screen-2026-04-16-13-57-50.png", width: 700pt)
+
 ]
 
+#slide[
+  = How to find circuits operating on features?
+
+  #grid(
+    columns: (1.1fr, 1fr),
+    gutter: 1em,
+    [
+      First, we use a _transcoder_ to replace neuron-wise feed-forward layers (=MLPs) with feature-wise MLPs.
+
+      → That gives us a "replacement model" that we can run instead of the original.
+
+      #infobox(
+        "Transcoder",
+      )[Unlike SAE, which only turns neurons into features, a _transcoder_ also provides an input for the next layer.]
+    ],
+    [
+      #image("img/lecture09/screen-2026-04-19-17-24-14.png")
+    ],
+  )
+  #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
+]
+
+
+#slide[
+  = How to find circuits operating on features?
+
+
+  #image("img/lecture09/screen-2026-04-19-17-28-42.png")
+]
+
+
+#slide[
+  = How to find circuits operating on features?
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      Next, we build an attribution graph:
+
+      + We *prompt* the model with a specific prompt (here: "Dallas capital?")
+      + We *map* which paths contributed to the token prediction.
+      + We *prune* the graph, keeping only the most significant features.
+      + We *group* the remaining features into "supernodes".
+
+      (Steps 3&4 mostly help visualization.)
+    ],
+    [
+      #image("img/lecture09/screen-2026-04-19-17-31-07.png")
+    ],
+  )
+  #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
+]
+
+
+#slide[
+  = Example circuit: completing a novel acronym
+
+  The model is prompted to fill the acronym of "National Digital Analytics Group":
+  #set align(center + horizon)
+
+  #image("img/lecture09/screen-2026-04-19-17-32-09.png", width: 500pt)
+]
+
+
+#slide[
+  = Validating circuits: interventions
+
+  To *validate* the circuit, we can multiply the feature's activation to make it stronger/weaker, then see if there is a causal effect:
+  #set align(center + horizon)
+
+
+  #image("img/lecture09/screen-2026-04-19-17-49-33.png", width: 350pt)
+
+  #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
+]
 
 #slide[
   = Induction heads
@@ -600,105 +729,29 @@
     title: "Olsson et al. (2022)",
   )
 
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    The most well-studied circuit: *induction heads*.
+  *Induction heads*: the key mechanism behind in-context learning.
 
-    Pattern: `[A][B] ... [A]` → predict `[B]`.
+  From the pattern `[A][B] ... [A]`, predicts `[B]`:
+  + *Previous token head*: labels token representations with _which token they were preceded by_ (→ the representation of `[B]` is now labeled by `[A]`).
+  + *Induction head*: looks for tokens _labeled by_ the current token and predicts the tokens that has that label (→ for the second `[A]`, it predicts `[B]`).
 
-    A two-head circuit:
-    + *Previous token head*: copies the token before the current one.
-    + *Induction head*: searches for previous occurrences and copies what followed.
-
-    This is a key mechanism behind *in-context learning*.
-  ][
-    #set align(center + horizon)
-    // TODO: figure showing the induction head attention pattern (A-B...A→B)
-    #todo[Figure: induction head attention pattern from Olsson et al. (2022).]
-  ]
-]
-
-
-#slide[
-  = Phase change in training
-
-  #source-slide(
-    "https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html",
-    title: "Olsson et al. (2022)",
-  )
-
-  A striking finding: induction heads form *suddenly* during training.
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1.5fr, 1fr),
-    gutter: 1em,
-  )[
-    - There is a discrete "bump" in the training loss.
-    - The bump coincides with induction head formation.
-    - After the bump, in-context learning ability jumps.
-
-    Six independent lines of evidence support this connection.
-
-    → Understanding circuits can help us understand how capabilities *emerge* during training.
-  ][
-    #set align(center + horizon)
-    // TODO: figure showing the training loss phase change bump from Olsson et al. (2022)
-    #todo[Figure: training loss "phase change" coinciding with induction head formation.]
-  ]
-]
-
-
-#slide[
-  = Circuit tracing at scale (2025)
+  #set align(center + horizon)
 
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
+  #image("img/lecture09/download (2).png", width: 550pt)
+]
+
+
+#slide[
+  = Circuit tracing at scale
+
+  #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/biology.html", title: "Anthropic (2025)")
 
   Recent Anthropic work scales circuit analysis to Claude 3.5 Haiku:
 
-  #v(0.5em)
-
-  - *Cross-layer transcoders* and *attribution graphs* replace SAEs for identifying circuits.
-  - Case studies: multi-hop reasoning, poetry planning, hallucination, refusal.
-
-  #v(0.5em)
-
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-  )[
-    #infobox(title: "Biology of a large language model")[
-      #link("https://transformer-circuits.pub/2025/biology-of-lm/index.html")[Lindsey et al. (2025)] presents the most detailed look inside a production-scale LLM to date.]
-  ][
-    #set align(center + horizon)
-    // TODO: figure showing an attribution graph from Anthropic's circuit tracing
-    #todo[Figure: attribution graph example from Anthropic (2025).]
-  ]
 ]
 
 
-#slide[
-  = Interpretability: summary
-
-  #v(0.5em)
-
-  - *Probing*: representations encode linguistic hierarchy (syntax → semantics across layers).
-  - *Linear representations*: concepts can be directions; LLMs may form world models.
-  - *Superposition*: models pack more features than neurons → polysemanticity.
-  - *SAEs*: dictionary learning can decompose activations into interpretable features.
-  - *Circuits*: specific behaviors can be traced back to small subnetworks.
-
-  #v(0.5em)
-
-  #warnbox("Open challenges")[
-    - Scaling to full models -- interpretability of the whole model, not just parts.
-    - Verifying that circuits are _complete_ (capturing all relevant computation).
-    - Moving from description to _prediction_.
-  ]
-]
 
 
 #section-slide(section: "Security")[LLM security]
