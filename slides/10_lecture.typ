@@ -337,7 +337,7 @@
 
 ]
 
-
+#section-slide(section: "Multilingual evaluation")[Evaluating multilingual models]
 
 #slide[
   = Choosing the right model
@@ -609,6 +609,8 @@
 
 ]
 
+#section-slide(section: "Machine translation")[Machine translation]
+
 
 #slide[
   = LLMs for machine translation
@@ -836,29 +838,64 @@
 #slide[
   = Vision-language tasks
 
-  What can VLMs do?
-
-  #let task-card(title, subtitle) = rect(width: 100%, radius: 0.3em, fill: white, inset: 0.4em, align(center)[
+  #let task-card(img, title, subtitle) = rect(width: 100%, radius: 0.3em, fill: white, inset: 0.2em, align(center)[
+    #image(img, height: 3.5em, fit: "contain")
     *#title* \
-    #text(size: 0.85em)[#subtitle]
+    #text(size: 0.8em)[#subtitle]
   ])
 
   #grid(
     columns: (1fr, 1fr, 1fr),
     gutter: 0.8em,
-    task-card("Visual QA", [Answer questions about images]),
-    task-card("Image captioning", [Generate text descriptions]),
-    task-card("Visual reasoning", [Multi-step inference over images]),
+    task-card("img/lecture10/task_vqa.jpg", "Visual QA", [Answer questions about images]),
+    task-card("img/lecture10/task_captioning.png", "Image captioning", [Generate text descriptions]),
+    task-card("img/lecture10/task_reasoning.jpg", "Visual reasoning", [Multi-step inference over images]),
   )
   #grid(
     columns: (1fr, 1fr, 1fr),
     gutter: 0.8em,
-    task-card("OCR / document parsing", [Read text from images]),
-    task-card("Grounding", [Localize objects by description]),
-    task-card("Image generation", [Generate images from text]),
+    task-card("img/lecture10/task_ocr.jpg", "OCR / document parsing", [Read text from images]),
+    task-card("img/lecture10/task_grounding.jpg", "Grounding", [Localize objects by description]),
+    task-card("img/lecture10/task_generation.png", "Image generation", [Generate images from text]),
   )
 ]
+#slide[
+  = Image generation
 
+  #source-slide("https://arxiv.org/abs/2408.11039", title: "https://arxiv.org/abs/2408.11039")
+
+  #grid(
+    columns: (1.2fr, 1fr),
+    gutter: 1em,
+    [
+      Early commercial LLMs called an *external image generation model* (e.g., DALL·E) when they recognized an image generation request.
+      #v(0.5em)
+
+      Current LLMs are (probably) *trained jointly* for text generation \& diffusion
+      →  better interplay between modalities.
+
+      #v(0.5em)
+
+      #set align(center + horizon)
+
+      #image("img/lecture10/screen-2026-04-20-15-45-13.png", width: 350pt)
+
+
+    ],
+    [
+      #set align(center + horizon)
+
+      #image("img/lecture10/screen-2026-04-20-15-19-30.png")
+
+      #source(
+        "https://openai.com/index/introducing-4o-image-generation/",
+        title: "OpenAI blog",
+      )
+
+    ],
+  )
+
+]
 
 // ═══════════════════════════════════════════════════════════
 // Speech & video
@@ -878,64 +915,85 @@
       *Traditional: MFCCs*
       - Extract spectral features from short audio frames.
       - Hand-engineered, lossy.
+
+      #set align(center + horizon)
+
+      #image("img/lecture10/1_bdgfd059O6WXzIg8DlbNuQ.png", width: 230pt)
+
+      #v(-0.5em)
+      #source(
+        "https://jonathan-hui.medium.com/speech-recognition-feature-extraction-mfcc-plp-5455f5a69dd9",
+        title: "Medium.com",
+      )
+
     ],
     [
-      *Modern: self-supervised models*
-      - *wav2vec 2.0*: learn representations directly from raw waveform.
-      - Pretrained on large amounts of _unlabeled_ audio.
+      *Current: Raw waveforms*
+      - Self-supervised training on unlabeled audio to build representations directly from the raw waveform.
+
+      #set align(center + horizon)
+      #v(-0.5em)
+
+      #image("img/lecture10/screen-2026-04-20-15-48-05.png", width: 200pt)
+      #source("https://arxiv.org/abs/2006.11477", title: "Baevski et al. (2020)")
     ],
   )
 
-  #source-slide("https://arxiv.org/abs/2006.11477", title: "Baevski et al. (2020)")
 
-  Just like BERT for text, we can pretrain on speech and fine-tune for downstream tasks.
 ]
 
 #slide[
   = Whisper
 
-  #source-slide("https://arxiv.org/abs/2212.04356", title: "Radford et al. (2023)")
+  #source-slide("https://openai.com/index/whisper/", title: "OpenAI blog")
 
-  An encoder-decoder Transformer for automatic speech recognition.
+  *Whisper:* An encoder-decoder Transformer for automatic speech recognition.
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+      - Trained on 680,000 hours of labeled audio from the web.
+      - Multi-task: ASR, translation, language identification, timestamps.
+      - Works well across many languages out of the box.
+      - *ÚFAL extensions*: #link("https://github.com/ufal/whisper_streaming")[WhisperStreaming] and #link("https://github.com/ufal/SimulStreaming")[SimulStreaming] → real-time processing, simultaneous translation.
+    ],
+    [
+      #image("img/lecture10/screen-2026-04-20-15-56-14.png")
+    ],
+  )
 
-  #todo("Add figure: Whisper architecture (audio spectrogram → encoder → decoder → text)")
-
-  - Trained on *680,000 hours* of labeled audio from the web.
-  - Multi-task: *ASR, translation, language identification, timestamps*.
-  - Works well across many languages out of the box.
-  - The "scaling + web data" recipe applied to speech.
 ]
 
 #slide[
-  = Plugging speech into LLMs
-
-  #ideabox()[Use the same pattern as for vision: *speech encoder → adapter → LLM*.]
-
-  #todo("Add figure: speech encoder + length adapter + LLM pipeline")
-
-  - Speech sequences are *much longer* than text → need a *length adapter* (e.g. downsampling convolutions).
-  - Enables voice assistants, spoken dialogue, audio understanding.
-  - Examples: Gemini and GPT-4o process audio natively alongside text and images.
-]
-
-#slide[
-  = Video understanding
+  = Video understanding and generation models
 
   Video adds the *temporal dimension*: a sequence of image frames.
+  #v(0.5em)
+
+
+  #source-slide("https://openai.com/index/video-generation-models-as-world-simulators/", title: "OpenAI blog")
 
   #grid(
     columns: (1.5fr, 1fr),
     gutter: 1em,
     [
-      Approaches:
-      - *Sample frames* at regular intervals and encode each with a vision encoder.
-      - Concatenate frame tokens → very long sequences.
-      - Need efficient attention mechanisms for *hour-long* videos.
+      *Input: spacetime latent patches*
+      1. We embed the video into a lower-dimensional latent space (→ for efficiency).
+      2. We flatten the representation into a series of patches (\→ similar to images, but in 3D).
 
-      Recent models: Gemini 1.5, GPT-4o, Vidi.
+      #v(0.5em)
+
+      #image("img/lecture10/figure-patches.png")
+
     ],
     [
-      #todo("Add figure: video frame sampling for VLMs")
+      *Output: video diffusion*
+
+      Given noisy video patches + text prompt, predict the original clean patches.
+
+      #v(1.5em)
+
+      #image("img/lecture10/figure-diffusion.png")
     ],
   )
 ]
@@ -945,37 +1003,14 @@
 
   #source-slide("https://video-zero-shot.github.io/", title: "Google DeepMind (2025)")
 
-  Recent video generation models (e.g. Veo 3) show surprising *emergent zero-shot capabilities*:
+  Recent video generation models (e.g. Veo 3) show surprising *emergent zero-shot capabilities* for image-related tasks (edge detection, style transfer, simulations, ...)
 
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    gutter: 0.5em,
-    [
-      - Edge detection
-      - Segmentation
-      - Depth estimation
-    ],
-    [
-      - Style transfer
-      - Object tracking
-      - Optical flow
-    ],
-    [
-      - Maze solving
-      - Physics simulation
-      - Scene understanding
-    ],
-  )
 
-  #v(0.5em)
 
-  Video models may be on a path to becoming *vision foundation models*, not just generators.
+  #image("img/lecture10/screen-2026-04-20-16-00-20.png")
 ]
 
 
-// ═══════════════════════════════════════════════════════════
-// Summary
-// ═══════════════════════════════════════════════════════════
 
 #slide[
   = Summary
@@ -991,5 +1026,29 @@
   - Vision Transformers and CLIP bridge the gap between images and text.
   - VLMs combine a vision encoder with an LLM via a projector (or cross-attention).
   - The same pattern extends to speech and video understanding.
+]
+
+
+#slide[
+  = Links and resources
+
+  #set text(size: 14pt)
+
+  - #link(
+      "https://arxiv.org/abs/1911.02116",
+    )[Conneau et al. (2020): Unsupervised cross-lingual representation learning at scale]
+  - #link(
+      "https://arxiv.org/pdf/2205.04086v1",
+    )[Malkin et al. (2022): Studying multilingual language models through transfer]
+  - #link(
+      "https://arxiv.org/pdf/2305.13707",
+    )[Ahia et al. (2023): Do all languages cost the same? Tokenization in multilingual models]
+  - #link("https://arxiv.org/abs/2010.11929")[Dosovitskiy et al. (2021): Vision Transformer]
+  - #link("https://arxiv.org/abs/2103.00020")[Radford et al. (2021): CLIP]
+  - #link(
+      "https://magazine.sebastianraschka.com/p/understanding-multimodal-llms",
+    )[Raschka: Understanding multimodal LLMs]
+  - #link("https://arxiv.org/abs/2006.11477")[Baevski et al. (2020): wav2vec 2.0]
+  - #link("https://openai.com/index/whisper/")[Whisper overview]
 ]
 

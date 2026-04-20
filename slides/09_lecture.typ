@@ -747,7 +747,12 @@
 
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/biology.html", title: "Anthropic (2025)")
 
-  Recent Anthropic work scales circuit analysis to Claude 3.5 Haiku:
+  #link("https://transformer-circuits.pub/2025/attribution-graphs/biology.html")[Recent work] from Anthropic scales circuit analysis to Claude 3.5 Haiku, finding evidence of various circuits that are used within current LLMs.
+
+
+  #set align(center + horizon)
+
+  #image("img/lecture09/screen-2026-04-20-18-09-54.png", width: 700pt)
 
 ]
 
@@ -1291,13 +1296,17 @@
   - *Sparse autoencoders (SAEs)*: decompose activations into millions of interpretable features.
   - *Circuits*: specific behaviors traced to small subnetworks (e.g. induction heads).
 
-  *Security (Part 2):*
+
+]
+#slide[
+  = Summary
+  *Security:*
 
   - *Prompt injection*: fundamental confused-deputy problem; no complete solution yet.
   - *Jailbreaking*: persona attacks, many-shot, adversarial suffixes (GCG), automated attacks (PAIR).
   - *Defenses*: red teaming, constitutional AI, input filtering -- all fragile against adaptive attackers.
-]
 
+]
 
 #slide[
   = Links and resources
