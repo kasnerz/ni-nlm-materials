@@ -13,10 +13,10 @@
   date: "21 Apr 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
-#section-slide()[Why interpretability?]
+#section-slide()[Interpretability]
 
 
 #slide[
