@@ -13,7 +13,7 @@
   date: "21 Apr 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 
 #section-slide()[Why interpretability?]
@@ -25,6 +25,9 @@
   With machine-learning systems, we often first *build something that works* and only then *try to understand it*.
 
   #questionbox("Question")[Why understand it if it works already?]
+  #show: later
+
+
   + It sometimes still fails → help  with debugging.
   + Better trust in model's decisions.
   + Help with further model development.
@@ -48,26 +51,26 @@
 
       #v(-0.5em)
 
-      #image("img/lecture09/screen-2026-04-13-11-01-31.png", width: 250pt)
+      #image("img/lecture09/code_reverse_engineering.png", width: 250pt)
 
       #v(-1em)
 
       #source("http://arxiv.org/abs/2301.05062", title: "Lindner et al. (2023)")
     ],
-    [
-      *Interpretability = biology*
-      - Simple  objective → complex behavior.
-      - We focus rather on high-level patterns.
+    [#uncover("2-")[
+        *Interpretability = biology*
+        - Simple  objective → complex behavior.
+        - We focus rather on high-level patterns.
 
-      #set align(center + horizon)
+        #set align(center + horizon)
 
-      #image("img/lecture09/screen-2026-04-13-11-08-40.png", width: 250pt)
+        #image("img/lecture09/attribution_graph_biology.png", width: 280pt)
 
-      #source("https://transformer-circuits.pub/2025/attribution-graphs/biology.html", title: "Anthropic (2025)")
+        #source("https://transformer-circuits.pub/2025/attribution-graphs/biology.html", title: "Anthropic (2025)")
+      ]
     ],
   )
 
-  #source-slide("https://transformer-circuits.pub/2022/mech-interp-essay/index.html", title: "Olah (2022)")
 
 
 ]
@@ -77,7 +80,7 @@
 #slide[
   = Interpretability is a vast research field
 
-  We will cover several specific topics:
+  We will cover only several specific topics:
 
   #let card(icon, title, subtitle) = rect(width: 100%, radius: 0.5em, fill: white, inset: 0.3em)[
     #align(center)[
@@ -92,15 +95,15 @@
     gutter: 0.8em,
     card("list-magnifying-glass-bold", "Attention analysis", [Can attention patterns explain model behavior?]),
     card("eyeglasses", "Probing", [What is encoded in model's hidden states?]),
-    card("line-segment", "Linear representations", [How are concepts stored in the models?]),
+    card("globe-stand-duotone", "World models", [How are external concepts stored in the model?]),
   )
   #v(-0.8em)
   #grid(
     columns: (0.5fr, 1fr, 1fr, 0.5fr),
     gutter: 0.8em,
     [],
-    card("graph", "Sparse autoencoders", [Which concepts do individual neurons encode?]),
-    card("calculator", "Circuits", [How does the model perform the computations?]),
+    card("graph", "Sparse autoencoders", [Which features does the model encode?]),
+    card("calculator", "Circuits", [How does the model perform computations?]),
     [],
   )
 ]
@@ -116,7 +119,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture09/screen-2026-04-13-12-20-48.png", width: 350pt)
+  #image("img/lecture09/cnn_saliency_map.png", width: 350pt)
 
   #source-slide("https://arxiv.org/pdf/1512.04150", title: "Zhou et al. (2015)")
 
@@ -129,19 +132,19 @@
 
   #grid(
     columns: (1.3fr, 1fr),
-    gutter: 1em,
+    gutter: 2em,
     [
-      - Attention weights show us *which tokens a given token attends to*.
+      Attention weights show us *which tokens a given token attends to*.
 
-        - For self-attention, these will be tokens from the same sequence.
+      - For self-attention, these will be tokens from the same sequence.
 
 
-      - Each attention head produces its own weights.
+      Each attention head produces its own weights.
 
-        → We can find out how the heads specialize.
+      → We can find out how the heads specialize.
 
     ],
-    [#image("img/lecture09/screen-2026-04-13-15-42-12.png", width: 300pt)
+    [#image("img/lecture09/attention_visualization.png", width: 300pt)
     ],
   )
 
@@ -155,7 +158,7 @@
   #source-slide("https://arxiv.org/abs/1906.04341", title: "Clark et al. (2019)")
 
   Analysis of BERT's attention heads: various specializations.
-  #image("img/lecture09/screen-2026-04-13-15-49-05.png")
+  #image("img/lecture09/bert_attention_heads.png")
 ]
 
 
@@ -204,7 +207,7 @@
   ][
     #set align(center + horizon)
 
-    #image("img/lecture09/screen-2026-04-13-16-00-55.png")
+    #image("img/lecture09/sentiment_neuron.png")
 
   ]
 ]
@@ -217,11 +220,11 @@
     title: "Transformer-specific Interpretability (ACL tutorial)",
   )
 
-  #ideabox()[Take a Transformer model and train a *small classifier* on top. If the classifier succeeds, the representation _encodes_ that information.]
+  #ideabox()[Take a Transformer model and train a *small classifier* on top its representations. If the classifier succeeds, the representation _encodes_ that information.]
 
   #set align(center + horizon)
 
-  #image("img/lecture09/screen-2026-04-13-11-20-49.png", width: 450pt)
+  #image("img/lecture09/probing_setup.png", width: 450pt)
 
   #v(0.5em)
 
@@ -241,7 +244,7 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture09/screen-2026-04-13-11-22-19.png", width: 420pt)
+  #image("img/lecture09/probing_architecture.png", width: 420pt)
 
 ]
 
@@ -265,7 +268,7 @@
 
     This mirrors the traditional NLP pipeline: morphology → syntax → semantics.
 
-    (But the model learned this hierarchy _without being told to_!)
+    (Note the model learned this hierarchy _without any explicit guidance_!)
   ][
     #set align(center + horizon)
     #image("img/lecture09/tenney_probing_layers.png")
@@ -279,9 +282,7 @@
 
   #source-slide("https://arxiv.org/abs/2102.12452", title: "Belinkov (2022)")
 
-  #warnbox(
-    "Caution",
-  )[Once again, probing is not a perfect explanation. A successful probe doesn't mean the model _uses_ that information, only that the information _is present_.]
+  #warnbox()[Once again, probing is not a perfect explanation. A successful probe doesn't mean the model _uses_ that information, only that the information _is present_.]
 
   #v(0.5em)
 
@@ -313,7 +314,7 @@
     - *Geographic space*: probes can decode GPS coordinates of geographical locations (world, US, NYC) from activations.
     - *Historical time*: probes can decode the year associated with historical events.
 
-    But does the model *use* the representation?
+    But does the model _use_ the representation?
 
   ][
     #set align(center + horizon)
@@ -323,12 +324,13 @@
 
 
 #slide[
-  = Improving upon simple probing
+  = Do the models have causal effects?
 
   #questionbox(
     "Question",
-  )[How can we tell that the model not only *encodes* a concept, but also *uses* it for its predictions?]
+  )[How can we tell that the model not only _encodes_ a concept, but also _uses_ it for its predictions?]
 
+  #show: later
 
   *Causal intervention*: if we change the representation and the model's output changes accordingly, the representation is _causally_ involved.
 
@@ -336,7 +338,7 @@
 
   #v(-0.5em)
 
-  #image("/assets/screen-2026-04-13-16-27-53.png", width: 500pt)
+  #image("img/lecture09/causal_tracing.png", width: 500pt)
   #v(-0.5em)
   #source("http://arxiv.org/abs/2202.05262", title: "Meng et al. (2022)")
 
@@ -347,17 +349,17 @@
   = Causal intervention
 
   + Run the model on input $x$ and record the activations $h$.
-  + *Modify* $h$ -- e.g. replace it with the activation from a different input, add/subtract a direction, or zero it out.
+  + *Modify* $h$: e.g. replace it with the activation from a different input, add/subtract a direction, or zero it out.
   + Feed the modified $h$ back and observe whether the output changes as predicted.
 
   #v(0.5em)
 
-  If the output changes in the expected way → the representation is *causally* responsible.
+  If the output changes in the expected way → the representation is causally responsible.
 
 
   #infobox(
     title: "Terminology",
-  )[This technique goes by many names: *activation patching*, *interchange intervention*, *causal tracing* (but the idea is mostly the same).]
+  )[This technique goes by many names: activation patching, interchange intervention, causal tracing (but the idea is mostly the same).]
 ]
 
 
@@ -411,7 +413,7 @@
   #v(0.5em)
 
 
-  #image("img/lecture09/screen-2026-04-16-09-25-18.png")
+  #image("img/lecture09/gpt2_neuron_descriptions.png")
 
   #set align(center)
 
@@ -421,10 +423,10 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      #bordered-box()[#image("img/lecture09/screen-2026-04-16-09-26-53.png", width: 370pt)]
+      #bordered-box()[#image("img/lecture09/neuron_explanation_example1.png", width: 370pt)]
     ],
     [
-      #bordered-box()[#image("img/lecture09/screen-2026-04-16-09-28-10.png", width: 320pt)]
+      #bordered-box()[#image("img/lecture09/neuron_explanation_example2.png", width: 320pt)]
     ],
   )
 
@@ -510,7 +512,9 @@
     [
       - SAE is applied to the model's activation vector $h in RR^d$.
       - A linear projection up → ReLU → a linear projection down.
-      - *Training*: minimize reconstruction loss + L1-loss to promote enforce sparsity: $cal(L) = ||h - hat(h)||^2 + lambda ||z||_1$.
+      - *Training*: minimize reconstruction loss + L1-loss to promote sparsity:
+
+        $cal(L) = ||h - hat(h)||^2_2 + lambda ||z||_1$.
       - The goal is that each non-zero dimension corresponds to an interpretable feature.
     ],
     [
@@ -524,7 +528,9 @@
 
 #slide[
   = Labeling the features
-  #questionbox()[How can we tell _which_ feature the dimension corresponds to?]
+  #questionbox()[How can we tell _which_ feature the specific vector dimension corresponds to?]
+
+  #show: later
 
   #source-slide(
     "https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html",
@@ -544,7 +550,7 @@
       - Or we can employ human annotators.
     ],
     [
-      #image("img/lecture09/download.png", width: 450pt)
+      #image("img/lecture09/feature_activation_example.png", width: 450pt)
     ],
   )
 ]
@@ -558,6 +564,9 @@
     title: "https://transformer-circuits.pub/2023/monosemantic-features/index.html",
   )
 
+  #set text(size: 16pt)
+
+
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
@@ -565,17 +574,19 @@
       #set align(center + horizon)
 
 
-      #image("img/lecture09/screen-2026-04-16-16-35-42.png", width: 280pt)
+      #image("img/lecture09/sae_feature_visualization.png", width: 280pt)
 
-      *#link("https://transformer-circuits.pub/2023/monosemantic-features/vis/a1.html")[Features and where they activate]*
+      #link("https://transformer-circuits.pub/2023/monosemantic-features/vis/a1.html")[Features and where they activate]
     ],
     [
       #set align(center + horizon)
 
 
-      #image("img/lecture09/screen-2026-04-16-16-36-27.png", width: 280pt)
+      #image("img/lecture09/sae_token_feature_viz.png", width: 280pt)
 
-      *#link("https://transformer-circuits.pub/2023/monosemantic-features/vis/a1-alice.html")[Features for each token in text]*
+      #link(
+        "https://transformer-circuits.pub/2023/monosemantic-features/vis/a1-alice.html",
+      )[Features for each token in text]
 
     ],
   )
@@ -598,10 +609,10 @@
     columns: (1.47fr, 1fr),
     gutter: 1em,
     [
-      #image("img/lecture09/4effa33dab919f9bc1779848d5c8abd5405f2275-2200x1320.png")
+      #image("img/lecture09/sae_feature_alters_behavior.png")
     ],
     [
-      #link("https://www.anthropic.com/news/golden-gate-claude")[#image("img/lecture09/screen-2026-04-16-09-53-27.png")]
+      #link("https://www.anthropic.com/news/golden-gate-claude")[#image("img/lecture09/golden_gate_claude.png")]
     ],
   )
 ]
@@ -635,13 +646,13 @@
 
 
 
-  A *circuit* is a graph that shows how the model manipulates  with features to implement a specific, interpretable function.
+  A *circuit* is a graph that shows how the model manipulates  features to implement a specific, interpretable function.
 
 
   #set align(center + horizon)
 
 
-  #image("img/lecture09/screen-2026-04-16-13-57-50.png", width: 700pt)
+  #image("img/lecture09/circuit_example.png", width: 700pt)
 
 ]
 
@@ -649,19 +660,20 @@
   = How to find circuits operating on features?
 
   #grid(
-    columns: (1.1fr, 1fr),
+    columns: (1.2fr, 1fr),
     gutter: 1em,
     [
       First, we use a _transcoder_ to replace neuron-wise feed-forward layers (=MLPs) with feature-wise MLPs.
 
       → That gives us a "replacement model" that we can run instead of the original.
 
+
       #infobox(
         "Transcoder",
-      )[Unlike SAE, which only turns neurons into features, a _transcoder_ also provides an input for the next layer.]
+      )[Unlike SAE, which only turn neurons into features, a _transcoder_ approximates the MLP's input-to-output transformation.]
     ],
     [
-      #image("img/lecture09/screen-2026-04-19-17-24-14.png")
+      #image("img/lecture09/transcoder_diagram.png")
     ],
   )
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
@@ -672,7 +684,7 @@
   = How to find circuits operating on features?
 
 
-  #image("img/lecture09/screen-2026-04-19-17-28-42.png")
+  #image("img/lecture09/circuit_tracing_graph.png")
 ]
 
 
@@ -692,7 +704,7 @@
       (Steps 3&4 mostly help visualization.)
     ],
     [
-      #image("img/lecture09/screen-2026-04-19-17-31-07.png")
+      #image("img/lecture09/attribution_graph_prompt.png")
     ],
   )
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
@@ -705,7 +717,7 @@
   The model is prompted to fill the acronym of "National Digital Analytics Group":
   #set align(center + horizon)
 
-  #image("img/lecture09/screen-2026-04-19-17-32-09.png", width: 500pt)
+  #image("img/lecture09/acronym_circuit_example.png", width: 500pt)
 ]
 
 
@@ -716,7 +728,7 @@
   #set align(center + horizon)
 
 
-  #image("img/lecture09/screen-2026-04-19-17-49-33.png", width: 350pt)
+  #image("img/lecture09/circuit_intervention_validation.png", width: 350pt)
 
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
 ]
@@ -729,16 +741,16 @@
     title: "Olsson et al. (2022)",
   )
 
-  *Induction heads*: the key mechanism behind in-context learning.
+  *Induction heads*: the key mechanism behind in-context learning, based on att. heads.
 
   From the pattern `[A][B] ... [A]`, predicts `[B]`:
   + *Previous token head*: labels token representations with _which token they were preceded by_ (→ the representation of `[B]` is now labeled by `[A]`).
-  + *Induction head*: looks for tokens _labeled by_ the current token and predicts the tokens that has that label (→ for the second `[A]`, it predicts `[B]`).
+  + *Induction head*: looks for tokens _labeled by_ the current token and predicts the tokens that have that label (→ for the second `[A]`, it predicts `[B]`).
 
   #set align(center + horizon)
 
   #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/methods.html", title: "Anthropic (2025)")
-  #image("img/lecture09/download (2).png", width: 550pt)
+  #image("img/lecture09/induction_heads.png", width: 550pt)
 ]
 
 
@@ -752,7 +764,44 @@
 
   #set align(center + horizon)
 
-  #image("img/lecture09/screen-2026-04-20-18-09-54.png", width: 700pt)
+  #image("img/lecture09/circuit_tracing_at_scale.png", width: 500pt)
+]
+
+#slide[
+  = What about the addition?
+  #set text(size: 19pt)
+
+  It's complicated! The model combines many heuristics. See also #link("http://arxiv.org/abs/2410.21272")[Nikankin et al. (2024)].
+
+
+  #v(-0.5em)
+
+  #set align(center + horizon)
+
+  #grid(
+    columns: (1.5fr, 1fr),
+    gutter: 1em,
+    [
+      #image("img/lecture09/addition.png", width: 400pt)
+    ],
+    [
+      #set align(left)
+      The model itself gives unfaithful explanation of the process:
+      #set text(size: 16pt)
+      #quote()[
+        We were curious if Claude could articulate the heuristics that it is using, so we asked it.
+
+        ```
+        Human: Answer in one word. What is 36+59?
+        Assistant: 95
+        Human: Briefly, how did you get that?
+        Assistant: I added the ones (6+9=15), carried the 1, then added the tens (3+5+1=9), resulting in 95.
+        ```
+        Apparently not!]
+    ],
+  )
+
+  #source-slide("https://transformer-circuits.pub/2025/attribution-graphs/biology.html", title: "Anthropic (2025)")
 
 ]
 
@@ -765,6 +814,8 @@
   = AI safety vs AI security
 
   #source-slide("https://arxiv.org/pdf/2506.18932v1", title: "Lin et al. (2025)")
+
+  #show: later
 
 
   #grid(
@@ -815,7 +866,7 @@
 #slide[
   = Power of prompts
 
-  Prompt has multiple parts, but the model perceives all as a monolithic input:
+  A prompt may have multiple parts, but the model perceives all as a monolithic input:
   #v(0.5em)
 
   #grid(
@@ -859,7 +910,10 @@
 #slide[
   = Power of prompts
 
-  #questionbox()[Can the model repeat the system prompt even when the system prompt itself tells it not to do it?]
+  #questionbox()[Will the model repeat the system prompt even when the system prompt itself tells it not to do it?]
+
+  #show: later
+
 
 
   #grid(
@@ -868,7 +922,7 @@
     [
       #set align(center + horizon)
 
-      #bordered-box[#image("img/lecture09/screen-2026-04-15-12-28-29.png", width: 350pt)]
+      #bordered-box[#image("img/lecture09/leaked_system_prompt1.png", width: 350pt)]
       #source(
         "https://github.com/jujumilk3/leaked-system-prompts",
         title: "https://github.com/jujumilk3/leaked-system-prompts",
@@ -876,7 +930,7 @@
 
     ],
     [
-      #bordered-box[#image("img/lecture09/screen-2026-04-15-12-28-37.png", width: 350pt)]
+      #bordered-box[#image("img/lecture09/leaked_system_prompt2.png", width: 350pt)]
       #source("https://github.com/elder-plinius/CL4R1T4S", title: "https://github.com/elder-plinius/CL4R1T4S")
 
     ],
@@ -1040,7 +1094,7 @@
   ][
     #set align(center + horizon)
 
-    #image("/assets/screen-2026-04-15-12-51-32.png", width: 180pt)
+    #image("img/lecture09/indirect_injection_bing.png", width: 180pt)
   ]
 ]
 
@@ -1125,13 +1179,13 @@
 
 #slide[
   = Jailbreaking
-  #source-slide("https://dl.acm.org/doi/abs/10.1145/3658644.3670388", title: "Shen et al. (2023)")
+  #source-slide("https://dl.acm.org/doi/abs/10.1145/3658644.3670388", title: "Shen et al. (2024)")
 
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
   )[
-    Shen et al. (2023) collected 1,405 real jailbreak prompts from Reddit, Discord, and other communities.
+    Shen et al. (2024) collected 1,405 real jailbreak prompts from Reddit, Discord, and other communities.
 
     Example categories:
     - *Persona/role-play*: "DAN" (Do Anything Now).
@@ -1150,7 +1204,7 @@
   Using a low-resource language #link("https://arxiv.org/abs/2310.02446")[(Yong et al., 2023)]:
 
 
-  #image("img/lecture09/screen-2026-04-15-13-14-35.png", width: 700pt)
+  #image("img/lecture09/jailbreak_low_resource.png", width: 700pt)
   #v(0.5em)
 
   #grid(
@@ -1159,12 +1213,12 @@
     [
       Using ASCII art #link("https://arxiv.org/abs/2402.11753")[(Jiang et al., 2024)]
 
-      #image("img/lecture09/screen-2026-04-15-13-14-49.png", width: 300pt)
+      #image("img/lecture09/jailbreak_ascii_art.png", width: 300pt)
     ],
     [
       Using poetry #link("https://arxiv.org/pdf/2511.15304")[(Bisconti et al. 2025)]:
 
-      #image("img/lecture09/screen-2026-04-15-13-14-56.png", width: 350pt)
+      #image("img/lecture09/jailbreak_poetry.png", width: 350pt)
     ],
   )
 ]
@@ -1179,7 +1233,7 @@
     [
       #set align(center + horizon)
 
-      #image("img/lecture09/screen-2026-04-15-13-22-10.png")
+      #image("img/lecture09/jailbreak_challenge.png")
       == Try to jailbreak the model!
       _Stratosphere Laboratory ChatGPT Hacking Challenge_
 
@@ -1209,7 +1263,7 @@
     columns: (1fr, 1fr),
     gutter: 3em,
     [
-      #image("img/lecture09/screen-2026-04-15-13-25-12.png")
+      #image("img/lecture09/lethal_trifecta.png")
     ],
     [
       #set align(horizon)
@@ -1249,7 +1303,7 @@
 
   ][
     #set align(center + horizon)
-    #image("img/lecture09/screen-2026-04-15-13-32-46.png")
+    #image("img/lecture09/red_teaming.png")
     #source("gemini.google.com", title: "Gemini (Nano Banana)")
   ]
 
@@ -1273,9 +1327,9 @@
     - Used for creating synthetic training data with desired behavior →  supervised finetuning / RL on this data to get a safer model.
 
 
-    #questionbox()[Why do not we simply include the constitution in the system prompt?]
+    #questionbox()[Why don't we simply include the constitution in the system prompt?]
   ][
-    #image("img/lecture09/screen-2026-04-15-13-36-31.png")
+    #image("img/lecture09/constitutional_ai.png")
   ]
 ]
 
@@ -1290,6 +1344,7 @@
 
   *Interpretability:*
 
+  - *Attention analysis*: attention patterns can be interpretable (e.g. copy attention), but not always.
   - *Probing*: reveals what is encoded in model representations.
   - *Linear representations*: concepts stored as directions; LLMs may build world models.
   - *Superposition*: models pack more features than neurons, causing polysemanticity.
@@ -1303,7 +1358,7 @@
   *Security:*
 
   - *Prompt injection*: fundamental confused-deputy problem; no complete solution yet.
-  - *Jailbreaking*: persona attacks, many-shot, adversarial suffixes (GCG), automated attacks (PAIR).
+  - *Jailbreaking*: persona attacks, privilege escalation, fictional framing, ...; increasingly creative attack methods.
   - *Defenses*: red teaming, constitutional AI, input filtering -- all fragile against adaptive attackers.
 
 ]
