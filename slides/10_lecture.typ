@@ -13,7 +13,7 @@
   date: "28 Apr 2026",
 )[]
 
-#enable-handout-mode(true)
+#enable-handout-mode(false)
 
 
 #section-slide(section: "Multilinguality")[Multilinguality
@@ -28,7 +28,7 @@
       fill: rgb("#ffffff"),
       weight: "regular",
     )[
-      re-using some #link("https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf")[#text(fill: rgb("#ffffff"))[NPFL140]] materials by Tomasz Limisiewicz and Jindřich Libovický],
+      reusing some #link("https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf")[#text(fill: rgb("#ffffff"))[NPFL140]] materials by Tomasz Limisiewicz and Jindřich Libovický],
   )
 ]
 
@@ -41,13 +41,12 @@
 
 
   #grid(
-    columns: (1.4fr, 1fr),
+    columns: (1.41fr, 1fr),
     gutter: 1em,
     [
       There are around *7,170 languages* today.
-      - Out of these, *4,153 (58%)* have a writing system.
-        - Remaining 3,011 languags are  spoken-only.
-      - 94% of people speaks 6% of languages.
+      - Out of these, only *4,153 (58%)* have a writing system.
+      - 94% of people speak 6% of languages.
       - Roughly 44% of all languages are now endangered (\<1,000 users remaining).
     ],
     [
@@ -248,15 +247,20 @@
 #slide[
   = Training multilingual LLMs
 
-  How do we handle the data imbalance?
+
+  #source-slide(
+    "https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf",
+    title: "NPFL140 - Lecture 8",
+  )
 
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
     [
       - *Naive approach*: train on all data proportionally → the model mostly learns English.
-      - *Temperature-based sampling*: oversample low-resource, undersample high-resource languages.
-      - Still a trade-off: oversampling low-resource data can hurt high-resource performance.
+      - *Sampling*: oversample low-resource, undersample high-resource languages.
+        - Still a trade-off: can hurt high-resource performance.
+        - Low-resource data are also often of lower quality.
     ],
     [
       #set align(center + horizon)
@@ -324,14 +328,14 @@
 #slide[
   = Knowledge might also be shared
 
-  However, LLMs can develop *language agnostic concepts*:
+  However, LLMs can develop *language-agnostic concepts*:
 
   #set align(center + horizon)
 
   #image("img/lecture10/language_agnostic_concepts.png", width: 600pt)
 
   #source-slide(
-    "https://transformer-circuits.pub/2025/attribution-graphs/biology.html#dives-multilingual ",
+    "https://transformer-circuits.pub/2025/attribution-graphs/biology.html#dives-multilingual",
     title: "Anthropic (2025)",
   )
 
@@ -460,8 +464,8 @@
   )
 
   #source-slide(
-    "https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf",
-    title: "NPFL140 - Lecture 8",
+    "https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/07-tokenization.pdf",
+    title: "NPFL140 - Lecture 7",
   )
 
 ]
@@ -501,7 +505,7 @@
 
       ✅ Better reflects actual language use, cultural values etc.
 
-      ⛔ Hard to compare across langauges.
+      ⛔ Hard to compare across languages.
 
       ⛔ Getting local expert annotators is difficult.
     ],
@@ -548,14 +552,14 @@
 
   #source-slide("https://arxiv.org/abs/2411.19799", title: "https://arxiv.org/abs/2411.19799")
 
-  *INCLUDE*: Authentic questions local education systems
+  *INCLUDE*: Authentic questions from local education systems.
   #grid(
     columns: (1fr, 1.3fr),
     gutter: 2em,
     [
-      - 55 countries, 44 languages, 15 scripts
+      - 55 countries, 44 languages, 15 scripts, 200k QA pairs
       - Still, major model releases prefer M-MMLU
-        - Heavily US-centric, several multilingual version
+        - Heavily US-centric
         - Multilingual versions combine human and machine translation
 
     ],
@@ -575,9 +579,9 @@
 
   #source-slide("https://arxiv.org/abs/2308.16884", title: "Bandarkar et al. (2023)")
 
-  *Belebele:* Multiple-choice questions about a text, spanning *122 languages*.
+  *Belebele:* Another multiple-choice QA benchmark, spanning *122 languages*.
 
-  Questions are naturally written by native speakers (not just translated from English).
+  Questions translated from English by native speakers → parallel data.
 
   #set align(center + horizon)
 
@@ -631,7 +635,7 @@
       #image("img/lecture10/screen-2026-04-20-13-34-22.png", width: 500pt)
       #v(-1em)
 
-      #source("https://ufal.mff.cuni.dcz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf", title: "NPFL140")
+      #source("https://ufal.mff.cuni.cz/~helcl/courses/npfl140/slides/2026/08-multilinguality.pdf", title: "NPFL140")
 
     ],
     [
@@ -662,10 +666,6 @@
 
 
 
-// ═══════════════════════════════════════════════════════════
-// PART 2: MULTIMODALITY
-// ═══════════════════════════════════════════════════════════
-
 #section-slide(section: "Multimodality")[Multimodal models]
 
 #slide[
@@ -674,6 +674,9 @@
   Modern LLMs are being extended to handle *images, audio, and video*.
 
   #questionbox()[How would you represent non-text modalities so that a language model can process them?]
+
+  #show: later
+
 
   #grid(
     columns: (1.5fr, 1fr),
@@ -871,7 +874,7 @@
       Early commercial LLMs called an *external image generation model* (e.g., DALL·E) when they recognized an image generation request.
       #v(0.5em)
 
-      Current LLMs are (probably) *trained jointly* for text generation \& diffusion
+      Some current LLMs are *trained jointly* for text generation \& diffusion
       →  better interplay between modalities.
 
       #v(0.5em)
