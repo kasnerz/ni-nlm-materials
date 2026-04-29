@@ -13,7 +13,7 @@
   date: "28 Apr 2026",
 )[]
 
-#enable-handout-mode(false)
+#enable-handout-mode(true)
 
 
 #section-slide(section: "Multilinguality")[Multilinguality
@@ -347,6 +347,9 @@
   = Choosing the right model
 
   #questionbox()[How would you pick the right model for a specific language?]
+
+  #show: later
+
 
   #grid(
     columns: (1fr, 1fr),
