@@ -8,17 +8,13 @@
 #title-slide(
   title: "NI-NLM",
   name: "NI-NLM – Lecture 11",
-  subtitle: "Understanding in LLMs, legal aspects.",
+  subtitle: "Philosophical and legal aspects of LLMs.",
   author: "Zdeněk Kasner",
   date: "05 May 2026",
 )[]
 
 #enable-handout-mode(true)
 
-
-// ============================================================
-// SECTION 1: Understanding
-// ============================================================
 
 #section-slide(section: "Understanding")[Do LLMs understand language?]
 
@@ -67,7 +63,7 @@
     gutter: 2em,
     [
       - A person sits in a room and answers requests in Chinese.
-      - The person  does not understand a word of Chinese -- they just follow a rulebook step by step.
+      - The person does not understand a word of Chinese -- they just follow a rulebook step by step.
       - From outside, the room _appears_ to understand Chinese.
 
     ],
@@ -135,17 +131,17 @@
       🐙 *The octopus test* #link("https://aclanthology.org/2020.acl-main.463.pdf")[(Bender and Koller, 2020)]
 
 
-      LLMs learn only by "tapping our telephone line", listening to our outputs without knowing the real world → they cannot give us real-world advice.
+      LLMs learn only by "tapping our telephone line", listening to our outputs without knowing the real world → they cannot give us good real-world advice.
 
     ],
   )
   #warnbox()[
-    Their specific examples are mostly defeated with current LLMs (...although we can always move the goalposts). See e.g. Yoav Goldberg's #link("https://gist.github.com/yoavg/9fc9be2f98b47c189a513573d902fb27")[critique].]
+    Their specific examples are already defeated with current LLMs (...although we can always move the goalposts). See also Yoav Goldberg's #link("https://gist.github.com/yoavg/9fc9be2f98b47c189a513573d902fb27")[critique].]
 
 ]
 
 #slide[
-  = LLMs are smarter than octopuses
+  = LLMs are already smarter than octopuses
 
   #source-slide(
     "https://docs.google.com/presentation/d/e/2PACX-1vRSPOn_gWUEb5XZ9tI9mSm_-Hou9D3dCm8huh-e1IuZnG7g0ACWRk5dWvMa18PU5W_keMduVMven2Yp/pub?start=false&loop=false&delayms=30000#slide=id.p",
@@ -199,13 +195,13 @@
       #infobox("Structural", icon: iconify(
         "ph",
         "tree-structure",
-      ))[Knowing how words and expressions are used  within the language system.]
+      ))[Knowing how words and expressions are used within the language system.]
     ],
   )
+  #v(0.5em)
 
-  Since LLMs learn distributional regularities of symbols, they have genuine *structural understanding* of language.
 
-
+  → Since LLMs learn distributional regularities of symbols, they have genuine *structural understanding* of language in this view.
 ]
 
 
@@ -220,7 +216,7 @@
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-      - By the ways of training LMs are *models of intentional agents*.
+      - By the ways of training, LMs are *models of intentional agents*.
 
       - Even without direct access to those mental states, an LM can *infer* them from text context.
 
@@ -241,22 +237,17 @@
 
   #set text(size: 22pt)
 
-  #quote()[The AI effect is a phenomenon in which advances in artificial intelligence lead to a redefinition of what is considered intelligence, such that capabilities achieved by AI systems are no longer regarded as examples of "real" intelligence.
+  Understanding in LLMs seems to be partially the victim of the "AI effect":
+
+  #quote()[The *AI effect* is a phenomenon in which advances in artificial intelligence lead to a redefinition of what is considered intelligence, such that capabilities achieved by AI systems are no longer regarded as examples of "real" intelligence.
   ]
   #source("https://en.wikipedia.org/wiki/AI_effect", title: "https://en.wikipedia.org/wiki/AI_effect")
 
 
   #set align(left)
 
-  #v(1em)
-
-  (Undestanding != intelligence, but it is partially a victim of the same effect.)
 ]
 
-
-// ============================================================
-// SECTION 2: Consciousness
-// ============================================================
 
 #section-slide(section: "Consciousness")[Are LLMs conscious?]
 
@@ -278,9 +269,7 @@
 
       - *Phenomenal consciousness (qualia)*: there is _something it is like_ to be in that state (the "hard" problem of consciousness).
 
-        → no viable way to check for that.
-
-
+        → no good way to check for that.
     ],
     [
       #set align(center + horizon)
@@ -294,45 +283,40 @@
   )
 ]
 
+#slide[
+  = Can LLMs achieve functional consciousness?
+
+
+  From the talk of #link("https://arxiv.org/pdf/2303.07103")[David Chalmers (2023):]
+  - There is no strong evidence that LLMs are conscious.
+  - Any current evidence (self-reports, they "seem" conscious, intelligence, ...) is weak.
+  - Arguments against: no embodiment, limited memory, no global workspace.
+  - However, these limitations seem mostly temporary (see also #link("https://arxiv.org/pdf/2601.17060")[Shiller et al., 2026]).
+
+  #show: later
+
+  #infobox("Biological vs. silicon substrate")[
+    If consciousness depends on having biological substrate, then LLM-based systems _cannot_ be conscious #link("https://www.nature.com/articles/s41599-024-03553-w")[(Overgaard & Kirkeby-Hinrup, 2024)]. There are some arguments for that (see e.g. #link("https://www.cambridge.org/core/journals/behavioral-and-brain-sciences/article/conscious-artificial-intelligence-and-biological-naturalism/C9912A5BE9D806012E3C8B3AF612E39A")[Seth (2025)]), but far from widely accepted.
+  ]
+
+]
+
 
 #slide[
-  = Dennett's view of consciousness
+  = Can LLMs have at least a _degree_ of consciousness?
+
+  Consciousness can have *various forms and degrees*. Some degree of consciousness #link("https://philiplow.foundation/consciousness/")[is attributed] also to mammals, birds, and other species including octopuses.
+
+  #show: later
 
   #ideabox(
-    "Dennett's implication",
-  )[If consciousness is functional and there is no sharp threshold, then asking "is the LLM conscious?" may be a *category error*. The more productive question: what functional states does it have?]
+    "David Dennett's \"Intentional Stance\" (1987)",
+  )[*Eliminativist view*: If something acts based upon intents, it needs to have a functional equivalent of consciousness. There may be nothing more to it.
 
+    → LLMs may be already partially conscious according to this definition.]
 
+  However, it can be argued that an LLM agent having an "intent" is not the same as being goal-directed by evolution in an environment, which leads to development of emotions, pain, etc.
 ]
-
-
-#slide[
-  = The AI consciousness debate
-
-  #source-slide("https://www.nature.com/articles/s41599-024-03553-w", title: "Dung & Candiotto (2024)")
-
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 1em,
-    [
-      *Arguments that LLMs might be conscious*
-      - They produce coherent reports about "inner states".
-      - Complexity and integration of representations may approach conditions associated with consciousness.
-      - No agreed-on threshold exists -- the same arguments used to deny LLM consciousness could deny consciousness in many animals.
-    ],
-    [
-      *Arguments against*
-      - No body, no sensorimotor loop -- missing key aspects of embodied consciousness.
-      - "Reporting" inner states in text ≠ having them -- a mirror doesn't experience what it reflects.
-      - Current LLMs have no persistent memory, no continuous experience.
-      - Similarity to human language does not mean similarity to human minds.
-    ],
-  )
-
-  #v(0.5em)
-  #warnbox()[This is an *open question*. The scientific and philosophical communities are far from consensus. Treat strong claims (either way) with skepticism.]
-]
-
 
 
 #section-slide(section: "Legal aspects")[Legal aspects of AI]
@@ -342,6 +326,8 @@
   = Why regulate AI?
 
   #questionbox()[Do you think we should regulate AI systems? Why?]
+  #show: later
+
 
   AI systems can cause real harm, some of which are not covered by existing laws:
 
@@ -383,36 +369,37 @@
 ]
 
 
-
 #slide[
-  = General-purpose AI (GPAI) models
+  = EU AI Act -- rules for generative AI
 
-  #source-slide(
-    "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
-    title: "European Commission",
-  )
+  #source-slide("https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689", title: "EUR-Lex")
 
-  LLMs are typically *general-purpose AI models* -- they can be integrated into many downstream systems.
 
-  The AI Act has *specific rules for GPAI providers* (in force since August 2025):
+  The most relevant parts for generative AI models are Articles 50 and 53:
 
-  - *Transparency*: publish a summary of training data.
-  - *Copyright*: comply with EU copyright law; allow rights holders to opt out.
-  - *Technical documentation*: detailed documentation for downstream deployers.
+  ==== Article 50: rules for generated content
 
-  For GPAI models with *systemic risk* (very large compute, wide deployment):
-  - Adversarial testing and red-teaming.
-  - Serious incident reporting.
-  - Cybersecurity measures.
+  - Any chatbot that a user might mistake for a human *must identify itself as AI*.
+  - Any image, audio, or video that is AI-generated *must be labeled* as such an output, including watermarking where technically feasible.
 
+  #v(-0.5em)
+
+
+  #show: later
+
+  ==== Article 53: rules for general-purpose models
+  - Providers need to *maintain and share up-to-date documentation* of the model training process and evaluation.
+  - Providers need to *respect the EU copyright law* (including respecting opt-outs from the training process).
 ]
+
+
 
 
 #slide[
   = AI Act: timeline
 
   #source-slide(
-    "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+    "https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act",
     title: "European Commission",
   )
 
@@ -421,18 +408,20 @@
 
   #grid(
     columns: (auto, 1fr),
-    gutter: (1em, 0.5em),
+    gutter: 1em,
     [*02/2025*], [Prohibitions on unacceptable-risk AI practices take effect.],
-    [*08/2025*], [Rules for *GPAI models* (including LLMs) take effect.],
-    [*08/2026*], [Rules for *high-risk AI* systems (Annex I) and transparency obligations take effect.],
-    [*08/2027*], [Rules for additional high-risk AI systems (Annex II) take effect.],
+    [*08/2025*], [Rules for general-purpose AI models (including LLMs) take effect.],
+    [*08/2026*],
+    [Most AI Act rules take effect, including transparency obligations and rules for high-risk AI systems in Annex III.],
+
+    [*08/2027*], [Rules for high-risk AI systems embedded in regulated products take effect.],
   )
 
   #v(0.5em)
 
   #infobox(
-    "What this means for LLM providers",
-  )[If you train or deploy a general-purpose AI model for use in the EU, you need to comply with GPAI rules now. Downstream systems built on top of LLMs may also fall into high-risk categories.]
+    "Digital Omnibus",
+  )[Some of the rules can be delayed if the #link("https://digital-strategy.ec.europa.eu/en/library/digital-omnibus-regulation-proposal")[Digital Omnibus] suite of laws is accepted (the discussions are currently taking place).]
 ]
 
 
@@ -443,17 +432,15 @@
   = Summary
 
   *Understanding:*
-  - The Chinese Room and Stochastic Parrots arguments claim LLMs lack real understanding.
-  - The Singleton Fallacy and LMs-as-Agent-Models papers push back: understanding is not binary, and LLMs do represent structural and intentional aspects of language.
+  - There are some arguments that claim LLMs lack understanding.
+  - However, LLMs can quite certainly possess _certain kinds_ of language understanding (namely structural).
 
   *Consciousness:*
-  - Whether LLMs are conscious is philosophically murky and practically unanswered.
-  - Dennett's functionalist view makes the question harder to answer -- and possibly less important than asking what functional states the model has.
+  - Whether LLMs are conscious is far from being answered yet.
 
   *Legal aspects:*
-  - The EU AI Act introduces the first comprehensive AI law worldwide.
-  - Risk-based: unacceptable → banned, high risk → strict rules, GPAI → transparency and documentation.
-  - GPAI rules (covering LLMs) are already in effect since August 2025.
+  - EU AI Act: first comprehensive AI regulation world-wide, risk-based approach.
+    - GPAI rules (covering LLMs) are already in effect since August 2025.
 ]
 
 
@@ -471,13 +458,17 @@
   - #link("https://arxiv.org/abs/2212.01681")[Andreas: Language Models as Agent Models (EMNLP 2022)]
 
   *Consciousness:*
-  - #link("https://www.nature.com/articles/s41599-024-03553-w")[Dung & Candiotto: AI consciousness and Dennett (2024)]
-  - #link("https://philpapers.org/archive/LERTAF.pdf")[Lerike: Towards a Framework for AI Consciousness (2021)]
+  - #link("https://arxiv.org/pdf/2303.07103")[Chalmers: Could a Large Language Model be Conscious? (2023)]
+  - #link(
+      "https://www.cambridge.org/core/journals/behavioral-and-brain-sciences/article/conscious-artificial-intelligence-and-biological-naturalism/C9912A5BE9D806012E3C8B3AF612E39A",
+    )[Seth: Conscious Artificial Intelligence and Biological Naturalism (2025)]
 
   *Legal:*
   - #link("https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32024R1689")[Full text of the EU AI Act]
   - #link(
       "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
     )[European Commission: AI Act overview]
-  - #link("https://ai-act-service-desk.ec.europa.eu/en")[AI Act Single Information Platform (FAQ)]
+  - #link(
+      "https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act",
+    )[European Commission: AI Act timeline]
 ]
