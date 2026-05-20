@@ -1,10 +1,8 @@
-// ÚFAL Polylux Theme
-// Inspired by the ÚFAL Marp theme and Touying theme
 // Built with Polylux framework
 
-#import "@preview/prequery:0.2.0"
 #import "@preview/polylux:0.4.0": *
 #import "@preview/polylux:0.4.0": slide as polylux-slide
+#import "@preview/prequery:0.2.0"
 #import "@preview/prequery:0.2.0": image as prequery-image
 
 
